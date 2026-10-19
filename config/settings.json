@@ -1,0 +1,250 @@
+{
+  "_note": "File cấu hình chính. Team Marketing có thể sửa trực tiếp trên GitHub. Mỗi lần sửa, lần chạy kế tiếp sẽ dùng giá trị mới.",
+
+  "timezone": "Asia/Ho_Chi_Minh",
+  "historyDays": 120,
+
+  "regions": {
+    "q1q2": {
+      "label": "Quận 1 & Quận 2",
+      "searchTerms": ["quận 1", "quận 2", "Thảo Điền", "Thủ Thiêm", "Bùi Viện", "Nguyễn Huệ", "District 1", "Thao Dien"],
+      "newsLocale": "vi",
+      "newsQueries": [
+        "cocktail bar quận 1",
+        "nhà hàng quận 1",
+        "Thảo Điền nhà hàng",
+        "rooftop bar quận 1",
+        "phố đi bộ Nguyễn Huệ sự kiện",
+        "Bùi Viện"
+      ]
+    },
+    "hcm": {
+      "label": "TP. Hồ Chí Minh",
+      "searchTerms": ["Sài Gòn", "Saigon", "TP.HCM", "Hồ Chí Minh", "Ho Chi Minh City"],
+      "newsLocale": "vi",
+      "newsQueries": [
+        "cocktail bar Sài Gòn",
+        "hidden bar Sài Gòn",
+        "speakeasy Sài Gòn",
+        "fine dining Sài Gòn",
+        "nhà hàng Michelin TP.HCM",
+        "nightlife Sài Gòn",
+        "Saigon bar opening"
+      ]
+    },
+    "vn": {
+      "label": "Việt Nam",
+      "searchTerms": ["Việt Nam", "Vietnam"],
+      "newsLocale": "vi",
+      "newsQueries": [
+        "xu hướng ẩm thực giới trẻ",
+        "cocktail Việt Nam",
+        "Michelin Guide Việt Nam",
+        "xu hướng nightlife",
+        "Asia's 50 Best Bars Vietnam"
+      ]
+    },
+    "sea": {
+      "label": "Đông Nam Á",
+      "searchTerms": ["Bangkok", "Singapore", "Kuala Lumpur", "Jakarta", "Manila", "Southeast Asia"],
+      "newsLocale": "en",
+      "newsQueries": [
+        "cocktail bar trend Bangkok",
+        "Singapore bar opening",
+        "Asia's 50 Best Bars",
+        "Southeast Asia dining trend",
+        "speakeasy Singapore",
+        "fun dining Asia"
+      ]
+    }
+  },
+
+  "rssFeeds": [
+    { "name": "VnExpress Du lịch", "url": "https://vnexpress.net/rss/du-lich.rss", "region": "vn" },
+    { "name": "VnExpress Giải trí", "url": "https://vnexpress.net/rss/giai-tri.rss", "region": "vn" },
+    { "name": "VnExpress International Travel", "url": "https://e.vnexpress.net/rss/travel.rss", "region": "vn" },
+    { "name": "Tuổi Trẻ Du lịch", "url": "https://tuoitre.vn/rss/du-lich.rss", "region": "vn" },
+    { "name": "Saigoneer", "url": "https://saigoneer.com/?format=feed&type=rss", "region": "hcm" }
+  ],
+
+  "autocompleteSeeds": [
+    "cocktail bar",
+    "hidden bar",
+    "speakeasy",
+    "rooftop bar",
+    "quán bar",
+    "pub",
+    "lounge",
+    "club",
+    "nhà hàng",
+    "fine dining",
+    "fun dining",
+    "omakase",
+    "nhà hàng sang trọng",
+    "nhà hàng view đẹp",
+    "chỗ hẹn hò",
+    "đi đâu tối nay",
+    "ăn tối lãng mạn",
+    "live music",
+    "happy hour",
+    "sinh nhật ở đâu"
+  ],
+  "autocompleteSuffixes": ["quận 1", "quận 2", "thảo điền", "sài gòn"],
+
+  "youtubeQueries": [
+    "cocktail bar Sài Gòn",
+    "hidden bar Sài Gòn",
+    "nhà hàng quận 1",
+    "Saigon nightlife",
+    "rooftop bar Saigon",
+    "Thảo Điền ăn gì",
+    "Bangkok cocktail bar",
+    "Singapore speakeasy"
+  ],
+
+  "apify": {
+    "_note": "Cần biến môi trường APIFY_TOKEN. Mỗi nền tảng có thể bật/tắt. 'input' hỗ trợ placeholder {{hashtags}}, {{queries}}, {{urls}}, {{limit}}. Actor bên thứ ba có thể đổi tên field, nên kiểm tra input schema trên Apify Console.",
+    "maxItemsPerPlatform": 60,
+    "timeoutSecs": 240,
+    "_budgetNote": "Gói Apify FREE có 5 USD/tháng. monthlyBudgetUsd: tự dừng crawl khi đã dùng ≥ 95% ngân sách. everyDays: chạy mỗi N ngày (ngày không chạy sẽ dùng lại dữ liệu gần nhất). maxChargeUsd: trần chi phí mỗi lượt chạy. Nâng lên gói Starter (39 USD) thì có thể để everyDays = 1.",
+    "monthlyBudgetUsd": 5,
+    "platforms": {
+      "tiktok": {
+        "enabled": true,
+        "actor": "clockworks~tiktok-scraper",
+        "everyDays": 3,
+        "maxChargeUsd": 0.2,
+        "hashtags": ["saigonnightlife", "cocktailbar", "hiddenbar", "speakeasy", "quan1", "thaodien", "rooftopbar", "reviewnhahang"],
+        "input": { "hashtags": "{{hashtags}}", "resultsPerPage": 6, "shouldDownloadVideos": false, "shouldDownloadCovers": false, "shouldDownloadSlideshowImages": false, "shouldDownloadAvatars": false }
+      },
+      "instagram": {
+        "enabled": true,
+        "actor": "apify~instagram-hashtag-scraper",
+        "everyDays": 3,
+        "maxChargeUsd": 0.12,
+        "hashtags": ["saigonbar", "saigoncocktail", "saigonnightlife", "speakeasysaigon", "saigonfoodie", "bangkokbar"],
+        "input": { "hashtags": "{{hashtags}}", "resultsLimit": 6, "resultsType": "posts" }
+      },
+      "facebook": {
+        "enabled": true,
+        "actor": "apify~facebook-posts-scraper",
+        "_note": "Facebook không cho tìm theo hashtag ổn định. Liệt kê các Page/Group công khai cần theo dõi (báo, review food, đối thủ).",
+        "urls": [
+          "https://www.facebook.com/saigoneer",
+          "https://www.facebook.com/timeoutvietnam"
+        ],
+        "everyDays": 7,
+        "maxChargeUsd": 0.12,
+        "input": { "startUrls": "{{urls}}", "resultsLimit": 10 }
+      },
+      "threads": {
+        "enabled": true,
+        "actor": "themineworks~threads-scraper",
+        "runEach": "queries",
+        "everyDays": 7,
+        "maxChargeUsd": 0.5,
+        "_runEachNote": "Actor này nhận 1 từ khoá/lượt nên chạy lần lượt từng query ({{query}}). Chi phí ~0,002 USD/bài.",
+        "queries": ["quán bar sài gòn", "cocktail sài gòn", "hidden bar sài gòn", "quán bar quận 1", "nhà hàng thảo điền", "đi bar"],
+        "input": { "mode": "search", "searchQuery": "{{query}}", "maxPosts": "{{limit}}", "resultType": "recent", "includeReplies": false }
+      },
+      "googlemaps": {
+        "enabled": true,
+        "kind": "venue",
+        "actor": "compass~crawler-google-places",
+        "_note": "Theo dõi địa điểm trên Google Maps: số review tăng nhanh = đang hot. Thêm tên đối thủ vào queries để theo dõi trực tiếp.",
+        "everyDays": 7,
+        "maxChargeUsd": 0.3,
+        "queries": ["cocktail bar quận 1", "speakeasy quận 1", "rooftop bar quận 1", "fine dining quận 1", "cocktail bar thảo điền", "nhà hàng thảo điền"],
+        "input": { "searchStringsArray": "{{queries}}", "locationQuery": "Ho Chi Minh City, Vietnam", "maxCrawledPlacesPerSearch": 10, "language": "vi", "maxReviews": 0, "skipClosedPlaces": true, "scrapePlaceDetailPage": false }
+      },
+      "tripadvisor": {
+        "enabled": true,
+        "kind": "venue",
+        "actor": "maxcopell~tripadvisor",
+        "_note": "Tripadvisor chặn crawl trực tiếp nên phải đi qua Apify. Khách quốc tế/expat dùng nhiều, rất quan trọng với Q1/Q2.",
+        "urls": [
+          "https://www.tripadvisor.com/Restaurants-g293925-Ho_Chi_Minh_City.html",
+          "https://www.tripadvisor.com/Attractions-g293925-Activities-c20-Ho_Chi_Minh_City.html"
+        ],
+        "everyDays": 14,
+        "maxChargeUsd": 0.25,
+        "input": { "startUrls": "{{urls}}", "maxItemsPerQuery": 25, "language": "en", "currency": "VND", "includeTags": true, "maxPhotosPerPlace": 0 }
+      }
+    }
+  },
+
+  "venues": {
+    "_note": "Nền tảng đặt bàn/review lấy trực tiếp, không tốn phí. PasGo là nền tảng đặt bàn phổ biến nhất tại VN.",
+    "pasgo": {
+      "enabled": true,
+      "pages": [
+        "https://pasgo.vn/ho-chi-minh",
+        "https://pasgo.vn/ho-chi-minh/diem-den-moi-nhat",
+        "https://pasgo.vn/ho-chi-minh/giam-gia-nhieu-nhat",
+        "https://pasgo.vn/ho-chi-minh/nha-hang-uy-tin"
+      ]
+    }
+  },
+
+  "brand": {
+    "_note": "Điền tên thương hiệu của mình và đối thủ để tool cảnh báo khi được nhắc đến hoặc khi đối thủ đang hot.",
+    "names": [],
+    "competitors": []
+  },
+
+  "marketingCalendar": {
+    "_note": "MM-DD = lặp lại hằng năm; YYYY-MM-DD = ngày cụ thể. leadDays = số ngày cần chuẩn bị trước.",
+    "events": [
+      { "date": "01-01", "name": "Tết Dương lịch", "leadDays": 21 },
+      { "date": "02-14", "name": "Valentine", "leadDays": 21 },
+      { "date": "03-08", "name": "Quốc tế Phụ nữ 8/3", "leadDays": 14 },
+      { "date": "04-30", "name": "Lễ 30/4 – 1/5 (nghỉ dài)", "leadDays": 21 },
+      { "date": "05-13", "name": "World Cocktail Day", "leadDays": 14 },
+      { "date": "06-01", "name": "Mùa công bố Michelin Guide Việt Nam (khoảng tháng 6)", "leadDays": 14 },
+      { "date": "09-02", "name": "Quốc khánh 2/9 (nghỉ lễ)", "leadDays": 14 },
+      { "date": "10-20", "name": "Phụ nữ Việt Nam 20/10", "leadDays": 14 },
+      { "date": "10-31", "name": "Halloween", "leadDays": 21 },
+      { "date": "11-20", "name": "Nhà giáo Việt Nam 20/11", "leadDays": 10 },
+      { "date": "2026-11-27", "name": "Black Friday", "leadDays": 14 },
+      { "date": "12-24", "name": "Giáng sinh / Noel", "leadDays": 30 },
+      { "date": "12-31", "name": "Countdown – Đêm giao thừa Dương lịch", "leadDays": 30 },
+      { "date": "2027-02-06", "name": "Tết Nguyên Đán 2027 (mùng 1)", "leadDays": 45 },
+      { "date": "2027-02-14", "name": "Valentine trùng dịp Tết", "leadDays": 21 },
+      { "date": "2027-09-15", "name": "Trung thu 2027", "leadDays": 21 }
+    ]
+  },
+
+  "ai": {
+    "_note": "provider: auto | anthropic | openai | gemini | none. 'auto' = dùng provider nào có API key (ưu tiên anthropic → openai → gemini). Có thể ghi đè bằng biến AI_PROVIDER / AI_MODEL.",
+    "provider": "auto",
+    "models": {
+      "anthropic": "claude-opus-5-5",
+      "openai": "gpt-5-mini",
+      "gemini": "gemini-3.5-flash"
+    }
+  },
+
+  "weather": {
+    "location": { "name": "TP.HCM (Quận 1)", "latitude": 10.7769, "longitude": 106.7009 },
+    "pastDays": 7,
+    "forecastDays": 7
+  },
+
+  "themes": [
+    { "id": "speakeasy", "label": "Hidden bar & Speakeasy", "terms": ["hidden bar", "speakeasy", "bar ẩn", "quán bar bí mật", "secret bar", "bar ẩn mình", "cửa bí mật"] },
+    { "id": "rooftop", "label": "Rooftop & View đẹp", "terms": ["rooftop", "sân thượng", "view sông", "view thành phố", "skybar", "sky bar", "view đẹp", "riverside"] },
+    { "id": "cocktail", "label": "Cocktail sáng tạo & Signature", "terms": ["cocktail", "signature", "mixology", "bartender", "mocktail", "highball", "negroni", "martini", "gin", "whisky", "whiskey", "rượu vang", "wine", "sake", "rum"] },
+    { "id": "finedining", "label": "Fine / Fun dining & Omakase", "terms": ["fine dining", "fun dining", "omakase", "tasting menu", "chef's table", "michelin", "degustation", "set menu", "nhà hàng sang trọng"] },
+    { "id": "party", "label": "Party, Club, Live music & DJ", "terms": ["club", "dj", "live music", "nhạc sống", "acoustic", "jazz", "party", "lounge", "bữa tiệc", "quẩy", "nightlife", "pub"] },
+    { "id": "dating", "label": "Hẹn hò & Dịp đặc biệt", "terms": ["hẹn hò", "lãng mạn", "date night", "kỷ niệm", "sinh nhật", "cầu hôn", "romantic", "anniversary", "tỏ tình"] },
+    { "id": "deal", "label": "Ưu đãi & Happy hour", "terms": ["happy hour", "ưu đãi", "khuyến mãi", "giảm giá", "free flow", "buffet", "combo", "1 tặng 1", "voucher", "ladies night"] },
+    { "id": "season", "label": "Lễ hội & Mùa vụ", "terms": ["halloween", "giáng sinh", "noel", "christmas", "tết", "năm mới", "countdown", "valentine", "trung thu", "20/10", "8/3", "lễ hội", "festival"] },
+    { "id": "local", "label": "Bản địa & Ẩm thực Việt twist", "terms": ["ẩm thực việt", "món việt", "nguyên liệu bản địa", "đặc sản", "vietnamese cuisine", "cocktail việt", "rượu việt", "rượu cần", "rượu mơ"] },
+    { "id": "wellness", "label": "Low/No alcohol & Healthy", "terms": ["mocktail", "không cồn", "low alcohol", "no alcohol", "healthy", "kombucha", "sober"] }
+  ],
+
+  "_excludeNote": "Regex (không phân biệt hoa thường). Truy vấn/keyword khớp sẽ bị loại khỏi phân tích.",
+  "excludePatterns": ["pubmed", "pubg", "club de nuit", "pub quiz", "chair", "nước hoa", "perfume", "\\bmp3\\b", "lyrics", "karaoke beat"],
+
+  "stopwords": ["và", "của", "cho", "các", "những", "với", "là", "có", "được", "một", "này", "đó", "tại", "ở", "từ", "khi", "the", "a", "an", "of", "in", "on", "for", "to", "and", "at", "is", "with", "by", "fyp", "foryou", "foryoupage", "xuhuong", "trending", "viral", "tiktok", "reels", "explore"]
+}

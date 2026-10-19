@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LLG Trend Radar</title>
+  <meta name="description" content="Tổng hợp trending F&B & nightlife Q1, Q2, HCM, Việt Nam, Đông Nam Á cho team Marketing" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%23111'/><circle cx='16' cy='16' r='8.5' fill='none' stroke='%23c6f04e' stroke-width='3.5' stroke-dasharray='40 14' stroke-linecap='round'/></svg>" />
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></symbol>
+      <symbol id="i-radar" viewBox="0 0 24 24"><path d="M12 3.5 19.5 9l-2.8 9h-9.4L4.5 9z"/><path d="M12 8.5 15 11l-1.2 3.6h-3.6L9 11z"/></symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 4 8.5 4.5L12 13 3.5 8.5z"/><path d="m3.5 12.5 8.5 4.5 8.5-4.5"/><path d="m3.5 16.5 8.5 4.5 8.5-4.5"/></symbol>
+      <symbol id="i-hash" viewBox="0 0 24 24"><path d="M9.5 4 8 20M16 4l-1.5 16M4.5 9h16M3.5 15h16"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 17.5a4 4 0 0 1-.4-8 5.5 5.5 0 0 1 10.6 1.3A3.4 3.4 0 0 1 17 17.5z"/><path d="m9 20 .8-1.5M13 20l.8-1.5"/></symbol>
+      <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.5h6M10 20.5h4M12 3.5a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V17h5.2v-.7c0-.8.4-1.5 1-2A6 6 0 0 0 12 3.5z"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.2"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 19.5h14"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="shell">
+    <aside class="sidebar" aria-label="Điều hướng">
+      <a class="logo-ring" href="#s-summary" title="LLG Trend Radar" aria-label="Về đầu trang"></a>
+      <nav class="side-nav" id="side-nav">
+        <a href="#s-summary" title="Tổng quan" class="on"><svg><use href="#i-home"/></svg><span>Tổng quan</span></a>
+        <a href="#s-actions" title="Action đề xuất"><svg><use href="#i-bolt"/></svg><span>Action</span></a>
+        <a href="#s-keywords" title="Top 10 keyword"><svg><use href="#i-search"/></svg><span>Keyword</span></a>
+        <a href="#s-trends" title="Xu hướng chính"><svg><use href="#i-radar"/></svg><span>Xu hướng</span></a>
+        <a href="#s-ptrends" title="Xu hướng từng nền tảng"><svg><use href="#i-layers"/></svg><span>Nền tảng</span></a>
+        <a href="#s-hashtags" title="Hashtag"><svg><use href="#i-hash"/></svg><span>Hashtag</span></a>
+        <a href="#s-platforms" title="Nội dung top"><svg><use href="#i-grid"/></svg><span>Nội dung</span></a>
+        <a href="#s-weather" title="Thời tiết"><svg><use href="#i-cloud"/></svg><span>Thời tiết</span></a>
+        <a href="#s-ideas" title="Ý tưởng content"><svg><use href="#i-bulb"/></svg><span>Ý tưởng</span></a>
+      </nav>
+      <div class="side-bottom">
+        <a href="#status-card" title="Nguồn dữ liệu & phương pháp"><svg><use href="#i-info"/></svg></a>
+        <button id="theme" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện"><svg><use href="#i-moon"/></svg></button>
+      </div>
+    </aside>
+
+    <div class="frame">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div>
+            <h1>Trend Radar</h1>
+            <p class="muted small" id="updated">Đang tải dữ liệu…</p>
+          </div>
+          <div class="seg" role="tablist" aria-label="Kỳ phân tích" id="period">
+            <button data-v="day" class="on">Ngày</button>
+            <button data-v="week">Tuần</button>
+            <button data-v="month">Tháng</button>
+          </div>
+        </div>
+        <div class="chips" id="regions" aria-label="Khu vực"></div>
+      </header>
+
+      <main>
+        <section id="s-summary">
+          <div class="kpis" id="kpis"></div>
+          <div class="card ai-card" id="ai-summary"></div>
+        </section>
+
+        <section id="s-actions">
+          <div class="sec-head">
+            <h2>Action đề xuất cho team Marketing</h2>
+            <div class="seg small-seg" id="action-src"><button data-v="all" class="on">Tất cả</button><button data-v="ai">AI</button><button data-v="rule">Tự động</button></div>
+          </div>
+          <div class="events" id="events"></div>
+          <div class="actions" id="actions"></div>
+        </section>
+
+        <section id="s-keywords">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">
+                <h2>Top 10 keyword</h2>
+                <button class="btn pill" id="csv"><svg><use href="#i-download"/></svg>CSV</button>
+              </div>
+              <p class="muted small">Từ truy vấn Google thật, Google Trends, hashtag và cụm từ trên TikTok, Instagram, Facebook, Threads, YouTube, báo chí. Trọng số theo độ tiếp cận. Bấm vào keyword để xem chi tiết.</p>
+              <ol class="kw-list" id="kw-list"></ol>
+            </div>
+            <div class="stack">
+              <div class="card">
+                <h2>Diễn biến keyword</h2>
+                <div class="chart-box"><canvas id="kw-chart"></canvas></div>
+                <p class="muted small" id="kw-chart-note"></p>
+              </div>
+              <div class="card">
+                <h2>Keyword theo nền tảng</h2>
+                <div id="kw-platform"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="s-trends">
+          <div class="sec-head"><h2>Xu hướng chính</h2></div>
+          <div id="ai-trends" class="trend-grid"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-head">
+                <h2>Bản đồ chủ đề</h2>
+                <div class="legend"><span class="lg lime"></span>Kỳ này <span id="theme-legend-prev"><span class="lg line"></span>Kỳ trước</span></div>
+              </div>
+              <div class="chart-box radar"><canvas id="theme-radar"></canvas></div>
+            </div>
+            <div class="card">
+              <h2>Sức nóng theo chủ đề</h2>
+              <p class="muted small">Tổng tương tác, độ tiếp cận và truy vấn tìm kiếm nhắc đến chủ đề. Bấm để xem bằng chứng.</p>
+              <div id="themes"></div>
+            </div>
+          </div>
+          <div class="card" id="needs-card" hidden>
+            <h2>Nhu cầu khách hàng nổi bật</h2>
+            <ul id="needs" class="needs"></ul>
+          </div>
+        </section>
+
+        <section id="s-ptrends">
+          <div class="sec-head"><h2>Xu hướng riêng từng nền tảng</h2></div>
+          <p class="muted small">Mạng xã hội: chủ đề, keyword, hashtag trên từng kênh. Đặt bàn/review (PasGo, Google Maps, Tripadvisor): loại hình được đẩy, dạng ưu đãi, địa điểm mới, địa điểm tăng review.</p>
+          <div class="tabs" id="pt-tabs" role="tablist"></div>
+          <div id="pt-content"></div>
+        </section>
+
+        <section id="s-hashtags">
+          <div class="sec-head">
+            <h2>Hashtag được dùng trong kỳ</h2>
+            <button class="btn pill" id="ht-csv"><svg><use href="#i-download"/></svg>CSV</button>
+          </div>
+          <div class="chips" id="ht-filter"></div>
+          <div class="grid-2">
+            <div class="card">
+              <h2>Bảng xếp hạng hashtag</h2>
+              <div class="table-wrap" id="ht-table"></div>
+            </div>
+            <div class="stack">
+              <div class="card lime-card">
+                <h2>Bộ hashtag gợi ý</h2>
+                <div id="ht-suggest"></div>
+              </div>
+              <div class="card">
+                <h2>Đám mây hashtag</h2>
+                <div class="cloud" id="ht-cloud"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="s-platforms">
+          <div class="sec-head"><h2>Nội dung & địa điểm top theo nền tảng</h2></div>
+          <div class="tabs" id="ptabs" role="tablist"></div>
+          <div id="pcontent"></div>
+        </section>
+
+        <section id="s-weather">
+          <div class="sec-head"><h2>Thời tiết & insight</h2></div>
+          <div class="card">
+            <div class="wx-strip" id="wx-strip"></div>
+            <div class="chart-box short"><canvas id="wx-chart"></canvas></div>
+          </div>
+          <div class="trend-grid" id="wx-insights"></div>
+        </section>
+
+        <section id="s-ideas">
+          <div class="sec-head"><h2>Ý tưởng content đề xuất</h2></div>
+          <div class="trend-grid" id="ideas"></div>
+        </section>
+
+        <footer class="card foot" id="status-card">
+          <h2>Trạng thái nguồn dữ liệu</h2>
+          <div id="status" class="status-grid"></div>
+          <details>
+            <summary>Phương pháp & lưu ý</summary>
+            <ul class="bullets small">
+              <li><b>Google Search:</b> Google không công khai số lượt tìm kiếm. Tool dùng Google Autocomplete (truy vấn người dùng thật đang gõ; vị trí càng cao càng phổ biến) và Google Trends (lượng tìm kiếm ước tính, vd. "2K+").</li>
+              <li><b>Độ tiếp cận:</b> ưu tiên lượt xem (views). Nếu nền tảng không trả lượt xem thì quy đổi từ tương tác: (like + 3×comment + 5×share) × 20.</li>
+              <li><b>TikTok, Instagram, Facebook, Threads, Google Maps, Tripadvisor:</b> crawl qua Apify theo hashtag, từ khoá và trang cấu hình trong <code>config/settings.json</code>. PasGo lấy trực tiếp.</li>
+              <li><b>Thời tiết:</b> Open-Meteo, toạ độ Quận 1. "Mưa tối" là tổng lượng mưa từ 17h đến 23h.</li>
+              <li><b>Khu vực:</b> xác định theo từ khoá tìm kiếm, địa chỉ và nội dung (Q1/Q2, HCM, VN, SEA). HCM, VN và SEA chủ yếu để tham khảo xu hướng.</li>
+            </ul>
+          </details>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="modal"><div id="modal-body"></div><button class="btn dark" id="modal-close">Đóng</button></dialog>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app.js" type="module"></script>
+</body>
+</html>

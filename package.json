@@ -1,0 +1,17 @@
+{
+  "name": "llg-trending",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tổng hợp trending F&B & nightlife (Q1, Q2, HCM, VN, SEA) cho team Marketing",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "collect": "node --env-file-if-exists=.env scripts/collect.mjs",
+    "aggregate": "node --env-file-if-exists=.env scripts/collect.mjs --aggregate-only",
+    "dev": "npx --yes serve public -l 5173"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "fast-xml-parser": "^5.2.0"
+  }
+}
