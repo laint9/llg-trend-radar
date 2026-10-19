@@ -148,23 +148,34 @@ export async function generateInsights(ai, payload, periodLabel) {
   const user = `Kỳ phân tích: ${periodLabel}\n\nDỮ LIỆU (JSON):\n${JSON.stringify(payload)}`;
   const t0 = Date.now();
   const call = { anthropic: callAnthropic, openai: callOpenAI, gemini: callGemini }[ai.provider];
-  const FALLBACK = { gemini: 'gemini-flash-latest', openai: 'gpt-5-mini' };
+  // Chuỗi model: chính → dự phòng. Mỗi model Gemini có hạn mức free riêng (≈20 lượt/ngày).
+  const FALLBACKS = { gemini: ['gemini-flash-latest', 'gemini-flash-lite-latest'], openai: ['gpt-5-mini'], anthropic: [] };
+  const models = [ai.model, ...(FALLBACKS[ai.provider] || []).filter((m) => m !== ai.model)];
   let out;
-  // Thử lại khi quá tải/giới hạn (429, 5xx); lần cuối chuyển sang model dự phòng
-  for (let attempt = 1; ; attempt++) {
-    const model = attempt === 4 && FALLBACK[ai.provider] && FALLBACK[ai.provider] !== ai.model ? FALLBACK[ai.provider] : ai.model;
-    try {
-      out = await call({ ...ai, model }, user);
-      if (model !== ai.model) log(`  AI: dùng model dự phòng ${model}`);
-      break;
-    } catch (e) {
-      const retryable = /HTTP (429|5\d\d)|overloaded|high demand|UNAVAILABLE|timeout|aborted/i.test(e.message);
-      if (!retryable || attempt >= 4 || (attempt === 3 && !FALLBACK[ai.provider])) throw e;
-      const wait = attempt * 15000;
-      log(`  AI: lỗi tạm thời (${e.message.slice(0, 60)}…), thử lại sau ${wait / 1000}s`);
-      await new Promise((r) => setTimeout(r, wait));
+  let lastErr;
+  for (const model of models) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        out = await call({ ...ai, model }, user);
+        if (model !== ai.model) log(`  AI: dùng model dự phòng ${model}`);
+        break;
+      } catch (e) {
+        lastErr = e;
+        // Hết hạn mức theo ngày → thử lại vô ích, chuyển model khác ngay
+        if (/PerDay|per day|RESOURCE_EXHAUSTED.*day|quota/i.test(e.message) && /429/.test(e.message)) {
+          log(`  AI: ${model} đã hết hạn mức trong ngày, chuyển model dự phòng`);
+          break;
+        }
+        const retryable = /HTTP (429|5\d\d)|overloaded|high demand|UNAVAILABLE|timeout|aborted/i.test(e.message);
+        if (!retryable || attempt === 3) break;
+        const wait = attempt * 15000;
+        log(`  AI: lỗi tạm thời (${e.message.slice(0, 60)}…), thử lại sau ${wait / 1000}s`);
+        await new Promise((r) => setTimeout(r, wait));
+      }
     }
+    if (out) break;
   }
+  if (!out) throw lastErr;
   log(`  AI (${ai.provider}/${ai.model}) ${periodLabel}: xong sau ${((Date.now() - t0) / 1000).toFixed(1)}s`);
   return out;
 }

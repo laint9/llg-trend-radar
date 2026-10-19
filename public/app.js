@@ -686,7 +686,7 @@ function renderStatus(d) {
   $('#status').innerHTML = Object.entries(names)
     .map(([k, n]) => {
       const v = s[k] || '—';
-      const cls = /^OK/.test(v) ? 'ok' : /Lỗi/.test(v) ? 'err' : 'off';
+      const cls = /^OK|đã crawl/.test(v) ? 'ok' : /Lỗi/.test(v) ? 'err' : 'off';
       return `<div class="st ${cls}"><span class="d"></span><div><b>${n}</b><br><span class="muted">${esc(v)}</span></div></div>`;
     })
     .join('') + `<div class="st ${state.meta?.ai?.provider !== 'none' ? 'ok' : 'off'}"><span class="d"></span><div><b>AI insight</b><br><span class="muted">${esc(state.meta?.ai?.provider === 'none' ? 'Đang tắt' : `${state.meta?.ai?.provider} / ${state.meta?.ai?.model}`)}</span></div></div>`;
@@ -780,18 +780,58 @@ $('#modal-close').onclick = () => $('#modal').close();
 $('#modal').addEventListener('click', (e) => e.target.id === 'modal' && $('#modal').close());
 
 initTheme();
-// Sidebar: sáng mục đang xem
-const navLinks = [...document.querySelectorAll('#side-nav a')];
-const io = new IntersectionObserver(
-  (entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      navLinks.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === `#${e.target.id}`));
-    }
-  },
-  { rootMargin: '-35% 0px -60% 0px' },
-);
-document.querySelectorAll('main > section').forEach((sec) => io.observe(sec));
+// ---------- Trang riêng cho từng section (hash router #/trang) ----------
+const PAGES = [...document.querySelectorAll('main > section')].map((el) => ({
+  slug: el.id.replace(/^s-/, ''),
+  el,
+  no: el.querySelector('.sec-no')?.textContent || '',
+  title: el.querySelector('.sec-title h2')?.textContent || '',
+  sub: el.querySelector('.sec-title p')?.textContent || '',
+  icon: el.querySelector('.sec-ic use')?.getAttribute('href') || '#i-home',
+}));
+function renderShortcuts() {
+  $('#shortcuts').innerHTML = PAGES.filter((p) => p.slug !== 'summary')
+    .map((p) => `<a class="shortcut" href="#/${p.slug}"><span class="sec-ic"><svg><use href="${p.icon}"/></svg></span><div><span class="sc-no">${esc(p.no)}</span><b>${esc(p.title)}</b><small>${esc(p.sub)}</small></div><span class="sc-go">→</span></a>`)
+    .join('');
+}
+function route() {
+  const raw = location.hash.replace(/^#\/?/, '').replace(/^s-/, '');
+  const page = PAGES.find((p) => p.slug === raw) || PAGES[0];
+  PAGES.forEach((p) => p.el.classList.toggle('page-off', p !== page));
+  document.querySelectorAll('.side-nav a, .side-bottom a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === `#/${page.slug}`));
+  document.title = page.slug === 'summary' ? 'LLG Trend Radar' : `${page.title} · Trend Radar`;
+  const i = PAGES.indexOf(page);
+  const prev = PAGES[i - 1];
+  const next = PAGES[i + 1];
+  $('#pager').innerHTML = `${prev ? `<a class="btn" href="#/${prev.slug}">← ${esc(prev.title)}</a>` : '<span></span>'}<span class="muted small">Trang ${i + 1}/${PAGES.length}</span>${next ? `<a class="btn pill" href="#/${next.slug}">${esc(next.title)} →</a>` : '<span></span>'}`;
+  window.scrollTo({ top: 0 });
+  // Biểu đồ vẽ lúc đang ẩn → cập nhật kích thước khi trang hiện ra
+  requestAnimationFrame(() => Object.values(charts).forEach((c) => c?.resize?.()));
+}
+window.addEventListener('hashchange', route);
+renderShortcuts();
+route();
+
+// ---------- Tooltip nhãn cho icon sidebar ----------
+const tip = Object.assign(document.createElement('div'), { id: 'navtip', role: 'tooltip' });
+document.body.append(tip);
+document.querySelectorAll('.sidebar [data-tip]').forEach((el) => {
+  const show = () => {
+    if (matchMedia('(max-width: 760px)').matches) return;
+    const r = el.getBoundingClientRect();
+    tip.textContent = el.dataset.tip;
+    tip.style.top = `${r.top + r.height / 2}px`;
+    tip.style.left = `${r.right + 14}px`;
+    tip.classList.add('show');
+  };
+  const hide = () => tip.classList.remove('show');
+  el.addEventListener('mouseenter', show);
+  el.addEventListener('focus', show);
+  el.addEventListener('mouseleave', hide);
+  el.addEventListener('blur', hide);
+  el.addEventListener('click', hide);
+});
+
 fetch('data/meta.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : null))
   .then((m) => {

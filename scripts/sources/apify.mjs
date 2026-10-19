@@ -145,7 +145,9 @@ export async function apify(settings, token, { today, lastRun = {} } = {}) {
     if (!p.enabled) return (status[platform] = 'Đang tắt'), [];
     const every = p.everyDays || 1;
     if (!force && today && lastRun[platform] && daysBetween(lastRun[platform], today) < every) {
-      status[platform] = `Theo lịch ${every} ngày/lần, dùng dữ liệu ngày ${lastRun[platform]}`;
+      const next = new Date(new Date(lastRun[platform]).getTime() + every * 864e5).toISOString().slice(0, 10);
+      const vn = (d) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
+      status[platform] = `OK · đã crawl ${vn(lastRun[platform])}, lần tới ${vn(next)} (${every} ngày/lần)`;
       skipped.push(platform);
       return [];
     }

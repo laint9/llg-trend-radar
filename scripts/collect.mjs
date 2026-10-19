@@ -103,8 +103,20 @@ async function collect() {
   }
   status.counts = { searchQueries: queries?.length || 0, trending: trending?.length || 0, items: items.size };
 
+  // Thời tiết lỗi → dùng lại bản gần nhất (kể cả snapshot hôm nay trước khi ghi đè)
+  let weatherData = wx;
+  if (!weatherData) {
+    for (const d of (await listDailyDates()).filter((x) => x <= today).reverse()) {
+      const old = await readJson(join(DAILY_DIR, `${d}.json`));
+      if (old?.weather?.days?.length) {
+        weatherData = { ...old.weather, stale: d };
+        status.weather = `Lỗi tạm thời, dùng dữ liệu ngày ${d}`;
+        break;
+      }
+    }
+  }
   const general = { youtube: ytt?.items || [], news: gnews || [] };
-  const snap = { date: today, generatedAt: new Date().toISOString(), apifyRuns, status, general, items: [...items.values()], searchQueries: queries || [], googleTrending: trending || [], weather: wx };
+  const snap = { date: today, generatedAt: new Date().toISOString(), apifyRuns, status, general, items: [...items.values()], searchQueries: queries || [], googleTrending: trending || [], weather: weatherData };
   await writeJson(join(DAILY_DIR, `${today}.json`), snap);
   log(`Đã lưu snapshot: ${items.size} nội dung, ${queries?.length || 0} truy vấn, ${trending?.length || 0} trending`);
 
@@ -234,8 +246,8 @@ async function aggregate({ useAi }) {
 
     const file = join(DATA_DIR, `summary-${period}.json`);
     const old = await readJson(file);
-    const fresh = old?.ai?.generatedAt && old.ai.to === summary.to && (Date.now() - new Date(old.ai.generatedAt)) / 864e5 < 0.5;
-    const recent = old?.ai?.generatedAt && (Date.now() - new Date(old.ai.generatedAt)) / 864e5 < (regen[period] ?? 1) - 0.1;
+    const fresh = old?.ai?.generatedAt && !old.ai.stale && old.ai.to === summary.to && (Date.now() - new Date(old.ai.generatedAt)) / 864e5 < 0.5;
+    const recent = old?.ai?.generatedAt && !old.ai.stale && (Date.now() - new Date(old.ai.generatedAt)) / 864e5 < (regen[period] ?? 1) - 0.1;
     if (ai.provider !== 'none' && (args['force-ai'] || !(fresh || recent))) {
       try {
         const label = { day: `Ngày ${w.to}`, week: `7 ngày ${w.from} → ${w.to}`, month: `30 ngày ${w.from} → ${w.to}` }[period];

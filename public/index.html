@@ -33,23 +33,23 @@
 
   <div class="shell">
     <aside class="sidebar" aria-label="Điều hướng">
-      <a class="logo-ring" href="#s-summary" title="LLG Trend Radar" aria-label="Về đầu trang"></a>
+      <a class="logo-ring" href="#/summary" data-tip="Trend Radar – Tổng quan" aria-label="Về trang tổng quan"></a>
       <nav class="side-nav" id="side-nav">
-        <a href="#s-summary" title="Tổng quan" class="on"><svg><use href="#i-home"/></svg><span>Tổng quan</span></a>
-        <a href="#s-actions" title="Action đề xuất"><svg><use href="#i-bolt"/></svg><span>Action</span></a>
-        <a href="#s-segments" title="So sánh phân khúc"><svg><use href="#i-columns"/></svg><span>Phân khúc</span></a>
-        <a href="#s-general" title="Top xu hướng chung"><svg><use href="#i-fire"/></svg><span>Xu hướng chung</span></a>
-        <a href="#s-keywords" title="Top 10 keyword"><svg><use href="#i-search"/></svg><span>Keyword</span></a>
-        <a href="#s-trends" title="Xu hướng chính"><svg><use href="#i-radar"/></svg><span>Xu hướng</span></a>
-        <a href="#s-ptrends" title="Xu hướng từng nền tảng"><svg><use href="#i-layers"/></svg><span>Nền tảng</span></a>
-        <a href="#s-hashtags" title="Hashtag"><svg><use href="#i-hash"/></svg><span>Hashtag</span></a>
-        <a href="#s-platforms" title="Nội dung top"><svg><use href="#i-grid"/></svg><span>Nội dung</span></a>
-        <a href="#s-weather" title="Thời tiết"><svg><use href="#i-cloud"/></svg><span>Thời tiết</span></a>
-        <a href="#s-ideas" title="Ý tưởng content"><svg><use href="#i-bulb"/></svg><span>Ý tưởng</span></a>
+        <a href="#/summary" data-tip="Tổng quan" aria-label="Tổng quan" class="on"><svg><use href="#i-home"/></svg><span>Tổng quan</span></a>
+        <a href="#/actions" data-tip="Action đề xuất" aria-label="Action đề xuất"><svg><use href="#i-bolt"/></svg><span>Action</span></a>
+        <a href="#/segments" data-tip="So sánh phân khúc" aria-label="So sánh phân khúc"><svg><use href="#i-columns"/></svg><span>Phân khúc</span></a>
+        <a href="#/general" data-tip="Top xu hướng chung" aria-label="Top xu hướng chung"><svg><use href="#i-fire"/></svg><span>Xu hướng chung</span></a>
+        <a href="#/keywords" data-tip="Top 10 keyword" aria-label="Top 10 keyword"><svg><use href="#i-search"/></svg><span>Keyword</span></a>
+        <a href="#/trends" data-tip="Xu hướng chính" aria-label="Xu hướng chính"><svg><use href="#i-radar"/></svg><span>Xu hướng</span></a>
+        <a href="#/ptrends" data-tip="Xu hướng từng nền tảng" aria-label="Xu hướng từng nền tảng"><svg><use href="#i-layers"/></svg><span>Nền tảng</span></a>
+        <a href="#/hashtags" data-tip="Hashtag" aria-label="Hashtag"><svg><use href="#i-hash"/></svg><span>Hashtag</span></a>
+        <a href="#/platforms" data-tip="Nội dung top" aria-label="Nội dung top"><svg><use href="#i-grid"/></svg><span>Nội dung</span></a>
+        <a href="#/weather" data-tip="Thời tiết" aria-label="Thời tiết"><svg><use href="#i-cloud"/></svg><span>Thời tiết</span></a>
+        <a href="#/ideas" data-tip="Ý tưởng content" aria-label="Ý tưởng content"><svg><use href="#i-bulb"/></svg><span>Ý tưởng</span></a>
       </nav>
       <div class="side-bottom">
-        <a href="#status-card" title="Nguồn dữ liệu & phương pháp"><svg><use href="#i-info"/></svg></a>
-        <button id="theme" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện"><svg><use href="#i-moon"/></svg></button>
+        <a href="#/sources" data-tip="Nguồn dữ liệu & phương pháp" aria-label="Nguồn dữ liệu & phương pháp"><svg><use href="#i-info"/></svg></a>
+        <button id="theme" data-tip="Đổi giao diện sáng / tối" aria-label="Đổi giao diện"><svg><use href="#i-moon"/></svg></button>
       </div>
     </aside>
 
@@ -74,6 +74,8 @@
           <div class="sec-head big"><div class="sec-title"><span class="sec-no">01</span><span class="sec-ic"><svg><use href="#i-home"/></svg></span><div><h2>Tổng quan</h2><p>Tóm tắt nhanh kỳ đang xem: keyword số 1, số liệu chính và nhận định AI</p></div></div></div>
           <div class="kpis" id="kpis"></div>
           <div class="card ai-card" id="ai-summary"></div>
+          <div class="sec-sub"><h3>Đi tới các trang</h3><span class="muted small">Mỗi mục là một trang riêng, bấm để mở</span></div>
+          <div class="shortcuts" id="shortcuts"></div>
         </section>
 
         <section id="s-actions">
@@ -219,12 +221,15 @@
           <div class="trend-grid" id="ideas"></div>
         </section>
 
-        <footer class="card foot" id="status-card">
-          <h2>Trạng thái nguồn dữ liệu</h2>
+        <section id="s-sources">
+          <div class="sec-head big"><div class="sec-title"><span class="sec-no">12</span><span class="sec-ic"><svg><use href="#i-info"/></svg></span><div><h2>Nguồn dữ liệu & phương pháp</h2><p>Trạng thái từng nguồn, cách tính độ tiếp cận và lịch cập nhật</p></div></div></div>
+        <div class="card foot" id="status-card">
+          <h3>Trạng thái từng nguồn (lần chạy gần nhất)</h3>
           <div id="status" class="status-grid"></div>
           <details>
             <summary>Phương pháp & lưu ý</summary>
             <ul class="bullets small">
+              <li><b>Lịch cập nhật:</b> tự động 7:00 sáng mỗi ngày (giờ VN, GitHub có thể trễ 5–30 phút). TikTok/Instagram crawl 3 ngày/lần; Facebook, Threads, Google Maps 7 ngày/lần; Tripadvisor 14 ngày/lần để giữ ngân sách Apify.</li>
               <li><b>Google Search:</b> Google không công khai số lượt tìm kiếm. Tool dùng Google Autocomplete (truy vấn người dùng thật đang gõ; vị trí càng cao càng phổ biến) và Google Trends (lượng tìm kiếm ước tính, vd. "2K+").</li>
               <li><b>Độ tiếp cận:</b> ưu tiên lượt xem (views). Nếu nền tảng không trả lượt xem thì quy đổi từ tương tác: (like + 3×comment + 5×share) × 20.</li>
               <li><b>TikTok, Instagram, Facebook, Threads, Google Maps, Tripadvisor:</b> crawl qua Apify theo hashtag, từ khoá và trang cấu hình trong <code>config/settings.json</code>. PasGo lấy trực tiếp.</li>
@@ -232,7 +237,9 @@
               <li><b>Khu vực:</b> xác định theo từ khoá tìm kiếm, địa chỉ và nội dung (Q1/Q2, HCM, VN, SEA). HCM, VN và SEA chủ yếu để tham khảo xu hướng.</li>
             </ul>
           </details>
-        </footer>
+        </div>
+        </section>
+        <nav class="pager" id="pager" aria-label="Chuyển trang"></nav>
       </main>
     </div>
   </div>

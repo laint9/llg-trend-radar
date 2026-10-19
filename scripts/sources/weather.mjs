@@ -16,7 +16,17 @@ export async function weather(settings) {
     daily: 'weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,precipitation_sum,precipitation_probability_max,uv_index_max',
     hourly: 'precipitation',
   }).forEach(([k, v]) => u.searchParams.set(k, v));
-  const d = await fetchJson(u);
+  // Open-Meteo đôi khi trả 503 tạm thời → thử lại 3 lần
+  let d;
+  for (let i = 1; ; i++) {
+    try {
+      d = await fetchJson(u);
+      break;
+    } catch (e) {
+      if (i >= 3) throw e;
+      await new Promise((r) => setTimeout(r, i * 5000));
+    }
+  }
   // Mưa buổi tối (17h–23h) quan trọng nhất với nightlife
   const eveningRain = {};
   d.hourly.time.forEach((t, i) => {
