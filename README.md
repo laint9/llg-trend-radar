@@ -57,7 +57,7 @@ Vào repo → **Settings → Secrets and variables → Actions → New repositor
 | `OPENAI_API_KEY` | Tuỳ chọn (AI) | platform.openai.com | tuỳ model |
 | `GEMINI_API_KEY` | Tuỳ chọn (AI) | aistudio.google.com | có gói miễn phí |
 
-**Đang dùng Gemini:** tạo secret `GEMINI_API_KEY` và biến (tab Variables) `AI_PROVIDER` = `gemini`. Model mặc định `gemini-3.5-flash`; khi Gemini quá tải, tool tự thử lại và chuyển sang `gemini-2.5-flash`.
+**Đang dùng Gemini:** tạo secret `GEMINI_API_KEY` và biến (tab Variables) `AI_PROVIDER` = `gemini`. Model mặc định `gemini-3.5-flash`; khi Gemini quá tải, tool tự thử lại và chuyển sang `gemini-flash-latest`.
 
 **Chọn AI:** ở tab **Variables**, tạo biến `AI_PROVIDER` = `anthropic` | `openai` | `gemini` | `none`. Mặc định là `auto`: dùng key nào có sẵn, theo thứ tự ưu tiên Anthropic → OpenAI → Gemini. Muốn đổi model thì tạo biến `AI_MODEL`.
 

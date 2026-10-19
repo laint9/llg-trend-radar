@@ -74,14 +74,17 @@ function guessRegion(text) {
   return 'intl';
 }
 
+/**
+ * Chạy actor bất đồng bộ (start → poll → lấy dataset) để không bị giới hạn 300s của run-sync.
+ * maxItems / maxTotalChargeUsd: Apify dừng tính phí khi chạm trần.
+ */
 async function runActor(actor, input, token, timeoutSecs, { maxItems, maxCharge } = {}) {
-  // maxItems / maxTotalChargeUsd: Apify dừng tính phí khi chạm trần → không bao giờ vượt ngân sách mỗi lượt
+  const H = { Authorization: `Bearer ${token}` };
   const caps = `${maxItems ? `&maxItems=${maxItems}` : ''}${maxCharge ? `&maxTotalChargeUsd=${maxCharge}` : ''}`;
-  const url = `https://api.apify.com/v2/acts/${actor}/run-sync-get-dataset-items?timeout=${timeoutSecs}&format=json&clean=true${caps}`;
   const res = await fetchWithTimeout(
-    url,
-    { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(input) },
-    (timeoutSecs + 30) * 1000,
+    `https://api.apify.com/v2/acts/${actor}/runs?timeout=${timeoutSecs}&waitForFinish=60${caps}`,
+    { method: 'POST', headers: { 'Content-Type': 'application/json', ...H }, body: JSON.stringify(input) },
+    90000,
   );
   if (!res.ok) {
     const body = await res.text();
@@ -89,7 +92,17 @@ async function runActor(actor, input, token, timeoutSecs, { maxItems, maxCharge 
     if (/max-total-charge-usd-below-minimum/.test(body) && maxCharge && maxCharge < 0.5) return runActor(actor, input, token, timeoutSecs, { maxItems, maxCharge: 0.5 });
     throw new Error(`Apify ${actor} HTTP ${res.status}: ${body.slice(0, 200)}`);
   }
-  return res.json();
+  let run = (await res.json()).data;
+  const deadline = Date.now() + (timeoutSecs + 120) * 1000;
+  while (['READY', 'RUNNING'].includes(run.status) && Date.now() < deadline) {
+    const r = await fetchWithTimeout(`https://api.apify.com/v2/actor-runs/${run.id}?waitForFinish=60`, { headers: H }, 90000);
+    run = (await r.json()).data;
+  }
+  // TIMED-OUT / ABORTED vẫn có thể có dữ liệu một phần → vẫn lấy
+  if (!['SUCCEEDED', 'TIMED-OUT', 'ABORTED'].includes(run.status)) throw new Error(`Apify ${actor}: run ${run.status}`);
+  const items = await fetchWithTimeout(`https://api.apify.com/v2/datasets/${run.defaultDatasetId}/items?format=json&clean=true${maxItems ? `&limit=${maxItems}` : ''}`, { headers: H }, 60000).then((r) => r.json());
+  if (run.status !== 'SUCCEEDED') log(`  Apify ${actor}: ${run.status}, dùng ${items.length} kết quả đã lấy được`);
+  return items;
 }
 
 async function monthlyUsage(token) {

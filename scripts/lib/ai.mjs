@@ -116,7 +116,7 @@ export async function generateInsights(ai, payload, periodLabel) {
   const user = `Kỳ phân tích: ${periodLabel}\n\nDỮ LIỆU (JSON):\n${JSON.stringify(payload)}`;
   const t0 = Date.now();
   const call = { anthropic: callAnthropic, openai: callOpenAI, gemini: callGemini }[ai.provider];
-  const FALLBACK = { gemini: 'gemini-2.5-flash', openai: 'gpt-5-mini' };
+  const FALLBACK = { gemini: 'gemini-flash-latest', openai: 'gpt-5-mini' };
   let out;
   // Thử lại khi quá tải/giới hạn (429, 5xx); lần cuối chuyển sang model dự phòng
   for (let attempt = 1; ; attempt++) {

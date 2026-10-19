@@ -105,7 +105,7 @@
   "apify": {
     "_note": "Cần biến môi trường APIFY_TOKEN. Mỗi nền tảng có thể bật/tắt. 'input' hỗ trợ placeholder {{hashtags}}, {{queries}}, {{urls}}, {{limit}}. Actor bên thứ ba có thể đổi tên field, nên kiểm tra input schema trên Apify Console.",
     "maxItemsPerPlatform": 60,
-    "timeoutSecs": 240,
+    "timeoutSecs": 600,
     "_budgetNote": "Gói Apify FREE có 5 USD/tháng. monthlyBudgetUsd: tự dừng crawl khi đã dùng ≥ 95% ngân sách. everyDays: chạy mỗi N ngày (ngày không chạy sẽ dùng lại dữ liệu gần nhất). maxChargeUsd: trần chi phí mỗi lượt chạy. Nâng lên gói Starter (39 USD) thì có thể để everyDays = 1.",
     "monthlyBudgetUsd": 5,
     "platforms": {
