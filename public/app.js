@@ -16,7 +16,7 @@ const VENUE = ['pasgo', 'googlemaps', 'tripadvisor'];
 const REGION_SHORT = { q1q2: 'Q1/Q2', hcm: 'HCM', vn: 'VN', sea: 'SEA', intl: 'Quốc tế' };
 const WX_ICON = (c) => (c >= 95 ? '⛈' : c >= 80 ? '🌧' : c >= 61 ? '🌧' : c >= 51 ? '🌦' : c >= 45 ? '🌫' : c >= 3 ? '☁' : c >= 1 ? '⛅' : '☀');
 
-const state = { period: 'day', region: 'all', platform: 'google', ptPlatform: null, htPlatform: 'all', actionSrc: 'all', data: {}, meta: null };
+const state = { period: 'day', region: 'all', platform: 'google', ptPlatform: null, htPlatform: 'all', actionSrc: 'all', genTab: 'vn', genCat: 'all', data: {}, meta: null };
 const charts = {};
 
 // ---------- helpers ----------
@@ -402,6 +402,136 @@ function renderIdeas(d) {
     : '<p class="empty card">Ý tưởng content được AI tạo khi bật một provider AI (xem README). Trong lúc chờ, hãy dùng Top 10 keyword, chủ đề nóng và insight thời tiết ở trên để lên ý tưởng.</p>';
 }
 
+// ---------- Phân khúc ----------
+function renderSegments(d) {
+  const segs = d.segments || [];
+  $('#s-segments').hidden = !segs.length;
+  const ai = new Map((d.ai?.segmentInsights || []).map((x) => [x.segment, x]));
+  $('#segments').innerHTML = segs
+    .map((g) => {
+      const a = ai.get(g.id);
+      return `<article class="card segcard t-${esc(g.tone || 'violet')}">
+      <div class="head">
+        <div class="row"><h3>${esc(g.icon)} ${esc(g.label)}</h3>${delta(g.change)}</div>
+        <div class="score">${fmt(g.score)}<small>điểm sức nóng</small></div>
+        <div class="stats"><div><b>${fmt(g.socialPosts)}</b>bài social</div><div><b>${g.reach ? fmt(g.reach) : '—'}</b>reach</div><div><b>${fmt(g.venues)}</b>địa điểm</div></div>
+      </div>
+      <div class="bodyx">
+        ${a ? `<div class="headline">💡 ${esc(a.headline)}</div>` : ''}
+        ${g.searches?.length ? `<div><div class="lbl">Khách đang tìm</div><div class="tags">${g.searches.slice(0, 6).map((q) => `<span class="tagpill">${esc(q)}</span>`).join('')}</div></div>` : ''}
+        ${g.keywords?.length ? `<div><div class="lbl">Keyword nổi bật</div><div class="tags">${g.keywords.slice(0, 6).map((k) => `<span class="tagpill accent">${esc(k.keyword)}</span>`).join('')}</div></div>` : ''}
+        ${g.hashtags?.length ? `<div><div class="lbl">Hashtag</div><div class="tags">${g.hashtags.slice(0, 6).map((h) => `<span class="tagpill">#${esc(h.tag)}</span>`).join('')}</div></div>` : ''}
+        ${a?.needs?.length ? `<div><div class="lbl">Nhu cầu</div><ul>${a.needs.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></div>` : ''}
+        ${a?.contentIdeas?.length ? `<div><div class="lbl">Ý tưởng content</div><ul>${a.contentIdeas.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></div>` : ''}
+        ${g.top?.length ? `<div class="tops"><div class="lbl">Nội dung top</div>${g.top.map((t) => `<a href="${safeUrl(t.url)}" target="_blank" rel="noopener" title="${esc(t.title)}">${esc(t.title)}<span>${esc(PLATFORM[t.platform]?.label || t.platform)}${t.reach ? ` · ${fmt(t.reach)}` : ''}</span></a>`).join('')}</div>` : ''}
+        ${g.topVenues?.length ? `<div class="tops"><div class="lbl">Địa điểm nổi bật</div>${g.topVenues.map((t) => `<a href="${safeUrl(t.url)}" target="_blank" rel="noopener" title="${esc(t.title)}">${esc(t.title)}<span>${esc(PLATFORM[t.platform]?.label || '')}${t.rating ? ` · ★${Number(t.rating).toFixed(1)}` : ''}</span></a>`).join('')}</div>` : ''}
+      </div>
+    </article>`;
+    })
+    .join('');
+}
+
+// ---------- Xu hướng chung ----------
+const CAT_TONE = { sport: 'mint', music: 'violet', film: 'pink', tech: 'blue', finance: 'yellow', weather: 'blue', event: 'peach', food: 'peach', health: 'pink', society: 'yellow', other: 'violet' };
+const catTile = (it, no) => `<span class="tile tile-${CAT_TONE[it.category] || 'violet'}">${esc(it.categoryIcon || '✨')}${no ? `<span class="no">${no}</span>` : ''}</span>`;
+function renderGeneral(d) {
+  const G = d.general;
+  if (!G) {
+    $('#s-general').hidden = true;
+    return;
+  }
+  $('#s-general').hidden = false;
+  const ai = d.ai || {};
+  const cats = G.categories || [];
+  $('#gen-summary').innerHTML = `
+    <span class="tag">${ai.generalSummary ? 'Tóm tắt AI' : 'Tóm tắt tự động'}</span>
+    <p>${esc(ai.generalSummary || `Lĩnh vực được quan tâm nhiều nhất: ${cats.slice(0, 3).map((c) => c.label).join(', ') || '—'}. Top tìm kiếm: ${(G.searchesVN || []).slice(0, 3).map((t) => t.title).join(', ') || '—'}.`)}</p>
+    <div>${cats.slice(0, 6).map((c) => `<span class="cat-chip">${esc(c.icon)} ${esc(c.label)}</span>`).join('')}</div>`;
+  const max = Math.max(...cats.filter((c) => c.id !== 'other').map((c) => c.score), 1);
+  $('#gen-cats').innerHTML = cats
+    .map((c) => `<div class="cat-row" data-c="${esc(c.id)}"><span class="tile tile-${CAT_TONE[c.id] || 'violet'}">${esc(c.icon)}</span><div>${esc(c.label)}<div class="kw-bar"><span style="width:${Math.min((c.score / max) * 100, 100)}%"></span></div></div><div class="num">${fmt(c.score)}</div></div>`)
+    .join('') || '<p class="empty">Chưa có dữ liệu.</p>';
+  $('#gen-cats').onclick = (e) => {
+    const r = e.target.closest('[data-c]');
+    if (!r) return;
+    state.genCat = r.dataset.c;
+    renderGeneral(d);
+    $('#gen-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const opps = ai.trendOpportunities || [];
+  const riskCls = { 'an toàn': 'safe', 'cân nhắc': 'warn', tránh: 'avoid' };
+  $('#gen-opps').innerHTML = opps.length
+    ? opps
+        .map((o) => `<article class="card trend opp ${riskCls[o.risk] === 'avoid' ? 'avoid' : ''}">
+        <div class="trend-top"><span class="tile">🔥</span><span class="risk ${riskCls[o.risk] || 'warn'}">${esc(o.risk)}</span></div>
+        <div class="kw-meta"><span class="rtag">${esc(o.category)}</span><span class="rtag">⏱ ${esc(o.timing)}</span></div>
+        <h3>${esc(o.trend)}</h3>
+        <p class="muted small">${esc(o.why)}</p>
+        <div class="angle"><b>Cách đu trend:</b> ${esc(o.angle)}</div>
+        <div class="tags"><span class="tagpill">${esc(o.format)}</span></div>
+      </article>`)
+        .join('')
+    : '<p class="empty card">Bật AI để có gợi ý cách lồng các trend chung vào content F&B/nightlife.</p>';
+
+  const used = new Set([...(G.searchesVN || []), ...(G.youtube || []), ...(G.news || []), ...(G.searchesSEA || [])].map((x) => x.category));
+  $('#gen-filter').innerHTML = [['all', '✨', 'Tất cả lĩnh vực'], ...Object.entries(G.categoryMeta || {}).filter(([id]) => used.has(id)).map(([id, c]) => [id, c.icon, c.label])]
+    .map(([id, ic, l]) => `<button class="chip ${id === state.genCat ? 'on' : ''}" data-c="${esc(id)}">${esc(ic)} ${esc(l)}</button>`)
+    .join('');
+  $('#gen-filter').onclick = (e) => {
+    const b = e.target.closest('[data-c]');
+    if (!b) return;
+    state.genCat = b.dataset.c;
+    renderGeneral(d);
+  };
+  const tabs = [
+    ['vn', 'G', 'Google Trends VN', G.searchesVN],
+    ['yt', '▶', 'YouTube Thịnh hành', G.youtube],
+    ['news', '📰', 'Tin nổi bật', G.news],
+    ['sea', '🌏', 'Đông Nam Á', G.searchesSEA],
+  ];
+  const inCat = (x) => state.genCat === 'all' || x.category === state.genCat;
+  $('#gen-tabs').innerHTML = tabs
+    .map(([id, ic, l, list]) => `<button class="tab ${id === state.genTab ? 'on' : ''}" data-t="${id}"><span class="tile sm tile-${{ vn: 'blue', yt: 'pink', news: 'yellow', sea: 'mint' }[id]}">${ic}</span>${l}<span class="n">${(list || []).filter(inCat).length}</span></button>`)
+    .join('');
+  $('#gen-tabs').onclick = (e) => {
+    const b = e.target.closest('[data-t]');
+    if (!b) return;
+    state.genTab = b.dataset.t;
+    renderGeneral(d);
+  };
+  const list = (tabs.find((t) => t[0] === state.genTab)?.[3] || []).filter(inCat);
+  const sens = (x) => (x.sensitive ? '<span class="badge-sens">Nhạy cảm · không đu trend</span>' : '');
+  let html;
+  if (!list.length) html = '<p class="empty card">Không có mục nào cho bộ lọc này.</p>';
+  else if (state.genTab === 'yt')
+    html = `<div class="posts">${list
+      .slice(0, 24)
+      .map((v) => `<article class="post">
+        <a class="thumb" href="${safeUrl(v.url)}" target="_blank" rel="noopener">${v.image ? `<img src="${safeUrl(v.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="rank">#${v.bestRank}</span></a>
+        <div class="body">
+          <a class="t" href="${safeUrl(v.url)}" target="_blank" rel="noopener">${esc(v.title)}</a>
+          <div class="m"><span><b>${fmt(v.views)}</b> xem</span><span><b>${fmt(v.likes)}</b> thích</span>${v.days > 1 ? `<span>${v.days} ngày trong top</span>` : ''}</div>
+          <div class="kw-meta"><span class="rtag">${esc(v.categoryIcon)} ${esc(v.categoryLabel)}</span>${sens(v)}</div>
+          <div class="src"><span>${esc(v.channel)}</span><span>${fmtDate(v.publishedAt)}</span></div>
+        </div></article>`)
+      .join('')}</div>`;
+  else if (state.genTab === 'news')
+    html = `<div class="card"><ol class="gen-list">${list
+      .slice(0, 40)
+      .map((n, i) => `<li>${catTile(n, i + 1)}<div><a class="t" href="${safeUrl(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a><div class="sub">${esc(n.text || '')}</div><div class="kw-meta" style="margin-top:6px"><span class="rtag">${esc(n.categoryLabel)}</span><span class="rtag">${esc(n.source)}</span>${sens(n)}</div></div><div class="val">${fmtDate(n.publishedAt)}</div></li>`)
+      .join('')}</ol></div>`;
+  else
+    html = `<div class="card"><ol class="gen-list">${list
+      .slice(0, 40)
+      .map((t, i) => `<li>${catTile(t, i + 1)}<div><a class="t" href="${safeUrl(t.url)}" target="_blank" rel="noopener">${esc(t.title)}</a> ${t.isNew ? '<span class="badge-new">MỚI</span>' : ''} ${sens(t)}
+          <div class="sub">${(t.news || []).slice(0, 2).map((n) => `<a href="${safeUrl(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a> · ${esc(n.source || '')}`).join('<br>')}</div>
+          <div class="kw-meta" style="margin-top:6px"><span class="rtag">${esc(t.categoryLabel)}</span>${t.geo && t.geo !== 'VN' ? `<span class="rtag">${esc(t.geo)}</span>` : ''}${t.days > 1 ? `<span class="rtag">${t.days} ngày</span>` : ''}</div></div>
+          <div class="val">${esc(t.trafficLabel || fmt(t.traffic))}<small>lượt tìm</small></div></li>`)
+      .join('')}</ol></div>`;
+  $('#gen-content').innerHTML = html;
+}
+
 // ---------- Actions ----------
 const doneKey = (d, a) => `done:${d.to}:${a.title}`;
 function isDone(d, a) { try { return localStorage.getItem(doneKey(d, a)) === '1'; } catch { return false; } }
@@ -552,7 +682,7 @@ function downloadHashtagCsv(d) {
 
 function renderStatus(d) {
   const s = d.sourceStatus || {};
-  const names = { googleTrends: 'Google Trends', googleAutocomplete: 'Google Autocomplete', googleNews: 'Google News', rss: 'RSS báo', youtube: 'YouTube', weather: 'Thời tiết', pasgo: 'PasGo', tiktok: 'TikTok (Apify)', instagram: 'Instagram (Apify)', facebook: 'Facebook (Apify)', threads: 'Threads (Apify)', googlemaps: 'Google Maps (Apify)', tripadvisor: 'Tripadvisor (Apify)' };
+  const names = { googleTrends: 'Google Trends', googleAutocomplete: 'Google Autocomplete', googleNews: 'Google News', rss: 'RSS báo', youtube: 'YouTube', weather: 'Thời tiết', pasgo: 'PasGo', youtubeTrending: 'YouTube Thịnh hành', generalNews: 'Tin nổi bật (chung)', tiktok: 'TikTok (Apify)', instagram: 'Instagram (Apify)', facebook: 'Facebook (Apify)', threads: 'Threads (Apify)', googlemaps: 'Google Maps (Apify)', tripadvisor: 'Tripadvisor (Apify)' };
   $('#status').innerHTML = Object.entries(names)
     .map(([k, n]) => {
       const v = s[k] || '—';
@@ -600,6 +730,8 @@ async function render() {
   renderKwChart(d);
   renderTrends(d);
   renderActions(d);
+  renderSegments(d);
+  renderGeneral(d);
   renderPlatformTrends(d);
   renderHashtags(d);
   renderPlatformTabs(d);

@@ -1,18 +1,26 @@
 {
   "_note": "File cấu hình chính. Team Marketing có thể sửa trực tiếp trên GitHub. Mỗi lần sửa, lần chạy kế tiếp sẽ dùng giá trị mới.",
-
   "timezone": "Asia/Ho_Chi_Minh",
   "historyDays": 120,
-
   "regions": {
     "q1q2": {
       "label": "Quận 1 & Quận 2",
-      "searchTerms": ["quận 1", "quận 2", "Thảo Điền", "Thủ Thiêm", "Bùi Viện", "Nguyễn Huệ", "District 1", "Thao Dien"],
+      "searchTerms": [
+        "quận 1",
+        "quận 2",
+        "Thảo Điền",
+        "Thủ Thiêm",
+        "Bùi Viện",
+        "Nguyễn Huệ",
+        "District 1",
+        "Thao Dien"
+      ],
       "newsLocale": "vi",
       "newsQueries": [
-        "cocktail bar quận 1",
         "nhà hàng quận 1",
+        "cocktail bar quận 1",
         "Thảo Điền nhà hàng",
+        "nhà hàng mới khai trương quận 1",
         "rooftop bar quận 1",
         "phố đi bộ Nguyễn Huệ sự kiện",
         "Bùi Viện"
@@ -20,21 +28,34 @@
     },
     "hcm": {
       "label": "TP. Hồ Chí Minh",
-      "searchTerms": ["Sài Gòn", "Saigon", "TP.HCM", "Hồ Chí Minh", "Ho Chi Minh City"],
+      "searchTerms": [
+        "Sài Gòn",
+        "Saigon",
+        "TP.HCM",
+        "Hồ Chí Minh",
+        "Ho Chi Minh City"
+      ],
       "newsLocale": "vi",
       "newsQueries": [
-        "cocktail bar Sài Gòn",
-        "hidden bar Sài Gòn",
-        "speakeasy Sài Gòn",
+        "nhà hàng Sài Gòn",
         "fine dining Sài Gòn",
         "nhà hàng Michelin TP.HCM",
+        "review nhà hàng TP.HCM",
+        "cocktail bar Sài Gòn",
+        "hidden bar Sài Gòn",
         "nightlife Sài Gòn",
-        "Saigon bar opening"
+        "Saigon restaurant opening",
+        "Saigon bar opening",
+        "quán ăn ngon Sài Gòn",
+        "quán nhậu Sài Gòn"
       ]
     },
     "vn": {
       "label": "Việt Nam",
-      "searchTerms": ["Việt Nam", "Vietnam"],
+      "searchTerms": [
+        "Việt Nam",
+        "Vietnam"
+      ],
       "newsLocale": "vi",
       "newsQueries": [
         "xu hướng ẩm thực giới trẻ",
@@ -46,7 +67,14 @@
     },
     "sea": {
       "label": "Đông Nam Á",
-      "searchTerms": ["Bangkok", "Singapore", "Kuala Lumpur", "Jakarta", "Manila", "Southeast Asia"],
+      "searchTerms": [
+        "Bangkok",
+        "Singapore",
+        "Kuala Lumpur",
+        "Jakarta",
+        "Manila",
+        "Southeast Asia"
+      ],
       "newsLocale": "en",
       "newsQueries": [
         "cocktail bar trend Bangkok",
@@ -58,15 +86,114 @@
       ]
     }
   },
-
   "rssFeeds": [
-    { "name": "VnExpress Du lịch", "url": "https://vnexpress.net/rss/du-lich.rss", "region": "vn" },
-    { "name": "VnExpress Giải trí", "url": "https://vnexpress.net/rss/giai-tri.rss", "region": "vn" },
-    { "name": "VnExpress International Travel", "url": "https://e.vnexpress.net/rss/travel.rss", "region": "vn" },
-    { "name": "Tuổi Trẻ Du lịch", "url": "https://tuoitre.vn/rss/du-lich.rss", "region": "vn" },
-    { "name": "Saigoneer", "url": "https://saigoneer.com/?format=feed&type=rss", "region": "hcm" }
+    {
+      "name": "VnExpress Du lịch",
+      "url": "https://vnexpress.net/rss/du-lich.rss",
+      "region": "vn"
+    },
+    {
+      "name": "VnExpress Giải trí",
+      "url": "https://vnexpress.net/rss/giai-tri.rss",
+      "region": "vn"
+    },
+    {
+      "name": "VnExpress International Travel",
+      "url": "https://e.vnexpress.net/rss/travel.rss",
+      "region": "vn"
+    },
+    {
+      "name": "Tuổi Trẻ Du lịch",
+      "url": "https://tuoitre.vn/rss/du-lich.rss",
+      "region": "vn"
+    },
+    {
+      "name": "Saigoneer",
+      "url": "https://saigoneer.com/?format=feed&type=rss",
+      "region": "hcm"
+    }
   ],
-
+  "general": {
+    "_note": "Top xu hướng chung mọi lĩnh vực (không lọc ngành) để team khai thác đu trend. Nguồn miễn phí.",
+    "feeds": [
+      {
+        "name": "VnExpress Tin nổi bật",
+        "url": "https://vnexpress.net/rss/tin-noi-bat.rss"
+      },
+      {
+        "name": "Tuổi Trẻ Tin mới",
+        "url": "https://tuoitre.vn/rss/tin-moi-nhat.rss"
+      },
+      {
+        "name": "Thanh Niên",
+        "url": "https://thanhnien.vn/rss/home.rss"
+      }
+    ],
+    "youtubeTrendingMax": 50,
+    "categories": [
+      {
+        "id": "sport",
+        "label": "Thể thao",
+        "icon": "⚽",
+        "pattern": "bóng đá|trận|cầu thủ|v-league|v\\.league|sea games|aff|world cup|ngoại hạng|premier league|champions league|messi|ronaldo|\\bvs\\b|\\bfc\\b|tennis|\\bf1\\b|futsal|đội tuyển|\\bu2[0-9]\\b|hlv|bàn thắng|man utd|arsenal|liverpool|chelsea|real madrid|barca|pickleball|olympic|esports|chung kết|lck|lpl|t1"
+      },
+      {
+        "id": "music",
+        "label": "Âm nhạc & Showbiz",
+        "icon": "🎤",
+        "pattern": "ca sĩ|concert|\\bmv\\b|album|rapper|hoa hậu|diễn viên|showbiz|anh trai|chị đẹp|idol|kpop|blackpink|\\bbts\\b|official music|liveshow|sơn tùng|nghệ sĩ|ca khúc|bài hát|lyrics|rhyder|hiếu thứ hai|soobin|đen vâu|mono"
+      },
+      {
+        "id": "tech",
+        "label": "Game & Công nghệ",
+        "icon": "🎮",
+        "pattern": "game|gta|iphone|apple|samsung|trí tuệ nhân tạo|openai|\\bgta\\b|esports|liên minh|\\blol\\b|fc online|fc pro|chatgpt|gemini|công nghệ|pubg|liên quân|valorant|roblox|minecraft|playstation|nintendo|xbox|smartphone|ra mắt|cập nhật"
+      },
+      {
+        "id": "film",
+        "label": "Phim & Gameshow",
+        "icon": "🎬",
+        "pattern": "phim|trailer|rạp|netflix|tập \\d|series|gameshow|running man|teaser|điện ảnh|box office|doanh thu phòng vé"
+      },
+      {
+        "id": "finance",
+        "label": "Kinh tế & Tài chính",
+        "icon": "💰",
+        "pattern": "giá vàng|chứng khoán|vn-?index|tỷ giá|giá xăng|ngân hàng|bitcoin|crypto|lãi suất|cổ phiếu|bất động sản|đô la|usd|lương|thuế|xổ số|vietlott|tiết kiệm|giá cả|kinh doanh|doanh nghiệp"
+      },
+      {
+        "id": "weather",
+        "label": "Thời tiết & Thiên tai",
+        "icon": "🌧",
+        "pattern": "bão|mưa|lũ|áp thấp|động đất|nắng nóng|triều cường|thời tiết|sạt lở|ngập|windy|dự báo"
+      },
+      {
+        "id": "event",
+        "label": "Lễ hội & Sự kiện",
+        "icon": "🎉",
+        "pattern": "lễ hội|festival|halloween|20/10|phụ nữ việt nam|trung thu|tết|noel|giáng sinh|sự kiện|triển lãm|countdown|valentine|black friday|sale|pháo hoa|kỷ niệm"
+      },
+      {
+        "id": "food",
+        "label": "Du lịch & Ẩm thực",
+        "icon": "🍜",
+        "pattern": "du lịch|ẩm thực|nhà hàng|quán|món|food|michelin|khách sạn|resort|cocktail|bar\\b|cà phê|coffee"
+      },
+      {
+        "id": "health",
+        "label": "Sức khoẻ & Làm đẹp",
+        "icon": "💊",
+        "pattern": "giảm cân|slimming|làm đẹp|mỹ phẩm|skincare|sức khỏe|sức khoẻ|thuốc|thực phẩm chức năng|gym|fitness|yoga|dinh dưỡng|spa"
+      },
+      {
+        "id": "society",
+        "label": "Xã hội & Thời sự",
+        "icon": "📰",
+        "pattern": "tai nạn|\\bvụ\\b|công an|bắt|xét xử|cháy|giáo dục|học sinh|sinh viên|bộ |chính phủ|quốc hội|thủ tướng|tổng bí thư|chủ tịch|phật giáo|tôn giáo|bệnh viện|y tế|dịch"
+      }
+    ],
+    "sensitivePattern": "chết|tử vong|thiệt mạng|tai nạn|thảm họa|thảm kịch|động đất|sạt lở|lũ quét|tang lễ|qua đời|từ trần|xét xử|khởi tố|bắt giữ|đảng|quốc hội|bầu cử|tổng bí thư|chính phủ|chiến tranh|xung đột|khủng bố|tôn giáo|phật giáo|dịch bệnh"
+  },
   "autocompleteSeeds": [
     "cocktail bar",
     "hidden bar",
@@ -87,21 +214,37 @@
     "ăn tối lãng mạn",
     "live music",
     "happy hour",
-    "sinh nhật ở đâu"
+    "sinh nhật ở đâu",
+    "nhà hàng món âu",
+    "nhà hàng nhật",
+    "steak",
+    "nhà hàng phòng riêng",
+    "brunch",
+    "quán ăn ngon",
+    "quán nhậu",
+    "lẩu nướng",
+    "bistro",
+    "ăn gì",
+    "cocktail"
   ],
-  "autocompleteSuffixes": ["quận 1", "quận 2", "thảo điền", "sài gòn"],
-
+  "autocompleteSuffixes": [
+    "quận 1",
+    "quận 2",
+    "thảo điền",
+    "sài gòn"
+  ],
   "youtubeQueries": [
-    "cocktail bar Sài Gòn",
-    "hidden bar Sài Gòn",
-    "nhà hàng quận 1",
     "Saigon nightlife",
-    "rooftop bar Saigon",
+    "hidden bar Sài Gòn",
+    "cocktail bar Sài Gòn",
+    "fine dining Sài Gòn",
+    "omakase Sài Gòn",
+    "quán ăn ngon quận 1",
+    "ăn gì ở Sài Gòn",
     "Thảo Điền ăn gì",
     "Bangkok cocktail bar",
-    "Singapore speakeasy"
+    "Singapore restaurant"
   ],
-
   "apify": {
     "_note": "Cần biến môi trường APIFY_TOKEN. Mỗi nền tảng có thể bật/tắt. 'input' hỗ trợ placeholder {{hashtags}}, {{queries}}, {{urls}}, {{limit}}. Actor bên thứ ba có thể đổi tên field, nên kiểm tra input schema trên Apify Console.",
     "maxItemsPerPlatform": 60,
@@ -114,16 +257,43 @@
         "actor": "clockworks~tiktok-scraper",
         "everyDays": 3,
         "maxChargeUsd": 0.2,
-        "hashtags": ["saigonnightlife", "cocktailbar", "hiddenbar", "speakeasy", "quan1", "thaodien", "rooftopbar", "reviewnhahang"],
-        "input": { "hashtags": "{{hashtags}}", "resultsPerPage": 6, "shouldDownloadVideos": false, "shouldDownloadCovers": false, "shouldDownloadSlideshowImages": false, "shouldDownloadAvatars": false }
+        "hashtags": [
+          "saigonnightlife",
+          "hiddenbar",
+          "cocktailbar",
+          "cocktailsaigon",
+          "finedining",
+          "omakase",
+          "anngonsaigon",
+          "reviewquanan"
+        ],
+        "input": {
+          "hashtags": "{{hashtags}}",
+          "resultsPerPage": 6,
+          "shouldDownloadVideos": false,
+          "shouldDownloadCovers": false,
+          "shouldDownloadSlideshowImages": false,
+          "shouldDownloadAvatars": false
+        }
       },
       "instagram": {
         "enabled": true,
         "actor": "apify~instagram-hashtag-scraper",
         "everyDays": 3,
         "maxChargeUsd": 0.12,
-        "hashtags": ["saigonbar", "saigoncocktail", "saigonnightlife", "speakeasysaigon", "saigonfoodie", "bangkokbar"],
-        "input": { "hashtags": "{{hashtags}}", "resultsLimit": 6, "resultsType": "posts" }
+        "hashtags": [
+          "saigonbar",
+          "saigoncocktail",
+          "saigonfinedining",
+          "saigonrestaurant",
+          "saigonfoodie",
+          "anngonsaigon"
+        ],
+        "input": {
+          "hashtags": "{{hashtags}}",
+          "resultsLimit": 6,
+          "resultsType": "posts"
+        }
       },
       "facebook": {
         "enabled": true,
@@ -135,7 +305,10 @@
         ],
         "everyDays": 7,
         "maxChargeUsd": 0.12,
-        "input": { "startUrls": "{{urls}}", "resultsLimit": 10 }
+        "input": {
+          "startUrls": "{{urls}}",
+          "resultsLimit": 10
+        }
       },
       "threads": {
         "enabled": true,
@@ -144,8 +317,21 @@
         "everyDays": 7,
         "maxChargeUsd": 0.5,
         "_runEachNote": "Actor này nhận 1 từ khoá/lượt nên chạy lần lượt từng query ({{query}}). Chi phí ~0,002 USD/bài.",
-        "queries": ["quán bar sài gòn", "cocktail sài gòn", "hidden bar sài gòn", "quán bar quận 1", "nhà hàng thảo điền", "đi bar"],
-        "input": { "mode": "search", "searchQuery": "{{query}}", "maxPosts": "{{limit}}", "resultType": "recent", "includeReplies": false }
+        "queries": [
+          "quán bar sài gòn",
+          "cocktail sài gòn",
+          "nhà hàng sang trọng sài gòn",
+          "quán ăn ngon quận 1",
+          "ăn gì thảo điền",
+          "quán nhậu sài gòn"
+        ],
+        "input": {
+          "mode": "search",
+          "searchQuery": "{{query}}",
+          "maxPosts": "{{limit}}",
+          "resultType": "recent",
+          "includeReplies": false
+        }
       },
       "googlemaps": {
         "enabled": true,
@@ -154,8 +340,23 @@
         "_note": "Theo dõi địa điểm trên Google Maps: số review tăng nhanh = đang hot. Thêm tên đối thủ vào queries để theo dõi trực tiếp.",
         "everyDays": 7,
         "maxChargeUsd": 0.3,
-        "queries": ["cocktail bar quận 1", "speakeasy quận 1", "rooftop bar quận 1", "fine dining quận 1", "cocktail bar thảo điền", "nhà hàng thảo điền"],
-        "input": { "searchStringsArray": "{{queries}}", "locationQuery": "Ho Chi Minh City, Vietnam", "maxCrawledPlacesPerSearch": 10, "language": "vi", "maxReviews": 0, "skipClosedPlaces": true, "scrapePlaceDetailPage": false }
+        "queries": [
+          "cocktail bar quận 1",
+          "rooftop bar quận 1",
+          "fine dining quận 1",
+          "nhà hàng quận 1",
+          "quán ăn ngon quận 1",
+          "nhà hàng thảo điền"
+        ],
+        "input": {
+          "searchStringsArray": "{{queries}}",
+          "locationQuery": "Ho Chi Minh City, Vietnam",
+          "maxCrawledPlacesPerSearch": 10,
+          "language": "vi",
+          "maxReviews": 0,
+          "skipClosedPlaces": true,
+          "scrapePlaceDetailPage": false
+        }
       },
       "tripadvisor": {
         "enabled": true,
@@ -168,11 +369,17 @@
         ],
         "everyDays": 14,
         "maxChargeUsd": 0.25,
-        "input": { "startUrls": "{{urls}}", "maxItemsPerQuery": 25, "language": "en", "currency": "VND", "includeTags": true, "maxPhotosPerPlace": 0 }
+        "input": {
+          "startUrls": "{{urls}}",
+          "maxItemsPerQuery": 25,
+          "language": "en",
+          "currency": "VND",
+          "includeTags": true,
+          "maxPhotosPerPlace": 0
+        }
       }
     }
   },
-
   "venues": {
     "_note": "Nền tảng đặt bàn/review lấy trực tiếp, không tốn phí. PasGo là nền tảng đặt bàn phổ biến nhất tại VN.",
     "pasgo": {
@@ -185,35 +392,96 @@
       ]
     }
   },
-
   "brand": {
     "_note": "Điền tên thương hiệu của mình và đối thủ để tool cảnh báo khi được nhắc đến hoặc khi đối thủ đang hot.",
     "names": [],
     "competitors": []
   },
-
   "marketingCalendar": {
     "_note": "MM-DD = lặp lại hằng năm; YYYY-MM-DD = ngày cụ thể. leadDays = số ngày cần chuẩn bị trước.",
     "events": [
-      { "date": "01-01", "name": "Tết Dương lịch", "leadDays": 21 },
-      { "date": "02-14", "name": "Valentine", "leadDays": 21 },
-      { "date": "03-08", "name": "Quốc tế Phụ nữ 8/3", "leadDays": 14 },
-      { "date": "04-30", "name": "Lễ 30/4 – 1/5 (nghỉ dài)", "leadDays": 21 },
-      { "date": "05-13", "name": "World Cocktail Day", "leadDays": 14 },
-      { "date": "06-01", "name": "Mùa công bố Michelin Guide Việt Nam (khoảng tháng 6)", "leadDays": 14 },
-      { "date": "09-02", "name": "Quốc khánh 2/9 (nghỉ lễ)", "leadDays": 14 },
-      { "date": "10-20", "name": "Phụ nữ Việt Nam 20/10", "leadDays": 14 },
-      { "date": "10-31", "name": "Halloween", "leadDays": 21 },
-      { "date": "11-20", "name": "Nhà giáo Việt Nam 20/11", "leadDays": 10 },
-      { "date": "2026-11-27", "name": "Black Friday", "leadDays": 14 },
-      { "date": "12-24", "name": "Giáng sinh / Noel", "leadDays": 30 },
-      { "date": "12-31", "name": "Countdown – Đêm giao thừa Dương lịch", "leadDays": 30 },
-      { "date": "2027-02-06", "name": "Tết Nguyên Đán 2027 (mùng 1)", "leadDays": 45 },
-      { "date": "2027-02-14", "name": "Valentine trùng dịp Tết", "leadDays": 21 },
-      { "date": "2027-09-15", "name": "Trung thu 2027", "leadDays": 21 }
+      {
+        "date": "01-01",
+        "name": "Tết Dương lịch",
+        "leadDays": 21
+      },
+      {
+        "date": "02-14",
+        "name": "Valentine",
+        "leadDays": 21
+      },
+      {
+        "date": "03-08",
+        "name": "Quốc tế Phụ nữ 8/3",
+        "leadDays": 14
+      },
+      {
+        "date": "04-30",
+        "name": "Lễ 30/4 – 1/5 (nghỉ dài)",
+        "leadDays": 21
+      },
+      {
+        "date": "05-13",
+        "name": "World Cocktail Day",
+        "leadDays": 14
+      },
+      {
+        "date": "06-01",
+        "name": "Mùa công bố Michelin Guide Việt Nam (khoảng tháng 6)",
+        "leadDays": 14
+      },
+      {
+        "date": "09-02",
+        "name": "Quốc khánh 2/9 (nghỉ lễ)",
+        "leadDays": 14
+      },
+      {
+        "date": "10-20",
+        "name": "Phụ nữ Việt Nam 20/10",
+        "leadDays": 14
+      },
+      {
+        "date": "10-31",
+        "name": "Halloween",
+        "leadDays": 21
+      },
+      {
+        "date": "11-20",
+        "name": "Nhà giáo Việt Nam 20/11",
+        "leadDays": 10
+      },
+      {
+        "date": "2026-11-27",
+        "name": "Black Friday",
+        "leadDays": 14
+      },
+      {
+        "date": "12-24",
+        "name": "Giáng sinh / Noel",
+        "leadDays": 30
+      },
+      {
+        "date": "12-31",
+        "name": "Countdown – Đêm giao thừa Dương lịch",
+        "leadDays": 30
+      },
+      {
+        "date": "2027-02-06",
+        "name": "Tết Nguyên Đán 2027 (mùng 1)",
+        "leadDays": 45
+      },
+      {
+        "date": "2027-02-14",
+        "name": "Valentine trùng dịp Tết",
+        "leadDays": 21
+      },
+      {
+        "date": "2027-09-15",
+        "name": "Trung thu 2027",
+        "leadDays": 21
+      }
     ]
   },
-
   "ai": {
     "_note": "provider: auto | anthropic | openai | gemini | none. 'auto' = dùng provider nào có API key (ưu tiên anthropic → openai → gemini). Có thể ghi đè bằng biến AI_PROVIDER / AI_MODEL.",
     "provider": "auto",
@@ -223,28 +491,426 @@
       "gemini": "gemini-3.5-flash"
     }
   },
-
   "weather": {
-    "location": { "name": "TP.HCM (Quận 1)", "latitude": 10.7769, "longitude": 106.7009 },
+    "location": {
+      "name": "TP.HCM (Quận 1)",
+      "latitude": 10.7769,
+      "longitude": 106.7009
+    },
     "pastDays": 7,
     "forecastDays": 7
   },
-
   "themes": [
-    { "id": "speakeasy", "label": "Hidden bar & Speakeasy", "terms": ["hidden bar", "speakeasy", "bar ẩn", "quán bar bí mật", "secret bar", "bar ẩn mình", "cửa bí mật"] },
-    { "id": "rooftop", "label": "Rooftop & View đẹp", "terms": ["rooftop", "sân thượng", "view sông", "view thành phố", "skybar", "sky bar", "view đẹp", "riverside"] },
-    { "id": "cocktail", "label": "Cocktail sáng tạo & Signature", "terms": ["cocktail", "signature", "mixology", "bartender", "mocktail", "highball", "negroni", "martini", "gin", "whisky", "whiskey", "rượu vang", "wine", "sake", "rum"] },
-    { "id": "finedining", "label": "Fine / Fun dining & Omakase", "terms": ["fine dining", "fun dining", "omakase", "tasting menu", "chef's table", "michelin", "degustation", "set menu", "nhà hàng sang trọng"] },
-    { "id": "party", "label": "Party, Club, Live music & DJ", "terms": ["club", "dj", "live music", "nhạc sống", "acoustic", "jazz", "party", "lounge", "bữa tiệc", "quẩy", "nightlife", "pub"] },
-    { "id": "dating", "label": "Hẹn hò & Dịp đặc biệt", "terms": ["hẹn hò", "lãng mạn", "date night", "kỷ niệm", "sinh nhật", "cầu hôn", "romantic", "anniversary", "tỏ tình"] },
-    { "id": "deal", "label": "Ưu đãi & Happy hour", "terms": ["happy hour", "ưu đãi", "khuyến mãi", "giảm giá", "free flow", "buffet", "combo", "1 tặng 1", "voucher", "ladies night"] },
-    { "id": "season", "label": "Lễ hội & Mùa vụ", "terms": ["halloween", "giáng sinh", "noel", "christmas", "tết", "năm mới", "countdown", "valentine", "trung thu", "20/10", "8/3", "lễ hội", "festival"] },
-    { "id": "local", "label": "Bản địa & Ẩm thực Việt twist", "terms": ["ẩm thực việt", "món việt", "nguyên liệu bản địa", "đặc sản", "vietnamese cuisine", "cocktail việt", "rượu việt", "rượu cần", "rượu mơ"] },
-    { "id": "wellness", "label": "Low/No alcohol & Healthy", "terms": ["mocktail", "không cồn", "low alcohol", "no alcohol", "healthy", "kombucha", "sober"] }
+    {
+      "id": "speakeasy",
+      "label": "Hidden bar & Speakeasy",
+      "terms": [
+        "hidden bar",
+        "speakeasy",
+        "bar ẩn",
+        "quán bar bí mật",
+        "secret bar",
+        "bar ẩn mình",
+        "cửa bí mật"
+      ]
+    },
+    {
+      "id": "rooftop",
+      "label": "Rooftop & View đẹp",
+      "terms": [
+        "rooftop",
+        "sân thượng",
+        "view sông",
+        "view thành phố",
+        "skybar",
+        "sky bar",
+        "view đẹp",
+        "riverside"
+      ]
+    },
+    {
+      "id": "cocktail",
+      "label": "Cocktail sáng tạo & Signature",
+      "terms": [
+        "cocktail",
+        "signature",
+        "mixology",
+        "bartender",
+        "mocktail",
+        "highball",
+        "negroni",
+        "martini",
+        "gin",
+        "whisky",
+        "whiskey",
+        "rượu vang",
+        "wine",
+        "sake",
+        "rum"
+      ]
+    },
+    {
+      "id": "finedining",
+      "label": "Fine / Fun dining & Omakase",
+      "terms": [
+        "fine dining",
+        "fun dining",
+        "omakase",
+        "tasting menu",
+        "chef's table",
+        "michelin",
+        "degustation",
+        "set menu",
+        "nhà hàng sang trọng"
+      ]
+    },
+    {
+      "id": "party",
+      "label": "Party, Club, Live music & DJ",
+      "terms": [
+        "club",
+        "dj",
+        "live music",
+        "nhạc sống",
+        "acoustic",
+        "jazz",
+        "party",
+        "lounge",
+        "bữa tiệc",
+        "quẩy",
+        "nightlife",
+        "pub"
+      ]
+    },
+    {
+      "id": "dating",
+      "label": "Hẹn hò & Dịp đặc biệt",
+      "terms": [
+        "hẹn hò",
+        "lãng mạn",
+        "date night",
+        "kỷ niệm",
+        "sinh nhật",
+        "cầu hôn",
+        "romantic",
+        "anniversary",
+        "tỏ tình"
+      ]
+    },
+    {
+      "id": "deal",
+      "label": "Ưu đãi & Happy hour",
+      "terms": [
+        "happy hour",
+        "ưu đãi",
+        "khuyến mãi",
+        "giảm giá",
+        "free flow",
+        "buffet",
+        "combo",
+        "1 tặng 1",
+        "voucher",
+        "ladies night"
+      ]
+    },
+    {
+      "id": "season",
+      "label": "Lễ hội & Mùa vụ",
+      "terms": [
+        "halloween",
+        "giáng sinh",
+        "noel",
+        "christmas",
+        "tết",
+        "năm mới",
+        "countdown",
+        "valentine",
+        "trung thu",
+        "20/10",
+        "8/3",
+        "lễ hội",
+        "festival"
+      ]
+    },
+    {
+      "id": "local",
+      "label": "Bản địa & Ẩm thực Việt twist",
+      "terms": [
+        "ẩm thực việt",
+        "món việt",
+        "nguyên liệu bản địa",
+        "đặc sản",
+        "vietnamese cuisine",
+        "cocktail việt",
+        "rượu việt",
+        "rượu cần",
+        "rượu mơ"
+      ]
+    },
+    {
+      "id": "wellness",
+      "label": "Low/No alcohol & Healthy",
+      "terms": [
+        "mocktail",
+        "không cồn",
+        "low alcohol",
+        "no alcohol",
+        "healthy",
+        "kombucha",
+        "sober"
+      ]
+    },
+    {
+      "id": "cuisine",
+      "label": "Nhà hàng: ẩm thực Âu – Á",
+      "terms": [
+        "steak",
+        "bít tết",
+        "wagyu",
+        "món pháp",
+        "món ý",
+        "pasta",
+        "pizza",
+        "sushi",
+        "sashimi",
+        "món nhật",
+        "món hàn",
+        "hải sản",
+        "dimsum",
+        "món âu",
+        "nhà hàng nhật",
+        "nhà hàng ý",
+        "nhà hàng pháp",
+        "teppanyaki",
+        "bbq",
+        "nướng"
+      ]
+    },
+    {
+      "id": "dinner",
+      "label": "Nhà hàng: ăn tối, tiệc & phòng riêng",
+      "terms": [
+        "nhà hàng",
+        "restaurant",
+        "ăn tối",
+        "dinner",
+        "brunch",
+        "set menu",
+        "phòng riêng",
+        "private room",
+        "tiệc công ty",
+        "đặt bàn",
+        "đặt tiệc",
+        "tiệc sinh nhật",
+        "họp mặt",
+        "gia đình"
+      ]
+    },
+    {
+      "id": "opening",
+      "label": "Nhà hàng/bar mới & Chef",
+      "terms": [
+        "khai trương",
+        "mới mở",
+        "grand opening",
+        "soft opening",
+        "chef",
+        "đầu bếp",
+        "bếp trưởng",
+        "menu mới",
+        "new menu",
+        "ra mắt menu"
+      ]
+    },
+    {
+      "id": "casualfood",
+      "label": "Quán ăn casual & món ngon",
+      "terms": [
+        "quán ăn",
+        "ăn ngon",
+        "quán nhậu",
+        "lẩu",
+        "cơm",
+        "phở",
+        "bún",
+        "burger",
+        "pizza",
+        "ăn vặt",
+        "bình dân",
+        "món ngon",
+        "review quán",
+        "bistro"
+      ]
+    }
   ],
-
   "_excludeNote": "Regex (không phân biệt hoa thường). Truy vấn/keyword khớp sẽ bị loại khỏi phân tích.",
-  "excludePatterns": ["pubmed", "pubg", "club de nuit", "pub quiz", "chair", "nước hoa", "perfume", "\\bmp3\\b", "lyrics", "karaoke beat"],
-
-  "stopwords": ["và", "của", "cho", "các", "những", "với", "là", "có", "được", "một", "này", "đó", "tại", "ở", "từ", "khi", "the", "a", "an", "of", "in", "on", "for", "to", "and", "at", "is", "with", "by", "fyp", "foryou", "foryoupage", "xuhuong", "trending", "viral", "tiktok", "reels", "explore"]
+  "excludePatterns": [
+    "pubmed",
+    "pubg",
+    "club de nuit",
+    "pub quiz",
+    "chair",
+    "nước hoa",
+    "perfume",
+    "\\bmp3\\b",
+    "lyrics",
+    "karaoke beat"
+  ],
+  "stopwords": [
+    "và",
+    "của",
+    "cho",
+    "các",
+    "những",
+    "với",
+    "là",
+    "có",
+    "được",
+    "một",
+    "này",
+    "đó",
+    "tại",
+    "ở",
+    "từ",
+    "khi",
+    "the",
+    "a",
+    "an",
+    "of",
+    "in",
+    "on",
+    "for",
+    "to",
+    "and",
+    "at",
+    "is",
+    "with",
+    "by",
+    "fyp",
+    "foryou",
+    "foryoupage",
+    "xuhuong",
+    "trending",
+    "viral",
+    "tiktok",
+    "reels",
+    "explore"
+  ],
+  "segments": [
+    {
+      "id": "bar",
+      "label": "Bar & Nightlife",
+      "icon": "🌙",
+      "tone": "violet",
+      "terms": [
+        "bar",
+        "quán bar",
+        "pub",
+        "club",
+        "nightclub",
+        "lounge",
+        "nightlife",
+        "quẩy",
+        "dj",
+        "live music",
+        "nhạc sống",
+        "hidden bar",
+        "speakeasy",
+        "rooftop bar",
+        "sky bar",
+        "beer",
+        "bia",
+        "beer club",
+        "ladies night",
+        "party"
+      ]
+    },
+    {
+      "id": "cocktail",
+      "label": "Cocktail & Mixology",
+      "icon": "🍸",
+      "tone": "mint",
+      "terms": [
+        "cocktail",
+        "mocktail",
+        "mixology",
+        "bartender",
+        "signature",
+        "gin",
+        "whisky",
+        "whiskey",
+        "rum",
+        "tequila",
+        "highball",
+        "negroni",
+        "martini",
+        "rượu vang",
+        "wine",
+        "sake",
+        "cocktail bar",
+        "craft"
+      ]
+    },
+    {
+      "id": "fine",
+      "label": "Nhà hàng cao cấp / Fun dining",
+      "icon": "🍽",
+      "tone": "peach",
+      "terms": [
+        "fine dining",
+        "fun dining",
+        "omakase",
+        "tasting menu",
+        "chef's table",
+        "michelin",
+        "sang trọng",
+        "cao cấp",
+        "wagyu",
+        "degustation",
+        "set menu",
+        "steak",
+        "bít tết",
+        "món pháp",
+        "món ý",
+        "teppanyaki",
+        "nhà hàng sang trọng",
+        "finedining"
+      ]
+    },
+    {
+      "id": "casual",
+      "label": "Nhà hàng casual & quán ăn",
+      "icon": "🍜",
+      "tone": "yellow",
+      "terms": [
+        "quán ăn",
+        "ăn ngon",
+        "quán nhậu",
+        "lẩu",
+        "nướng",
+        "bbq",
+        "buffet",
+        "cơm",
+        "phở",
+        "bún",
+        "bistro",
+        "brunch",
+        "pizza",
+        "burger",
+        "ăn vặt",
+        "bình dân",
+        "review quán",
+        "ăn gì",
+        "món ngon",
+        "gia đình",
+        "nhà hàng",
+        "restaurant",
+        "anngon",
+        "reviewnhahang",
+        "reviewquanan",
+        "foodie",
+        "eats"
+      ]
+    }
+  ]
 }

@@ -17,7 +17,7 @@ export function resolveProvider(settings, env = process.env) {
 const SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['summary', 'customerNeeds', 'keywordInsights', 'emergingKeywords', 'trends', 'platformTrends', 'hashtagStrategy', 'weatherInsights', 'contentIdeas', 'actions'],
+  required: ['summary', 'customerNeeds', 'keywordInsights', 'emergingKeywords', 'trends', 'platformTrends', 'hashtagStrategy', 'weatherInsights', 'contentIdeas', 'actions', 'generalSummary', 'trendOpportunities', 'segmentInsights'],
   properties: {
     summary: { type: 'string', description: '3-5 câu tóm tắt bức tranh xu hướng của kỳ này cho team Marketing' },
     customerNeeds: { type: 'array', items: { type: 'string' }, description: '4-6 nhu cầu/động cơ khách hàng nổi bật' },
@@ -59,6 +59,36 @@ const SCHEMA = {
         },
       },
     },
+    segmentInsights: {
+      type: 'array',
+      description: 'Đúng 4 mục, mỗi phân khúc một mục: bar, cocktail, fine, casual',
+      items: {
+        type: 'object', additionalProperties: false, required: ['segment', 'headline', 'needs', 'contentIdeas'],
+        properties: {
+          segment: { type: 'string', enum: ['bar', 'cocktail', 'fine', 'casual'] },
+          headline: { type: 'string', description: '1 câu: xu hướng nổi bật nhất của phân khúc này' },
+          needs: { type: 'array', items: { type: 'string' }, description: '2-3 nhu cầu khách hàng' },
+          contentIdeas: { type: 'array', items: { type: 'string' }, description: '2-3 ý tưởng content cụ thể' },
+        },
+      },
+    },
+    generalSummary: { type: 'string', description: '2-4 câu: xã hội Việt Nam đang quan tâm gì (mọi lĩnh vực) trong kỳ này' },
+    trendOpportunities: {
+      type: 'array',
+      description: '6-10 trend chung (ngoài ngành) có thể "đu" cho F&B/nightlife, sắp theo tiềm năng',
+      items: {
+        type: 'object', additionalProperties: false, required: ['trend', 'category', 'why', 'angle', 'format', 'timing', 'risk'],
+        properties: {
+          trend: { type: 'string' },
+          category: { type: 'string' },
+          why: { type: 'string', description: 'Vì sao trend này đang nóng (dựa trên dữ liệu)' },
+          angle: { type: 'string', description: 'Cách lồng vào nhà hàng/bar/nightlife: content, cocktail/menu đặc biệt, event, ưu đãi' },
+          format: { type: 'string', description: 'Nền tảng + định dạng' },
+          timing: { type: 'string', description: 'Làm ngay hôm nay / trong 48h / tuần này…' },
+          risk: { type: 'string', enum: ['an toàn', 'cân nhắc', 'tránh'] },
+        },
+      },
+    },
     hashtagStrategy: { type: 'string', description: '2-4 câu: nên dùng hashtag nào, kết hợp ra sao, tránh gì' },
     actions: {
       type: 'array',
@@ -96,7 +126,7 @@ const SCHEMA = {
   },
 };
 
-const SYSTEM = `Bạn là chuyên gia phân tích xu hướng social & search cho một nhóm thương hiệu F&B/nightlife tại TP.HCM: nhà hàng tầm trung - cao cấp, cocktail bar, hidden bar, cocktail club, fun dining và các dịch vụ nightlife. Khu vực phục vụ chính: Quận 1 và Quận 2 (Thảo Điền, Thủ Thiêm). Dữ liệu từ HCM, Việt Nam và Đông Nam Á chỉ để tham khảo xu hướng.
+const SYSTEM = `Bạn là chuyên gia phân tích xu hướng social & search cho một nhóm thương hiệu F&B/nightlife tại TP.HCM: nhà hàng tầm trung - cao cấp và nhà hàng casual, cocktail bar, hidden bar, cocktail club, fun dining và các dịch vụ nightlife. Theo dõi song song 4 phân khúc: bar, cocktail, nhà hàng cao cấp, nhà hàng casual. Khu vực phục vụ chính: Quận 1 và Quận 2 (Thảo Điền, Thủ Thiêm). Dữ liệu từ HCM, Việt Nam và Đông Nam Á chỉ để tham khảo xu hướng.
 
 Nhiệm vụ: đọc dữ liệu đã thu thập (keyword đã chấm điểm, nội dung top theo độ tiếp cận, báo chí, Google Trends, thời tiết) và viết insight giúp team Marketing hiểu nhu cầu khách hàng để sản xuất nội dung.
 
@@ -109,6 +139,8 @@ Nguyên tắc:
 - platformTrends: phân tích riêng từng nền tảng có dữ liệu (TikTok, Facebook, Instagram, Threads, YouTube, Google, báo chí, PasGo, Google Maps, Tripadvisor). Với nền tảng đặt bàn/review, tập trung vào loại hình đang được đẩy, dạng ưu đãi và địa điểm đang lên.
 - hashtagStrategy: dựa trên dữ liệu hashtag thực tế; nếu chưa có dữ liệu social thì nói rõ và đề xuất bộ hashtag khởi đầu.
 - actions: việc cụ thể team Marketing nên làm ngay, có ưu tiên, team phụ trách, thời hạn, KPI. Tham khảo ruleActions và upcomingEvents nhưng viết chi tiết, sắc hơn; không lặp y nguyên.
+- segmentInsights: phân tích SONG SONG và CÂN BẰNG 4 phân khúc: Bar & Nightlife, Cocktail & Mixology, Nhà hàng cao cấp/Fun dining, Nhà hàng casual & quán ăn (dựa trên dữ liệu segments). Không thiên vị bar.
+- generalSummary + trendOpportunities: dựa trên generalTrends (Google Trends toàn quốc, YouTube Thịnh hành, tin nổi bật, SEA), KHÔNG giới hạn ngành F&B. Chọn trend có thể đu được (thể thao: chiếu trận/combo xem bóng; âm nhạc/showbiz: cocktail lấy cảm hứng, playlist, after-party; phim/game: theme night; lễ hội…). Đánh dấu risk "tránh" cho chủ đề NHẠY CẢM (tai nạn, thiên tai có thương vong, chính trị, tôn giáo, tang lễ) và không đề xuất khai thác thương mại các chủ đề đó.
 - weatherInsights: liên hệ thời tiết 7 ngày tới (đặc biệt mưa buổi tối 17–23h, nắng nóng) với hành vi đi chơi và gợi ý content/ưu đãi.`;
 
 export async function generateInsights(ai, payload, periodLabel) {

@@ -9,6 +9,8 @@ Mục đích: giúp team Marketing hiểu nhu cầu khách hàng để sản xu�
 | Mục | Nội dung |
 |---|---|
 | **Action đề xuất** | Việc cụ thể cho team (ưu tiên, team phụ trách, thời hạn, KPI, nguồn). Gồm 2 lớp: luật tự động (lịch lễ/sự kiện, keyword đang lên, thời tiết, hashtag, ưu đãi PasGo, đối thủ) và AI. Có ô đánh dấu "đã xử lý" |
+| **Song song theo phân khúc** | 4 phân khúc theo dõi ngang nhau: Bar & Nightlife · Cocktail & Mixology · Nhà hàng cao cấp/Fun dining · Nhà hàng casual & quán ăn. Mỗi phân khúc có điểm sức nóng, khách đang tìm gì, keyword, hashtag, nội dung/địa điểm top, nhu cầu & ý tưởng content (AI). Sửa từ khoá nhận diện trong `segments` |
+| **Top xu hướng chung** | Không lọc ngành: Google Trends VN & Đông Nam Á, YouTube Thịnh hành VN, tin nổi bật (VnExpress, Tuổi Trẻ, Thanh Niên). Tự phân loại lĩnh vực (thể thao, showbiz, game, kinh tế…), đánh dấu chủ đề nhạy cảm. AI gợi ý **cơ hội đu trend** cho F&B/nightlife kèm mức rủi ro |
 | **Top 10 keyword** | Truy vấn Google thật + hashtag/cụm từ trên TikTok, Instagram, Facebook, Threads, YouTube, báo chí. Có điểm số, % thay đổi so với kỳ trước, nhãn MỚI, lọc theo khu vực, xuất CSV |
 | **Xu hướng chính** | 10 chủ đề (Speakeasy, Rooftop, Cocktail, Fine/Fun dining, Party/DJ, Hẹn hò, Ưu đãi, Lễ hội, Bản địa, No/Low alcohol), kèm bằng chứng. Khi bật AI: phân tích xu hướng, nhu cầu khách hàng, ý tưởng content |
 | **Xu hướng từng nền tảng** | Tách riêng TikTok, Facebook, Instagram, Threads, YouTube, Google, Báo chí, **PasGo, Google Maps, Tripadvisor**: chủ đề, keyword, hashtag, định dạng hiệu quả. Với nền tảng đặt bàn/review: loại hình đang được đẩy, dạng ưu đãi, deal, địa điểm mới, địa điểm tăng review nhanh |

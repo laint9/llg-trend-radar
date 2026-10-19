@@ -11,7 +11,8 @@ const DOMAIN_WORDS = [
   'bar', 'pub', 'lounge', 'cocktail', 'mocktail', 'nhà hàng', 'quán bar', 'quán nhậu', 'quán ăn', 'restaurant', 'dining',
   'ẩm thực', 'rượu vang', 'wine', 'whisky', 'whiskey', 'sake', 'craft beer', 'bia thủ công', 'chef', 'đầu bếp', 'nightlife',
   'rooftop', 'speakeasy', 'michelin', 'buffet', 'brunch', 'bartender', 'omakase', 'fine dining', 'fun dining', 'beach club',
-  'nightclub', 'hẹn hò', 'ăn tối', 'dinner', 'món ăn', 'food tour', 'phố ẩm thực', 'phố đi bộ',
+  'nightclub', 'hẹn hò', 'ăn tối', 'dinner', 'món ăn', 'food tour', 'phố ẩm thực', 'phố đi bộ', 'lẩu', 'nướng', 'bistro', 'ăn ngon',
+  'món ngon', 'quán ngon', 'ăn gì', 'review quán', 'foodie', 'ăn uống',
 ];
 
 export function buildMatchers(settings) {
@@ -348,4 +349,56 @@ export function platformTrends(merged, prev, settings, M, kws) {
     out[p] = entry;
   }
   return out;
+}
+
+/** So sánh song song theo phân khúc (bar, cocktail, nhà hàng cao cấp, casual). */
+export function segmentSummary(merged, prev, settings, M) {
+  const segs = settings.segments || [];
+  const textOf = (it) => normalizeText(`${it.title} ${it.text || ''} ${it.category || ''} ${(it.hashtags || []).join(' ')}`);
+  const matchSeg = (seg) => {
+    const terms = seg.terms.map(normalizeText);
+    return (t) => terms.some((term) => M.has(t, term) || (!term.includes(' ') && t.includes(term) && term.length >= 6));
+  };
+  return segs.map((seg) => {
+    const m = matchSeg(seg);
+    const pick = (src) => ({
+      items: src.items.filter((it) => m(textOf(it))),
+      queries: src.queries.filter((q) => m(normalizeText(q.query))),
+      trending: src.trending.filter((t) => t.relevant && m(normalizeText(t.title))),
+    });
+    const cur = pick(merged);
+    const before = prev ? pick(prev) : null;
+    const social = cur.items.filter((i) => SOCIAL.includes(i.platform));
+    const reach = cur.items.reduce((s, i) => s + reachOf(i), 0);
+    const eng = social.reduce((s, i) => s + engagementOf(i), 0);
+    const kws = scoreKeywords(cur, M).slice(0, 8).map(({ keyword, score }) => ({ keyword, score }));
+    const tagCount = {};
+    for (const it of social) for (const h of new Set(it.hashtags || [])) if (!M.stop.has(h)) tagCount[h] = (tagCount[h] || 0) + 1;
+    const score = Math.round(cur.items.length * 2 + cur.queries.length * 3 + Math.log10(reach + 10) * 10);
+    const prevScore = before ? Math.round(before.items.length * 2 + before.queries.length * 3 + Math.log10(before.items.reduce((s, i) => s + reachOf(i), 0) + 10) * 10) : null;
+    return {
+      id: seg.id, label: seg.label, icon: seg.icon, tone: seg.tone,
+      score,
+      change: prevScore == null ? null : prevScore ? Math.round(((score - prevScore) / prevScore) * 100) : 'new',
+      items: cur.items.length,
+      socialPosts: social.length,
+      venues: cur.items.filter((i) => i.kind === 'venue').length,
+      reach,
+      avgEngagement: social.length ? Math.round(eng / social.length) : 0,
+      keywords: kws,
+      hashtags: Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([tag, n]) => ({ tag, n })),
+      searches: cur.queries
+        .map((q) => ({ query: q.query, pos: q.positions.reduce((a, b) => a + b, 0) / q.positions.length, region: q.region }))
+        .filter((q) => !settings.autocompleteSeeds.some((s) => normalizeText(s) === normalizeText(q.query)))
+        .sort((a, b) => a.pos - b.pos)
+        .slice(0, 8)
+        .map((q) => q.query),
+      top: [...cur.items]
+        .filter((i) => !isVenue(i))
+        .sort((a, b) => reachOf(b) - reachOf(a) || String(b.publishedAt).localeCompare(String(a.publishedAt)))
+        .slice(0, 4)
+        .map(pickCard),
+      topVenues: cur.items.filter(isVenue).sort((a, b) => venueScore(b) - venueScore(a)).slice(0, 3).map(pickCard),
+    };
+  });
 }

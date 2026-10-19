@@ -10,18 +10,22 @@ import { youtube } from './sources/youtube.mjs';
 import { apify } from './sources/apify.mjs';
 import { weather, weatherInsights } from './sources/weather.mjs';
 import { pasgo } from './sources/venues.mjs';
+import { youtubeTrending, generalNews, buildClassifier } from './sources/general.mjs';
+import { summarizeGeneral } from './lib/general.mjs';
 import { buildActions, upcomingEvents } from './lib/actions.mjs';
-import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends } from './lib/analyze.mjs';
+import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends, segmentSummary } from './lib/analyze.mjs';
 import { resolveProvider, generateInsights } from './lib/ai.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
 const settings = await readJson(join(ROOT, 'config', 'settings.json'));
 const today = args.date || dateInTz(new Date(), settings.timezone);
 const M = buildMatchers(settings);
+const classify = buildClassifier(settings);
 
 /** Lần crawl Apify gần nhất của từng nền tảng + dữ liệu để dùng lại khi chưa tới lịch chạy. */
 async function previousApify() {
-  const dates = (await listDailyDates()).filter((d) => d < today).reverse().slice(0, 30);
+  // Gồm cả snapshot hôm nay (nếu chạy lại trong ngày) để không crawl lặp
+  const dates = (await listDailyDates()).filter((d) => d <= today).reverse().slice(0, 30);
   const lastRun = {};
   const carry = {};
   for (const d of dates) {
@@ -54,7 +58,7 @@ async function collect() {
     }
   };
 
-  const [trending, queries, news, feeds, yt, social, wx, pg] = await Promise.all([
+  const [trending, queries, news, feeds, yt, social, wx, pg, ytt, gnews] = await Promise.all([
     track('googleTrends', () => googleTrending()),
     track('googleAutocomplete', () => googleAutocomplete(settings)),
     track('googleNews', () => googleNews(settings)),
@@ -63,7 +67,12 @@ async function collect() {
     track('apify', () => apify(settings, process.env.APIFY_TOKEN, { today, lastRun: prevApify.lastRun })),
     track('weather', () => weather(settings)),
     track('pasgo', () => pasgo(settings)),
+    track('youtubeTrending', () => youtubeTrending(settings, process.env.YOUTUBE_API_KEY)),
+    track('generalNews', () => generalNews(settings)),
   ]);
+  if (ytt?.skipped) status.youtubeTrending = ytt.skipped;
+  else if (ytt) status.youtubeTrending = `OK (${ytt.items.length})`;
+  if (gnews) status.generalNews = `OK (${gnews.length})`;
   if (yt?.skipped) status.youtube = yt.skipped;
   if (pg?.skipped) status.pasgo = pg.skipped;
   else if (pg) status.pasgo = `OK (${pg.items.length})`;
@@ -94,7 +103,8 @@ async function collect() {
   }
   status.counts = { searchQueries: queries?.length || 0, trending: trending?.length || 0, items: items.size };
 
-  const snap = { date: today, generatedAt: new Date().toISOString(), apifyRuns, status, items: [...items.values()], searchQueries: queries || [], googleTrending: trending || [], weather: wx };
+  const general = { youtube: ytt?.items || [], news: gnews || [] };
+  const snap = { date: today, generatedAt: new Date().toISOString(), apifyRuns, status, general, items: [...items.values()], searchQueries: queries || [], googleTrending: trending || [], weather: wx };
   await writeJson(join(DAILY_DIR, `${today}.json`), snap);
   log(`Đã lưu snapshot: ${items.size} nội dung, ${queries?.length || 0} truy vấn, ${trending?.length || 0} trending`);
 
@@ -127,6 +137,18 @@ function aiPayload(s) {
       ]),
     ),
     hashtags: { top: s.hashtags.top.slice(0, 25).map((h) => `#${h.tag} (${h.posts} bài, reach TB ${h.avgReach}${h.change != null ? `, ${h.change === 'new' ? 'mới' : h.change + '%'}` : ''})`), suggested: s.hashtags.suggested },
+    segments: s.segments.map((g) => ({
+      id: g.id, label: g.label, score: g.score, change: g.change, posts: g.socialPosts, venues: g.venues, reach: g.reach,
+      keywords: g.keywords.map((k) => k.keyword), hashtags: g.hashtags.map((h) => '#' + h.tag), searches: g.searches,
+      topContent: g.top.map((x) => `${x.title} (${x.platform}, reach ${x.reach})`),
+    })),
+    generalTrends: {
+      googleSearchesVN: s.general.searchesVN.slice(0, 25).map((t) => `${t.title} [${t.trafficLabel || t.traffic}] (${t.categoryLabel}${t.sensitive ? ', NHẠY CẢM' : ''})`),
+      youtubeTrendingVN: s.general.youtube.slice(0, 20).map((v) => `#${v.bestRank} ${v.title} – ${v.channel} (${v.categoryLabel}, ${v.views} views)`),
+      topNews: s.general.news.slice(0, 20).map((n) => `${n.title} (${n.categoryLabel}${n.sensitive ? ', NHẠY CẢM' : ''})`),
+      sea: s.general.searchesSEA.slice(0, 12).map((t) => `${t.title} (${t.geo})`),
+      categoryMix: s.general.categories.map((c) => `${c.label} ${c.score}`),
+    },
     upcomingEvents: s.upcomingEvents.map((e) => `${e.name} – ${e.date} (còn ${e.daysLeft} ngày)`),
     ruleActions: s.actions.map((a) => `[${a.priority}] ${a.title}`),
     brand: settings.brand,
@@ -170,6 +192,8 @@ async function aggregate({ useAi }) {
     });
     const platforms = rankPlatforms(merged, M);
     const hashtags = summarizeHashtags(merged, prev, M);
+    const general = summarizeGeneral(snaps, prevSnaps, settings, classify);
+    const segments = segmentSummary(merged, prev, settings, M);
     const pTrends = platformTrends(merged, prev, settings, M, kws);
     const days = [];
     for (let d = w.from; d <= w.to; d = addDays(d, 1)) days.push(d);
@@ -198,6 +222,8 @@ async function aggregate({ useAi }) {
       platforms,
       weather: { location: wx.location, days: wx.days, insights: weatherInsights(wx, latest) },
       hashtags,
+      general,
+      segments,
       platformTrends: pTrends,
       upcomingEvents: upcomingEvents(settings, latest),
       regions: Object.fromEntries(Object.entries(settings.regions).map(([k, v]) => [k, v.label])),
