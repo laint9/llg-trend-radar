@@ -872,6 +872,12 @@ function route() {
   const next = PAGES[i + 1];
   $('#pager').innerHTML = `${prev ? `<a class="btn" href="#/${prev.slug}">← ${esc(prev.title)}</a>` : '<span></span>'}<span class="muted small">Trang ${i + 1}/${PAGES.length}</span>${next ? `<a class="btn pill" href="#/${next.slug}">${esc(next.title)} →</a>` : '<span></span>'}`;
   window.scrollTo({ top: 0 });
+  // Mobile: cuộn thanh điều hướng để icon trang hiện tại nằm giữa
+  if (matchMedia('(max-width: 760px)').matches) {
+    const on = document.querySelector('.side-nav a.on');
+    const nav = document.querySelector('.side-nav');
+    if (on && nav) nav.scrollTo({ left: on.offsetLeft - nav.clientWidth / 2 + on.clientWidth / 2, behavior: 'smooth' });
+  }
   // Biểu đồ vẽ lúc đang ẩn → cập nhật kích thước khi trang hiện ra
   requestAnimationFrame(() => Object.values(charts).forEach((c) => c?.resize?.()));
 }
