@@ -272,13 +272,13 @@
         "maxChargeUsd": 0.2,
         "hashtags": [
           "saigonnightlife",
-          "hiddenbar",
           "cocktailbar",
-          "cocktailsaigon",
           "finedining",
-          "omakase",
           "anngonsaigon",
-          "reviewquanan"
+          "reviewquanan",
+          "dulichsaigon",
+          "saigontravel",
+          "staycation"
         ],
         "input": {
           "hashtags": "{{hashtags}}",
@@ -296,11 +296,11 @@
         "maxChargeUsd": 0.12,
         "hashtags": [
           "saigonbar",
-          "saigoncocktail",
-          "saigonfinedining",
-          "saigonrestaurant",
           "saigonfoodie",
-          "anngonsaigon"
+          "saigonrestaurant",
+          "saigontravel",
+          "visitvietnam",
+          "saigonevents"
         ],
         "input": {
           "hashtags": "{{hashtags}}",
@@ -332,11 +332,11 @@
         "_runEachNote": "Actor này nhận 1 từ khoá/lượt nên chạy lần lượt từng query ({{query}}). Chi phí ~0,002 USD/bài.",
         "queries": [
           "quán bar sài gòn",
-          "cocktail sài gòn",
-          "nhà hàng sang trọng sài gòn",
+          "nhà hàng sài gòn",
           "quán ăn ngon quận 1",
-          "ăn gì thảo điền",
-          "quán nhậu sài gòn"
+          "đi đâu chơi sài gòn",
+          "sự kiện cuối tuần sài gòn",
+          "staycation sài gòn"
         ],
         "input": {
           "mode": "search",
@@ -753,6 +753,72 @@
         "món ngon",
         "review quán",
         "bistro"
+      ]
+    },
+    {
+      "id": "travelcheckin",
+      "label": "Du lịch & điểm check-in",
+      "terms": [
+        "du lịch",
+        "check in",
+        "check-in",
+        "điểm đến",
+        "tham quan",
+        "things to do",
+        "itinerary",
+        "tour",
+        "khách du lịch",
+        "travel",
+        "sightseeing",
+        "phố đi bộ"
+      ]
+    },
+    {
+      "id": "staycation",
+      "label": "Staycation & khách sạn",
+      "terms": [
+        "staycation",
+        "khách sạn",
+        "hotel",
+        "resort",
+        "villa",
+        "homestay",
+        "pool",
+        "hồ bơi",
+        "rooftop pool"
+      ]
+    },
+    {
+      "id": "wellnessspa",
+      "label": "Spa, wellness & lifestyle",
+      "terms": [
+        "spa",
+        "massage",
+        "wellness",
+        "yoga",
+        "gym",
+        "workshop",
+        "làm đẹp",
+        "nail",
+        "salon",
+        "thư giãn"
+      ]
+    },
+    {
+      "id": "eventshow",
+      "label": "Sự kiện, concert & show",
+      "terms": [
+        "concert",
+        "event",
+        "sự kiện",
+        "show",
+        "nhạc hội",
+        "festival",
+        "triển lãm",
+        "exhibition",
+        "live show",
+        "fan meeting",
+        "countdown"
       ]
     }
   ],

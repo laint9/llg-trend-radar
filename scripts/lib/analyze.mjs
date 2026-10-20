@@ -378,9 +378,45 @@ export function platformTrends(merged, prev, settings, M, kws) {
     });
     const reach = cur.items.reduce((s, i) => s + reachOf(i), 0);
     const eng = cur.items.reduce((s, i) => s + engagementOf(i), 0);
+    // Phân bổ theo 6 ngành dịch vụ (F&B, nightlife, du lịch, lưu trú, sự kiện, dịch vụ)
+    const sectorScores = (src) => {
+      const sc = {};
+      for (const it of src.items) {
+        const sec = it.sector || M.sectorOf(`${it.title} ${it.text || ''} ${it.category || ''} ${(it.hashtags || []).join(' ')}`);
+        sc[sec] = (sc[sec] || 0) + 1 + Math.log10(reachOf(it) + engagementOf(it) + 1);
+      }
+      for (const q of src.queries) {
+        const sec = q.sector || M.sectorOf(q.query);
+        sc[sec] = (sc[sec] || 0) + (11 - q.positions[0]) / 4;
+      }
+      return sc;
+    };
+    const secCur = sectorScores(cur);
+    const secPrev = before ? sectorScores(before) : null;
+    const secTotal = Object.values(secCur).reduce((a, b) => a + b, 0) || 1;
+    const sectors = (settings.sectors?.list || []).map((x) => {
+      const v = secCur[x.id] || 0;
+      const pv = secPrev?.[x.id];
+      return { id: x.id, label: x.label, icon: x.icon, tone: x.tone, score: Math.round(v * 10) / 10, share: Math.round((v / secTotal) * 100), change: !secPrev ? null : pv >= 1 ? Math.round(((v - pv) / pv) * 100) : v ? 'new' : null };
+    });
+    // Keyword nổi bật đa dạng ngành: luân phiên lấy từ từng ngành (tối đa 3/ngành)
+    const platKw = kws.filter((k) => k.platforms[p]).sort((a, b) => b.platforms[p] - a.platforms[p]);
+    const bySec = {};
+    for (const k of platKw) (bySec[k.sector] ||= []).push(k);
+    const diverse = [];
+    for (let round = 0; round < 3 && diverse.length < 14; round++) {
+      for (const sec of Object.keys(bySec).sort((a, b) => (secCur[b] || 0) - (secCur[a] || 0))) {
+        const k = bySec[sec][round];
+        if (k && diverse.length < 14) diverse.push({ keyword: k.keyword, sector: sec, langs: Object.keys(k.langs || {}) });
+      }
+    }
     const entry = {
       platform: p,
       items: cur.items.length,
+      queries: cur.queries.length,
+      langs: p === 'google' ? Object.entries(cur.queries.reduce((a, q) => ((a[q.lang || 'vi'] = (a[q.lang || 'vi'] || 0) + 1), a), {})).map(([lang, n]) => ({ lang, n })) : [],
+      sectors,
+      keywordsDiverse: diverse,
       reach,
       avgReach: cur.items.length ? Math.round(reach / cur.items.length) : 0,
       avgEngagement: cur.items.length ? Math.round(eng / cur.items.length) : 0,

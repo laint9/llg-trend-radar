@@ -656,7 +656,7 @@ function renderPlatformTrends(d) {
   cards.push(`<div class="card">
     ${ai ? `<p class="pt-headline">${esc(ai.headline)}</p>` : ''}
     <div class="stat-row">
-      <div><b>${fmt(t.items)}</b>${isVenue ? 'địa điểm/deal' : 'nội dung'}</div>
+      ${p === 'google' ? `<div><b>${fmt(t.queries)}</b>truy vấn tìm kiếm</div>${(t.langs || []).filter((l) => l.lang !== 'vi').map((l) => `<div><b>${FLAG[l.lang] || ''} ${fmt(l.n)}</b>${LANG[l.lang] || l.lang}</div>`).join('')}` : `<div><b>${fmt(t.items)}</b>${isVenue ? 'địa điểm/deal' : 'nội dung'}</div>`}
       ${t.avgReach ? `<div><b>${fmt(t.avgReach)}</b>reach TB/bài</div>` : ''}
       ${t.avgEngagement ? `<div><b>${fmt(t.avgEngagement)}</b>tương tác TB/bài</div>` : ''}
       ${t.avgRating ? `<div><b>★ ${t.avgRating}</b>rating TB</div>` : ''}
@@ -665,10 +665,17 @@ function renderPlatformTrends(d) {
     ${ai?.formats?.length ? `<h3 class="mt">Định dạng hiệu quả</h3><div class="tags">${ai.formats.map((x) => `<span class="tagpill">${esc(x)}</span>`).join('')}</div>` : ''}
     ${!ai ? '<p class="muted small">Bật AI để có tóm tắt xu hướng riêng của nền tảng này.</p>' : ''}
   </div>`);
-  if (t.themes?.length) cards.push(`<div class="card"><h3>Chủ đề trên ${esc(PLATFORM[p].label)}</h3>${miniBars(t.themes)}</div>`);
-  if (t.keywords?.length || tags.length || ai?.hashtags?.length)
+  if (t.sectors?.length) {
+    const secs = t.sectors.filter((x) => x.score > 0).sort((a, b) => b.score - a.score);
+    cards.push(`<div class="card"><h3>Phân bổ theo ngành trên ${esc(PLATFORM[p].label)}</h3>${secs
+      .map((x) => `<div class="mini-row"><div>${esc(x.icon)} ${esc(x.label)}<div class="kw-bar"><span style="width:${x.share}%"></span></div></div><div class="num">${x.share}% ${delta(x.change)}</div></div>`)
+      .join('') || '<p class="empty">Chưa có dữ liệu</p>'}
+      ${t.themes?.length ? `<h3 class="mt">Chủ đề chi tiết</h3>${miniBars(t.themes.slice(0, 5))}` : ''}</div>`);
+  } else if (t.themes?.length) cards.push(`<div class="card"><h3>Chủ đề trên ${esc(PLATFORM[p].label)}</h3>${miniBars(t.themes)}</div>`);
+  const kwList = t.keywordsDiverse?.length ? t.keywordsDiverse : (t.keywords || []).map((k) => ({ keyword: k }));
+  if (kwList.length || tags.length || ai?.hashtags?.length)
     cards.push(`<div class="card">
-      ${t.keywords?.length ? `<h3>Keyword nổi bật</h3><div class="tags">${t.keywords.map((k) => `<span class="tagpill">${esc(k)}</span>`).join('')}</div>` : ''}
+      ${kwList.length ? `<h3>Keyword nổi bật theo ngành</h3><div class="kw-stack">${kwList.map((k) => `<div class="kw-line">${k.sector ? sectorTag(d, k.sector) : ''}<span>${esc(k.keyword)}</span>${langFlags(k.langs || [])}</div>`).join('')}</div>` : ''}
       ${tags.length ? `<h3 class="mt">Hashtag dùng nhiều</h3><div class="tags">${tags.map((h) => `<span class="tagpill">#${esc(h.tag)} · ${h.posts}</span>`).join('')}</div>` : ''}
       ${ai?.hashtags?.length ? `<h3 class="mt">Hashtag AI gợi ý</h3><div class="tags">${ai.hashtags.map((h) => `<span class="tagpill accent">${esc(h.startsWith('#') ? h : '#' + h)}</span>`).join('')}</div>` : ''}
     </div>`);

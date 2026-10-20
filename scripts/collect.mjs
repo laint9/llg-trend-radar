@@ -142,7 +142,9 @@ function aiPayload(s) {
       Object.entries(s.platformTrends).map(([p, t]) => [
         p,
         {
-          items: t.items, avgReach: t.avgReach, avgEngagement: t.avgEngagement, keywords: t.keywords,
+          items: t.items, queries: t.queries, avgReach: t.avgReach, avgEngagement: t.avgEngagement,
+          sectorMix: t.sectors.filter((x) => x.share > 0).map((x) => `${x.label} ${x.share}%${x.change != null ? ` (${x.change === 'new' ? 'mới' : x.change + '%'})` : ''}`),
+          keywords: t.keywordsDiverse.map((k) => `${k.keyword} [${k.sector}]`),
           themes: t.themes.map((x) => `${x.label} (${x.score}${x.change != null ? `, ${x.change === 'new' ? 'mới' : x.change + '%'}` : ''})`),
           hashtags: (s.hashtags.byPlatform[p] || []).slice(0, 10).map((h) => '#' + h.tag),
           ...(t.categories && { categories: t.categories.slice(0, 8).map((c) => `${c.name} (${c.n})`), dealTypes: t.dealTypes.map((d) => `${d.name} (${d.n})`), sampleDeals: t.deals.slice(0, 6).map((d) => `${d.title} – ${d.venue || ''} ${d.deal || ''}`), risingVenues: t.rising.slice(0, 5).map((v) => `${v.title} +${v.reviewsGrowth} review`), newVenues: t.newVenues.slice(0, 6).map((v) => v.title) }),

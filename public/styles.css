@@ -505,3 +505,8 @@ main > section { margin-bottom: 18px; min-height: 40vh; }
 .rtag.sec-yellow { background: var(--t-yellow); color: var(--t-yellow-i); }
 .rtag.sec-pink { background: var(--t-pink); color: var(--t-pink-i); }
 #kw-global table td { padding: 6px 4px; font-size: 13px; }
+
+.kw-stack { display: flex; flex-direction: column; gap: 6px; }
+.kw-line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13.5px; padding: 5px 0; border-bottom: 1px dashed var(--border); }
+.kw-line:last-child { border-bottom: 0; }
+.kw-line span:not(.rtag) { overflow-wrap: anywhere; }
