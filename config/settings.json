@@ -84,6 +84,19 @@
         "speakeasy Singapore",
         "fun dining Asia"
       ]
+    },
+    "global": {
+      "label": "Khách quốc tế",
+      "searchTerms": [
+        "tourist",
+        "traveler",
+        "expat",
+        "foreigner",
+        "khách quốc tế",
+        "khách nước ngoài"
+      ],
+      "newsLocale": "en",
+      "newsQueries": []
     }
   },
   "rssFeeds": [
@@ -754,7 +767,16 @@
     "perfume",
     "\\bmp3\\b",
     "lyrics",
-    "karaoke beat"
+    "karaoke beat",
+    "tuyển dụng",
+    "tuyen dung",
+    "việc làm",
+    "viec lam",
+    "hiring",
+    "\\bjobs?\\b",
+    "디시",
+    "dcinside",
+    "giá rẻ nhất"
   ],
   "stopwords": [
     "và",
@@ -912,5 +934,362 @@
         "eats"
       ]
     }
-  ]
+  ],
+  "sectors": {
+    "_note": "Tổng hợp keyword từ nhiều ngành dịch vụ để khách quan hơn. seeds.vi/en/ko/ja = gợi ý tìm kiếm Google theo ngôn ngữ (en/ko/ja = khách quốc tế). terms = từ nhận diện ngành của 1 keyword/nội dung.",
+    "list": [
+      {
+        "id": "fnb",
+        "label": "F&B – Ăn uống",
+        "icon": "🍽",
+        "tone": "peach",
+        "terms": [
+          "nhà hàng",
+          "restaurant",
+          "quán ăn",
+          "ăn",
+          "món",
+          "food",
+          "dining",
+          "omakase",
+          "buffet",
+          "brunch",
+          "lẩu",
+          "nướng",
+          "bbq",
+          "cafe",
+          "cà phê",
+          "coffee",
+          "bistro",
+          "chef",
+          "menu",
+          "eat",
+          "michelin",
+          "맛집",
+          "レストラン",
+          "グルメ"
+        ],
+        "seeds": {
+          "vi": [],
+          "en": [
+            "best restaurants ho chi minh",
+            "where to eat saigon",
+            "saigon food",
+            "vietnamese food district 1",
+            "fine dining saigon"
+          ],
+          "ko": [
+            "호치민 맛집",
+            "호치민 레스토랑"
+          ],
+          "ja": [
+            "ホーチミン グルメ",
+            "ホーチミン レストラン"
+          ]
+        },
+        "news": {
+          "vi": [],
+          "en": [
+            "Ho Chi Minh City restaurant",
+            "Saigon food scene"
+          ]
+        }
+      },
+      {
+        "id": "nightlife",
+        "label": "Nightlife & Bar",
+        "icon": "🌙",
+        "tone": "violet",
+        "terms": [
+          "bar",
+          "pub",
+          "club",
+          "lounge",
+          "nightlife",
+          "cocktail",
+          "rooftop",
+          "speakeasy",
+          "quẩy",
+          "dj",
+          "beer",
+          "bia",
+          "wine",
+          "night",
+          "bar",
+          "바",
+          "ナイトライフ"
+        ],
+        "seeds": {
+          "vi": [],
+          "en": [
+            "saigon nightlife",
+            "best bars saigon",
+            "rooftop bar saigon",
+            "cocktail bar ho chi minh"
+          ],
+          "ko": [
+            "호치민 바",
+            "호치민 루프탑"
+          ],
+          "ja": [
+            "ホーチミン バー",
+            "ホーチミン ナイトライフ"
+          ]
+        },
+        "news": {
+          "vi": [],
+          "en": [
+            "Saigon nightlife",
+            "Asia's 50 Best Bars Vietnam"
+          ]
+        }
+      },
+      {
+        "id": "travel",
+        "label": "Du lịch & Khách quốc tế",
+        "icon": "✈️",
+        "tone": "blue",
+        "terms": [
+          "du lịch",
+          "tour",
+          "travel",
+          "tourist",
+          "khách quốc tế",
+          "things to do",
+          "itinerary",
+          "visa",
+          "check in",
+          "điểm đến",
+          "tham quan",
+          "sightseeing",
+          "airport",
+          "sân bay",
+          "여행",
+          "가볼만한곳",
+          "観光",
+          "旅行"
+        ],
+        "seeds": {
+          "vi": [
+            "du lịch sài gòn",
+            "check in sài gòn",
+            "đi đâu chơi sài gòn"
+          ],
+          "en": [
+            "things to do in saigon",
+            "ho chi minh city itinerary",
+            "saigon travel",
+            "district 1 saigon",
+            "vietnam travel"
+          ],
+          "ko": [
+            "호치민 여행",
+            "호치민 가볼만한곳"
+          ],
+          "ja": [
+            "ホーチミン 観光",
+            "ホーチミン 旅行"
+          ]
+        },
+        "news": {
+          "vi": [
+            "khách quốc tế đến TP.HCM",
+            "du lịch TP.HCM"
+          ],
+          "en": [
+            "Vietnam tourism international arrivals",
+            "Ho Chi Minh City tourism"
+          ]
+        }
+      },
+      {
+        "id": "stay",
+        "label": "Lưu trú & Khách sạn",
+        "icon": "🏨",
+        "tone": "mint",
+        "terms": [
+          "khách sạn",
+          "hotel",
+          "resort",
+          "staycation",
+          "homestay",
+          "airbnb",
+          "villa",
+          "căn hộ",
+          "serviced apartment",
+          "호텔",
+          "ホテル"
+        ],
+        "seeds": {
+          "vi": [
+            "khách sạn quận 1",
+            "staycation sài gòn"
+          ],
+          "en": [
+            "hotel district 1 saigon",
+            "best hotels ho chi minh"
+          ],
+          "ko": [
+            "호치민 호텔"
+          ],
+          "ja": [
+            "ホーチミン ホテル"
+          ]
+        },
+        "news": {
+          "vi": [
+            "khách sạn TP.HCM công suất phòng"
+          ],
+          "en": [
+            "Ho Chi Minh City hotel"
+          ]
+        }
+      },
+      {
+        "id": "events",
+        "label": "Sự kiện & Giải trí",
+        "icon": "🎉",
+        "tone": "yellow",
+        "terms": [
+          "sự kiện",
+          "event",
+          "concert",
+          "festival",
+          "lễ hội",
+          "show",
+          "triển lãm",
+          "exhibition",
+          "live music",
+          "nhạc hội",
+          "countdown",
+          "halloween",
+          "giáng sinh",
+          "weekend",
+          "cuối tuần",
+          "공연",
+          "イベント"
+        ],
+        "seeds": {
+          "vi": [
+            "sự kiện cuối tuần sài gòn",
+            "concert sài gòn",
+            "lễ hội sài gòn"
+          ],
+          "en": [
+            "events in saigon this weekend",
+            "saigon concert"
+          ],
+          "ko": [],
+          "ja": []
+        },
+        "news": {
+          "vi": [
+            "sự kiện cuối tuần TP.HCM",
+            "concert TP.HCM"
+          ],
+          "en": [
+            "Saigon events"
+          ]
+        }
+      },
+      {
+        "id": "services",
+        "label": "Dịch vụ & Lifestyle",
+        "icon": "💆",
+        "tone": "pink",
+        "terms": [
+          "spa",
+          "massage",
+          "nail",
+          "salon",
+          "làm đẹp",
+          "gym",
+          "yoga",
+          "workshop",
+          "lớp học",
+          "wellness",
+          "shopping",
+          "mua sắm",
+          "마사지",
+          "スパ",
+          "マッサージ"
+        ],
+        "seeds": {
+          "vi": [
+            "spa quận 1",
+            "workshop sài gòn"
+          ],
+          "en": [
+            "massage saigon",
+            "spa district 1 ho chi minh",
+            "shopping in saigon"
+          ],
+          "ko": [
+            "호치민 마사지"
+          ],
+          "ja": [
+            "ホーチミン スパ"
+          ]
+        },
+        "news": {
+          "vi": [
+            "spa TP.HCM xu hướng"
+          ],
+          "en": []
+        }
+      }
+    ]
+  },
+  "genericKeywords": {
+    "_note": "Từ chỉ danh mục quá chung: tách khỏi Top 10, hiển thị riêng ở dòng 'Danh mục chung'.",
+    "list": [
+      "cocktail",
+      "bar",
+      "quán bar",
+      "nhà hàng",
+      "restaurant",
+      "restaurants",
+      "quán",
+      "quán ăn",
+      "food",
+      "foodie",
+      "foodies",
+      "saigon",
+      "sài gòn",
+      "hochiminhcity",
+      "hochiminh",
+      "hồ chí minh",
+      "hcm",
+      "tphcm",
+      "vietnam",
+      "việt nam",
+      "nightlife",
+      "club",
+      "pub",
+      "drinks",
+      "drink",
+      "ăn uống",
+      "travel",
+      "hotel",
+      "khách sạn",
+      "du lịch",
+      "dining",
+      "eat",
+      "eats",
+      "vietnamesefood",
+      "saigonfood",
+      "saigoneats",
+      "saigonfoodie",
+      "explore",
+      "instagood",
+      "food blogger",
+      "ancungtiktok",
+      "reviewanngon",
+      "anngon"
+    ]
+  },
+  "keywordBias": {
+    "_note": "Keyword trùng với hashtag/từ khoá mình dùng để crawl bị nhân hệ số này (phần điểm từ social/báo), vì nội dung lấy về đương nhiên chứa chúng.",
+    "factor": 0.35
+  }
 }

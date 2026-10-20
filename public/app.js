@@ -16,7 +16,7 @@ const VENUE = ['pasgo', 'googlemaps', 'tripadvisor'];
 const REGION_SHORT = { q1q2: 'Q1/Q2', hcm: 'HCM', vn: 'VN', sea: 'SEA', intl: 'Quốc tế' };
 const WX_ICON = (c) => (c >= 95 ? '⛈' : c >= 80 ? '🌧' : c >= 61 ? '🌧' : c >= 51 ? '🌦' : c >= 45 ? '🌫' : c >= 3 ? '☁' : c >= 1 ? '⛅' : '☀');
 
-const state = { period: 'day', region: 'all', platform: 'google', ptPlatform: null, htPlatform: 'all', actionSrc: 'all', genTab: 'vn', genCat: 'all', data: {}, meta: null };
+const state = { period: 'day', region: 'all', platform: 'google', ptPlatform: null, htPlatform: 'all', actionSrc: 'all', genTab: 'vn', genCat: 'all', kwTab: 'all', data: {}, meta: null };
 const charts = {};
 
 // ---------- helpers ----------
@@ -104,7 +104,7 @@ function renderKeywords(d) {
             <div>
               <div class="kw-name">${esc(k.keyword)}</div>
               <div class="kw-bar"><span style="width:${(k.score / max) * 100}%"></span></div>
-              <div class="kw-meta">${plats} ${regs}${k.reach ? `<span class="rtag">reach ~${fmt(k.reach)}</span>` : ''}</div>
+              <div class="kw-meta">${sectorTag(d, k.sector)}${langFlags(k.langs)} ${plats} ${regs}${k.reach ? `<span class="rtag">reach ~${fmt(k.reach)}</span>` : ''}</div>
               ${ins ? `<div class="kw-insight">💡 ${esc(ins)}</div>` : ''}
             </div>
             <div class="kw-score">${fmt(k.score)}${delta(k.change)}</div>
@@ -125,6 +125,58 @@ function renderKeywords(d) {
   if (d.ai?.emergingKeywords?.length) {
     $('#kw-platform').innerHTML += `<p class="small" style="margin-top:10px"><b>Keyword mới nổi (AI):</b> ${d.ai.emergingKeywords.map(esc).join(' · ')}</p>`;
   }
+}
+
+const FLAG = { vi: '🇻🇳', en: '🇬🇧', ko: '🇰🇷', ja: '🇯🇵' };
+const LANG = { en: 'Tiếng Anh', ko: 'Tiếng Hàn', ja: 'Tiếng Nhật' };
+const langFlags = (langs) => {
+  const ls = Array.isArray(langs) ? langs : Object.keys(langs || {});
+  return ls.filter((l) => l !== 'vi').map((l) => `<span class="rtag" title="${esc(LANG[l] || l)}">${FLAG[l] || l}</span>`).join('');
+};
+const sectorTag = (d, id) => {
+  const sec = (d.keywordsBySector || []).find((x) => x.id === id);
+  return sec ? `<span class="rtag sec-${esc(sec.tone)}">${esc(sec.icon)} ${esc(sec.label.split(' – ')[0].split(' & ')[0])}</span>` : '';
+};
+
+function renderKeywordTabs(d) {
+  document.querySelectorAll('#kw-tabs .tab').forEach((b) => b.classList.toggle('on', b.dataset.k === state.kwTab));
+  document.querySelectorAll('.kw-pane').forEach((p) => (p.hidden = p.dataset.pane !== state.kwTab));
+  $('#kw-generic').innerHTML = (d.genericKeywords || []).length
+    ? `<span class="lbl">Danh mục chung (đã tách khỏi top):</span> ${d.genericKeywords.map((k) => `<span class="tagpill">${esc(k.keyword)} <b>${fmt(k.score)}</b></span>`).join('')}`
+    : '';
+  // Đang tăng
+  const rising = d.risingKeywords;
+  $('#kw-rising').innerHTML = rising == null
+    ? '<li class="empty">Cần dữ liệu kỳ trước để so sánh. Tab này sẽ có số liệu từ ngày dữ liệu thứ 2 (kỳ Ngày), sau 7 ngày (kỳ Tuần) và 30 ngày (kỳ Tháng).</li>'
+    : rising.length
+      ? rising.map((k, i) => `<li><span class="tile tile-mint">↗<span class="no">${i + 1}</span></span><div><b class="t">${esc(k.keyword)}</b><div class="kw-meta" style="margin-top:6px">${sectorTag(d, k.sector)}${langFlags(k.langs)}${Object.keys(k.platforms || {}).map(pdot).join(' ')}</div></div><div class="val">${fmt(k.score)} ${delta(k.change)}<small>+${fmt(k.gain)} điểm</small></div></li>`).join('')
+      : '<li class="empty">Không có keyword tăng mạnh trong kỳ này.</li>';
+  // Theo ngành
+  $('#kw-sectors').innerHTML = (d.keywordsBySector || [])
+    .map((x) => `<article class="card segcard t-${esc(x.tone)}"><div class="head"><div class="row"><h3>${esc(x.icon)} ${esc(x.label)}</h3></div></div>
+      <div class="bodyx"><ol class="sector-list">${x.keywords.map((k, i) => `<li><span class="n">${i + 1}</span><span class="w">${esc(k.keyword)} ${langFlags(k.langs)}</span><b>${fmt(k.score)}</b>${delta(k.change)}</li>`).join('') || '<li class="empty">Chưa có dữ liệu</li>'}</ol></div></article>`)
+    .join('');
+  // Khách quốc tế
+  const G = d.global || { queries: {}, news: [], venues: [], keywords: [] };
+  const gi = d.ai?.globalInsight;
+  const qcol = (lang) => {
+    const qs = G.queries?.[lang] || [];
+    return `<div class="card"><h3>${FLAG[lang]} ${LANG[lang]} <span class="muted small">(${qs.length})</span></h3><ol class="sector-list">${qs.slice(0, 15).map((q, i) => `<li><span class="n">${i + 1}</span><a class="w" href="https://www.google.com/search?q=${encodeURIComponent(q.query)}" target="_blank" rel="noopener">${esc(q.query)}</a><b>${q.interest}</b></li>`).join('') || '<li class="empty">Chưa có</li>'}</ol></div>`;
+  };
+  $('#kw-global').innerHTML = `
+    <div class="grid-2">
+      <div class="card ai-card"><span class="tag">${gi ? 'AI · Khách quốc tế đang tìm gì' : 'Khách quốc tế'}</span>
+        <p>${esc(gi?.summary || 'Bật AI để có tóm tắt. Bên dưới là truy vấn Google thật của khách nói tiếng Anh, Hàn, Nhật khi tìm về Sài Gòn.')}</p>
+        ${gi?.needs?.length ? `<h3 style="margin-top:12px">Nhu cầu</h3><ul class="bullets">${gi.needs.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+        ${gi?.opportunities?.length ? `<h3 style="margin-top:12px">Nên làm</h3><ul class="bullets">${gi.opportunities.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+      </div>
+      <div class="card"><h2>Keyword khách quốc tế</h2><div class="tags">${(G.keywords || []).map((k) => `<span class="tagpill accent">${esc(k.keyword)} ${langFlags(k.langs)}</span>`).join('') || '<span class="empty">—</span>'}</div>
+        ${gi?.translations?.length ? `<h3 class="mt">Dịch nghĩa truy vấn tiêu biểu</h3><table><tbody>${gi.translations.map((t) => `<tr><td>${FLAG[t.lang] || ''} ${esc(t.query)}</td><td class="muted">${esc(t.meaning)}</td></tr>`).join('')}</tbody></table>` : ''}
+      </div>
+    </div>
+    <div class="seg-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:16px">${qcol('en')}${qcol('ko')}${qcol('ja')}</div>
+    ${G.news?.length ? `<div class="sec-sub"><h3>📰 Tin tiếng Anh về du lịch, F&amp;B, nightlife TP.HCM</h3></div><div class="card"><ol class="gen-list">${G.news.slice(0, 10).map((n, i) => `<li><span class="tile tile-blue">📰<span class="no">${i + 1}</span></span><div><a class="t" href="${safeUrl(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a><div class="sub">${esc(n.source || '')}</div></div><div class="val">${fmtDate(n.publishedAt)}</div></li>`).join('')}</ol></div>` : ''}
+    ${G.venues?.length ? `<div class="sec-sub"><h3>🦉 Địa điểm nổi bật với khách quốc tế (Tripadvisor)</h3></div><div class="posts">${G.venues.map(venueCard).join('')}</div>` : ''}`;
 }
 
 function showKeyword(k) {
@@ -727,6 +779,7 @@ async function render() {
   renderKpis(d);
   renderAiSummary(d);
   renderKeywords(d);
+  renderKeywordTabs(d);
   renderKwChart(d);
   renderTrends(d);
   renderActions(d);
@@ -774,6 +827,13 @@ $('#action-src').onclick = (e) => {
   state.actionSrc = b.dataset.v;
   [...$('#action-src').children].forEach((x) => x.classList.toggle('on', x === b));
   renderActions(state.data[state.period]);
+};
+$('#kw-tabs').onclick = (e) => {
+  const b = e.target.closest('[data-k]');
+  if (!b) return;
+  state.kwTab = b.dataset.k;
+  renderKeywordTabs(state.data[state.period]);
+  requestAnimationFrame(() => charts.kw?.resize?.());
 };
 $('#csv').onclick = () => state.data[state.period] && downloadCsv(state.data[state.period]);
 $('#modal-close').onclick = () => $('#modal').close();

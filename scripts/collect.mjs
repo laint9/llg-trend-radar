@@ -13,7 +13,7 @@ import { pasgo } from './sources/venues.mjs';
 import { youtubeTrending, generalNews, buildClassifier } from './sources/general.mjs';
 import { summarizeGeneral } from './lib/general.mjs';
 import { buildActions, upcomingEvents } from './lib/actions.mjs';
-import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends, segmentSummary } from './lib/analyze.mjs';
+import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends, segmentSummary, pickCard, venueScore } from './lib/analyze.mjs';
 import { resolveProvider, generateInsights } from './lib/ai.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
@@ -21,6 +21,7 @@ const settings = await readJson(join(ROOT, 'config', 'settings.json'));
 const today = args.date || dateInTz(new Date(), settings.timezone);
 const M = buildMatchers(settings);
 const classify = buildClassifier(settings);
+const normalizeQ = (x) => String(x || '').toLowerCase().trim();
 
 /** Lần crawl Apify gần nhất của từng nền tảng + dữ liệu để dùng lại khi chưa tới lịch chạy. */
 async function previousApify() {
@@ -93,7 +94,7 @@ async function collect() {
   // Báo: chỉ giữ bài thật sự liên quan ngành, hoặc sự kiện lớn tại Q1/Q2 (kéo lượng khách đi chơi)
   const EVENT = /concert|nhạc hội|lễ hội|festival|sự kiện|countdown|pháo hoa|đại nhạc hội|show diễn|biểu diễn/i;
   for (const it of [...(news || []), ...(feeds || [])]) it.relevance = M.relevance(`${it.title} ${it.text || ''}`);
-  const keepNews = (it) => it.relevance > 0 || (it.region === 'q1q2' && EVENT.test(it.title));
+  const keepNews = (it) => it.sector || it.relevance > 0 || (it.region === 'q1q2' && EVENT.test(it.title));
 
   const items = new Map();
   for (const it of [...(news || []).filter(keepNews), ...(feeds || []), ...(yt?.items || []), ...(social?.items || []), ...carried, ...(pg?.items || [])]) {
@@ -149,6 +150,16 @@ function aiPayload(s) {
       ]),
     ),
     hashtags: { top: s.hashtags.top.slice(0, 25).map((h) => `#${h.tag} (${h.posts} bài, reach TB ${h.avgReach}${h.change != null ? `, ${h.change === 'new' ? 'mới' : h.change + '%'}` : ''})`), suggested: s.hashtags.suggested },
+    keywordsBySector: s.keywordsBySector.map((x) => `${x.label}: ${x.keywords.slice(0, 8).map((k) => k.keyword).join(', ')}`),
+    risingKeywords: (s.risingKeywords || []).slice(0, 12).map((k) => `${k.keyword} (${k.change === 'new' ? 'mới' : '+' + k.change + '%'})`),
+    genericKeywords: s.genericKeywords.map((k) => k.keyword),
+    globalTourists: {
+      queriesEN: s.global.queries.en.slice(0, 20).map((q) => q.query),
+      queriesKO: s.global.queries.ko.slice(0, 15).map((q) => q.query),
+      queriesJA: s.global.queries.ja.slice(0, 15).map((q) => q.query),
+      newsEN: s.global.news.slice(0, 10).map((n) => n.title),
+      tripadvisor: s.global.venues.slice(0, 6).map((v) => `${v.title} ${v.rankingString || ''}`),
+    },
     segments: s.segments.map((g) => ({
       id: g.id, label: g.label, score: g.score, change: g.change, posts: g.socialPosts, venues: g.venues, reach: g.reach,
       keywords: g.keywords.map((k) => k.keyword), hashtags: g.hashtags.map((h) => '#' + h.tag), searches: g.searches,
@@ -186,14 +197,50 @@ async function aggregate({ useAi }) {
     const merged = mergeSnapshots(snaps);
     const prev = prevSnaps.length ? mergeSnapshots(prevSnaps) : null;
 
-    const kws = scoreKeywords(merged, M);
-    const prevKw = prev ? new Map(scoreKeywords(prev, M).map((k) => [k.keyword.toLowerCase(), k.score])) : null;
+    const bias = { biasFactor: settings.keywordBias?.factor ?? 0.35 };
+    const kws = scoreKeywords(merged, M, null, bias);
+    const prevKw = prev ? new Map(scoreKeywords(prev, M, null, bias).map((k) => [k.keyword.toLowerCase(), k.score])) : null;
     const withChange = (k) => {
       const p = prevKw?.get(k.keyword.toLowerCase());
       return { ...k, change: !prevKw ? null : p ? Math.round(((k.score - p) / p) * 100) : 'new' };
     };
     const topKeywords = kws.slice(0, 30).map(withChange);
-    const keywordsByRegion = Object.fromEntries(Object.keys(settings.regions).map((r) => [r, scoreKeywords(merged, M, r).slice(0, 10).map(withChange)]));
+    const keywordsByRegion = Object.fromEntries(Object.keys(settings.regions).map((r) => [r, scoreKeywords(merged, M, r, bias).slice(0, 10).map(withChange)]));
+    // Từ chỉ danh mục (cocktail, nhà hàng, #saigon…) tách riêng
+    const genericKeywords = scoreKeywords(merged, M, null, { generic: 'only', biasFactor: 1 }).slice(0, 12).map(({ keyword, score }) => ({ keyword, score }));
+    // Đang tăng: so với kỳ trước, xếp theo mức tăng điểm tuyệt đối
+    const risingKeywords = prevKw
+      ? kws
+          .filter((k) => k.score >= 30)
+          .map((k) => ({ ...withChange(k), gain: k.score - (prevKw.get(k.keyword.toLowerCase()) || 0) }))
+          .filter((k) => k.change === 'new' || k.change >= 25)
+          .sort((a, b) => b.gain - a.gain)
+          .slice(0, 20)
+          .map(({ dates, samples, ...k }) => k)
+      : null;
+    // Theo ngành dịch vụ
+    const keywordsBySector = (settings.sectors?.list || []).map((sec) => ({
+      id: sec.id, label: sec.label, icon: sec.icon, tone: sec.tone,
+      keywords: kws
+        .filter((k) => (k.sectors[sec.id] || 0) > 0)
+        .sort((a, b) => b.sectors[sec.id] - a.sectors[sec.id])
+        .slice(0, 10)
+        .map((k) => ({ keyword: k.keyword, score: Math.round(k.sectors[sec.id]), change: withChange(k).change, langs: Object.keys(k.langs) })),
+    }));
+    // Khách quốc tế: truy vấn tiếng Anh/Hàn/Nhật + tin tiếng Anh + Tripadvisor
+    const globalQueries = merged.queries
+      .filter((q) => q.lang && q.lang !== 'vi' && normalizeQ(q.query) !== normalizeQ(q.input))
+      .map((q) => {
+        const avg = q.positions.reduce((a, b) => a + b, 0) / q.positions.length;
+        return { query: q.query, lang: q.lang, sector: q.sector || M.sectorOf(q.query), interest: Math.round((11 - avg) * 10 * Math.min(1 + 0.25 * ((q.hits || 1) - 1), 2)), days: q.days };
+      })
+      .sort((a, b) => b.interest - a.interest);
+    const global = {
+      keywords: scoreKeywords(merged, M, 'global', bias).slice(0, 15).map(({ keyword, score, langs, sector }) => ({ keyword, score, langs: Object.keys(langs), sector })),
+      queries: { en: globalQueries.filter((q) => q.lang === 'en').slice(0, 30), ko: globalQueries.filter((q) => q.lang === 'ko').slice(0, 20), ja: globalQueries.filter((q) => q.lang === 'ja').slice(0, 20) },
+      news: merged.items.filter((i) => i.platform === 'news' && i.region === 'global').sort((a, b) => String(b.publishedAt).localeCompare(String(a.publishedAt))).slice(0, 15).map(pickCard),
+      venues: merged.items.filter((i) => i.platform === 'tripadvisor').sort((a, b) => venueScore(b) - venueScore(a)).slice(0, 8).map(pickCard),
+    };
     const keywordsByPlatform = Object.fromEntries(
       PLATFORMS.map((p) => [p, kws.filter((k) => k.platforms[p]).sort((a, b) => b.platforms[p] - a.platforms[p]).slice(0, 10).map((k) => ({ keyword: k.keyword, score: Math.round(k.platforms[p]) }))]),
     );
@@ -227,6 +274,10 @@ async function aggregate({ useAi }) {
         itemsByRegion: Object.fromEntries(Object.keys(settings.regions).map((r) => [r, merged.items.filter((i) => i.region === r).length])),
       },
       topKeywords: topKeywords.map(({ dates, ...k }) => k),
+      genericKeywords,
+      risingKeywords,
+      keywordsBySector,
+      global,
       keywordsByRegion: Object.fromEntries(Object.entries(keywordsByRegion).map(([r, l]) => [r, l.map(({ dates, samples, ...k }) => k)])),
       keywordsByPlatform,
       keywordHistory,

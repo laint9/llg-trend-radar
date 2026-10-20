@@ -42,12 +42,17 @@ export async function googleNews(settings) {
   for (const [region, cfg] of Object.entries(settings.regions)) {
     for (const q of cfg.newsQueries || []) jobs.push({ region, q, locale: cfg.newsLocale || 'vi' });
   }
-  const res = await pool(jobs, 3, async ({ region, q, locale }) => {
+  // Tin theo ngành dịch vụ (vi = TP.HCM, en = góc nhìn khách quốc tế)
+  for (const sec of settings.sectors?.list || []) {
+    for (const q of sec.news?.vi || []) jobs.push({ region: 'hcm', q, locale: 'vi', sector: sec.id });
+    for (const q of sec.news?.en || []) jobs.push({ region: 'global', q, locale: 'en', sector: sec.id });
+  }
+  const res = await pool(jobs, 3, async ({ region, q, locale, sector }) => {
     const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:7d')}&${LOCALES[locale]}`;
     const doc = xml.parse(await fetchText(url));
     return arr(doc?.rss?.channel?.item)
       .slice(0, 12)
-      .map((it) => toItem(it, { region, query: q, source: 'Google News' }));
+      .map((it) => toItem(it, { region, query: q, source: 'Google News', ...(sector && { sector }) }));
   });
   const failed = res.filter((r) => r?.error);
   if (failed.length) log(`  ! Google News: ${failed.length}/${jobs.length} lỗi (${failed[0].error})`);

@@ -17,7 +17,7 @@ export function resolveProvider(settings, env = process.env) {
 const SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['summary', 'customerNeeds', 'keywordInsights', 'emergingKeywords', 'trends', 'platformTrends', 'hashtagStrategy', 'weatherInsights', 'contentIdeas', 'actions', 'generalSummary', 'trendOpportunities', 'segmentInsights'],
+  required: ['summary', 'customerNeeds', 'keywordInsights', 'emergingKeywords', 'trends', 'platformTrends', 'hashtagStrategy', 'weatherInsights', 'contentIdeas', 'actions', 'generalSummary', 'trendOpportunities', 'segmentInsights', 'globalInsight'],
   properties: {
     summary: { type: 'string', description: '3-5 câu tóm tắt bức tranh xu hướng của kỳ này cho team Marketing' },
     customerNeeds: { type: 'array', items: { type: 'string' }, description: '4-6 nhu cầu/động cơ khách hàng nổi bật' },
@@ -56,6 +56,22 @@ const SCHEMA = {
           trends: { type: 'array', items: { type: 'string' }, description: '2-4 xu hướng cụ thể' },
           formats: { type: 'array', items: { type: 'string' }, description: 'Định dạng nội dung/ưu đãi hiệu quả trên nền tảng này' },
           hashtags: { type: 'array', items: { type: 'string' } },
+        },
+      },
+    },
+    globalInsight: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['summary', 'needs', 'opportunities', 'translations'],
+      description: 'Khách quốc tế (Anh/Hàn/Nhật) đang tìm gì về Sài Gòn',
+      properties: {
+        summary: { type: 'string', description: '2-4 câu' },
+        needs: { type: 'array', items: { type: 'string' }, description: '3-5 nhu cầu nổi bật của khách quốc tế' },
+        opportunities: { type: 'array', items: { type: 'string' }, description: '3-5 việc nên làm để thu hút khách quốc tế (SEO tiếng Anh/Hàn, Google Maps, Tripadvisor, menu song ngữ…)' },
+        translations: {
+          type: 'array',
+          description: 'Dịch nghĩa 10-15 truy vấn tiếng Hàn/Nhật/Anh tiêu biểu sang tiếng Việt',
+          items: { type: 'object', additionalProperties: false, required: ['query', 'lang', 'meaning'], properties: { query: { type: 'string' }, lang: { type: 'string', enum: ['en', 'ko', 'ja'] }, meaning: { type: 'string' } } },
         },
       },
     },
@@ -139,6 +155,8 @@ Nguyên tắc:
 - platformTrends: phân tích riêng từng nền tảng có dữ liệu (TikTok, Facebook, Instagram, Threads, YouTube, Google, báo chí, PasGo, Google Maps, Tripadvisor). Với nền tảng đặt bàn/review, tập trung vào loại hình đang được đẩy, dạng ưu đãi và địa điểm đang lên.
 - hashtagStrategy: dựa trên dữ liệu hashtag thực tế; nếu chưa có dữ liệu social thì nói rõ và đề xuất bộ hashtag khởi đầu.
 - actions: việc cụ thể team Marketing nên làm ngay, có ưu tiên, team phụ trách, thời hạn, KPI. Tham khảo ruleActions và upcomingEvents nhưng viết chi tiết, sắc hơn; không lặp y nguyên.
+- keywordInsights: KHÔNG giải thích các từ chỉ danh mục chung (genericKeywords); tập trung keyword cụ thể. Dùng keywordsBySector để nhìn đa ngành (F&B, nightlife, du lịch, lưu trú, sự kiện, dịch vụ).
+- globalInsight: dựa trên globalTourists (truy vấn Google bằng tiếng Anh/Hàn/Nhật, tin tiếng Anh, Tripadvisor) để nói khách quốc tế đang tìm gì về Sài Gòn/Q1/Q2 và cơ hội cho bar/nhà hàng.
 - segmentInsights: phân tích SONG SONG và CÂN BẰNG 4 phân khúc: Bar & Nightlife, Cocktail & Mixology, Nhà hàng cao cấp/Fun dining, Nhà hàng casual & quán ăn (dựa trên dữ liệu segments). Không thiên vị bar.
 - generalSummary + trendOpportunities: dựa trên generalTrends (Google Trends toàn quốc, YouTube Thịnh hành, tin nổi bật, SEA), KHÔNG giới hạn ngành F&B. Chọn trend có thể đu được (thể thao: chiếu trận/combo xem bóng; âm nhạc/showbiz: cocktail lấy cảm hứng, playlist, after-party; phim/game: theme night; lễ hội…). Đánh dấu risk "tránh" cho chủ đề NHẠY CẢM (tai nạn, thiên tai có thương vong, chính trị, tôn giáo, tang lễ) và không đề xuất khai thác thương mại các chủ đề đó.
 - weatherInsights: liên hệ thời tiết 7 ngày tới (đặc biệt mưa buổi tối 17–23h, nắng nóng) với hành vi đi chơi và gợi ý content/ưu đãi.`;

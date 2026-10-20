@@ -56,37 +56,45 @@ function regionOfQuery(q, fallback) {
  * Google Autocomplete: mỗi gợi ý là một truy vấn thật mà nhiều người đang gõ.
  * Vị trí càng cao → mức độ phổ biến càng cao (proxy cho lượng tìm kiếm).
  */
+const LOCALE = { vi: 'hl=vi&gl=vn', en: 'hl=en&gl=us', ko: 'hl=ko&gl=kr', ja: 'hl=ja&gl=jp' };
+
 export async function googleAutocomplete(settings) {
   const seeds = settings.autocompleteSeeds || [];
   const suffixRegion = { 'quận 1': 'q1q2', 'quận 2': 'q1q2', 'thảo điền': 'q1q2', 'sài gòn': 'hcm' };
   const jobs = [];
   for (const seed of seeds) {
-    jobs.push({ q: seed, region: 'vn', seed });
+    jobs.push({ q: seed, region: 'vn', seed, lang: 'vi' });
     for (const suf of settings.autocompleteSuffixes || []) {
-      jobs.push({ q: `${seed} ${suf}`, region: suffixRegion[suf] || 'hcm', seed });
+      jobs.push({ q: `${seed} ${suf}`, region: suffixRegion[suf] || 'hcm', seed, lang: 'vi' });
+    }
+  }
+  // Seed theo ngành + ngôn ngữ (en/ko/ja = khách quốc tế đang gõ gì về Sài Gòn)
+  for (const sec of settings.sectors?.list || []) {
+    for (const [lang, list] of Object.entries(sec.seeds || {})) {
+      for (const seed of list) jobs.push({ q: seed, region: lang === 'vi' ? 'hcm' : 'global', seed, lang, sector: sec.id });
     }
   }
   const results = await pool(jobs, 4, async (job) => {
-    const url = `https://suggestqueries.google.com/complete/search?client=firefox&hl=vi&gl=vn&q=${encodeURIComponent(job.q)}`;
+    const url = `https://suggestqueries.google.com/complete/search?client=firefox&${LOCALE[job.lang] || LOCALE.vi}&q=${encodeURIComponent(job.q)}`;
     const text = await fetchText(url, {}, 10000);
     const [, list] = JSON.parse(text);
     await sleep(120);
-    return (list || []).map((s, i) => ({ query: String(s), seed: job.seed, input: job.q, region: job.region, position: i + 1 }));
+    return (list || []).map((s, i) => ({ query: String(s), seed: job.seed, input: job.q, region: job.region, lang: job.lang, sector: job.sector || null, position: i + 1 }));
   });
   const exclude = (settings.excludePatterns || []).map((p) => new RegExp(p, 'i'));
   const flat = results
     .filter(Array.isArray)
     .flat()
     .filter((r) => !exclude.some((re) => re.test(r.query)))
-    .map((r) => ({ ...r, region: regionOfQuery(r.query, r.region) }));
+    .map((r) => ({ ...r, region: r.lang === 'vi' ? regionOfQuery(r.query, r.region) : 'global' }));
   const failed = results.filter((r) => r && r.error).length;
   if (failed) log(`  ! Autocomplete: ${failed}/${jobs.length} request lỗi`);
-  // Dedupe theo query, giữ vị trí tốt nhất
+  // Dedupe theo query + ngôn ngữ, giữ vị trí tốt nhất
   const best = new Map();
   for (const r of flat) {
-    const k = r.query.toLowerCase();
+    const k = `${r.lang}:${r.query.toLowerCase()}`;
     const prev = best.get(k);
-    if (!prev || r.position < prev.position) best.set(k, { ...r, hits: (prev?.hits || 0) + 1 });
+    if (!prev || r.position < prev.position) best.set(k, { ...r, sector: r.sector || prev?.sector || null, hits: (prev?.hits || 0) + 1 });
     else prev.hits++;
   }
   return [...best.values()];

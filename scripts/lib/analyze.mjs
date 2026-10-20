@@ -18,7 +18,20 @@ const DOMAIN_WORDS = [
 export function buildMatchers(settings) {
   const themeTerms = settings.themes.flatMap((t) => t.terms.map((term) => ({ term: normalizeText(term), theme: t.id })));
   const regionTerms = Object.values(settings.regions).flatMap((r) => r.searchTerms.map(normalizeText));
-  const relevantTerms = DOMAIN_WORDS.map(normalizeText);
+  const sectors = (settings.sectors?.list || []).map((x) => ({ id: x.id, terms: x.terms.map(normalizeText) }));
+  // Liên quan = từ ngành F&B/nightlife + từ nhận diện các ngành dịch vụ (bỏ từ quá ngắn dễ khớp nhầm)
+  const relevantTerms = [...new Set([...DOMAIN_WORDS.map(normalizeText), ...sectors.flatMap((x) => x.terms).filter((t) => t.length >= 4)])];
+  const k = (x) => normalizeText(x).replace(/^#/, '').replace(/\s+/g, '');
+  const genericKeys = new Set((settings.genericKeywords?.list || []).map(k));
+  // Từ khoá/hashtag mình dùng để crawl → nội dung lấy về đương nhiên chứa chúng (thiên lệch nguồn)
+  const ap = settings.apify?.platforms || {};
+  const crawlKeys = new Set(
+    [
+      ...Object.values(ap).flatMap((p) => [...(p.hashtags || []), ...(p.queries || [])]),
+      ...(settings.youtubeQueries || []),
+      ...Object.values(settings.regions).flatMap((r) => r.newsQueries || []),
+    ].map(k),
+  );
   const stop = new Set(settings.stopwords.map(normalizeText));
   const exclude = (settings.excludePatterns || []).map((p) => new RegExp(p, 'i'));
   const has = (text, term) => {
@@ -29,6 +42,24 @@ export function buildMatchers(settings) {
   return {
     themeTerms,
     regionTerms,
+    genericKeys,
+    isGeneric: (label) => genericKeys.has(k(label)),
+    /** Keyword trùng hoặc là phần đầu của hashtag/từ khoá crawl → bị thiên lệch nguồn. */
+    isCrawlBiased: (label) => {
+      const key = k(label);
+      return crawlKeys.has(key) || (key.length >= 5 && [...crawlKeys].some((c) => c.startsWith(key)));
+    },
+    /** Ngành dịch vụ của 1 đoạn text (nhiều từ khớp nhất), mặc định F&B. */
+    sectorOf: (text, fallback = 'fnb') => {
+      const t = normalizeText(text);
+      let best = null;
+      let n = 0;
+      for (const sec of sectors) {
+        const c = sec.terms.filter((term) => (term.length <= 3 ? has(t, term) : t.includes(term))).length;
+        if (c > n) [best, n] = [sec.id, c];
+      }
+      return best || fallback;
+    },
     stop,
     has,
     excluded: (text) => exclude.some((re) => re.test(text)),
@@ -109,31 +140,44 @@ export function mergeSnapshots(snaps) {
 }
 
 /** Chấm điểm keyword từ: truy vấn Google, hashtag social, cụm từ chủ đề trong bài viết/báo, Google Trending. */
-export function scoreKeywords(merged, M, regionFilter = null) {
+/**
+ * Chấm điểm keyword từ: truy vấn Google (vi/en/ko/ja), Google Trending, hashtag & cụm từ chủ đề trong social/báo.
+ * opts.generic: 'exclude' (mặc định, bỏ từ chỉ danh mục) | 'only' (chỉ lấy từ danh mục) | 'all'.
+ * opts.biasFactor: hệ số cho phần điểm social/báo của keyword trùng từ khoá crawl.
+ */
+export function scoreKeywords(merged, M, regionFilter = null, { generic = 'exclude', biasFactor = 0.35 } = {}) {
   const kw = new Map();
-  const add = (label, score, { platform, region, reach = 0, sample, date }) => {
+  const add = (label, score, { platform, region, reach = 0, sample, date, sector, lang = 'vi' }) => {
     const k = keyOf(label);
     if (!k || k.length < 3 || M.stop.has(normalizeText(label)) || M.excluded(label)) return;
-    const e = kw.get(k) || { keyword: label, score: 0, mentions: 0, reach: 0, platforms: {}, regions: {}, samples: [], dates: {} };
+    const g = M.isGeneric(label);
+    if ((generic === 'exclude' && g) || (generic === 'only' && !g)) return;
+    const e = kw.get(k) || { keyword: label, score: 0, mentions: 0, reach: 0, platforms: {}, regions: {}, sectors: {}, langs: {}, samples: [], dates: {} };
     if (label.includes(' ') && !e.keyword.includes(' ')) e.keyword = label; // ưu tiên dạng có dấu cách, dễ đọc
     e.score += score;
     e.mentions++;
     e.reach += reach;
     e.platforms[platform] = (e.platforms[platform] || 0) + score;
     if (region) e.regions[region] = (e.regions[region] || 0) + score;
+    const sec = sector || M.sectorOf(label);
+    e.sectors[sec] = (e.sectors[sec] || 0) + score;
+    e.langs[lang] = (e.langs[lang] || 0) + score;
     if (date) e.dates[date] = (e.dates[date] || 0) + score;
     if (sample && e.samples.length < 4 && !e.samples.some((s) => s.url === sample.url)) e.samples.push(sample);
     kw.set(k, e);
   };
   const inRegion = (r) => !regionFilter || r === regionFilter;
 
-  // 1) Truy vấn tìm kiếm thật (Autocomplete)
+  // 1) Truy vấn tìm kiếm thật (Autocomplete, nhiều ngôn ngữ)
   for (const q of merged.queries) {
     if (!inRegion(q.region)) continue;
     const avgPos = q.positions.reduce((a, b) => a + b, 0) / q.positions.length;
     const echo = normalizeText(q.query) === normalizeText(q.input) ? 0.5 : 1; // gợi ý trùng với từ gõ vào: giảm trọng số
-    const base = (11 - avgPos) * 8 * echo * Math.min(1 + 0.25 * ((q.hits || 1) - 1), 2);
-    q.dates.forEach((date) => add(q.query, base, { platform: 'google', region: q.region, date }));
+    // Truy vấn về thành phố khác (không phải TP.HCM): chỉ để tham khảo → giảm trọng số
+    const otherCity = /hà nội|ha noi|hanoi|đà lạt|da lat|dalat|nha trang|đà nẵng|da nang|vũng tàu|phú quốc|phu quoc|hội an|hoi an|cần thơ|huế|hạ long/i.test(q.query) ? 0.3 : 1;
+    const base = (11 - avgPos) * 8 * echo * otherCity * Math.min(1 + 0.25 * ((q.hits || 1) - 1), 2);
+    const sector = q.sector || M.sectorOf(q.query);
+    q.dates.forEach((date) => add(q.query, base, { platform: 'google', region: q.region, date, sector, lang: q.lang || 'vi' }));
   }
   // 2) Google Trending liên quan
   for (const t of merged.trending) {
@@ -141,9 +185,10 @@ export function scoreKeywords(merged, M, regionFilter = null) {
     add(t.title, Math.log10((t.metrics?.traffic || 100) + 10) * 25 * t.days, {
       platform: 'google', region: t.region, reach: t.metrics?.traffic || 0,
       sample: { title: t.title, url: t.url, platform: 'google' }, date: t.publishedAt?.slice(0, 10),
+      sector: M.sectorOf(`${t.title} ${(t.news || []).map((n) => n.title).join(' ')}`), lang: t.geo === 'VN' ? 'vi' : 'en',
     });
   }
-  // 3) Social + YouTube + báo
+  // 3) Social + YouTube + báo + địa điểm
   for (const it of merged.items) {
     if (!inRegion(it.region)) continue;
     const r = reachOf(it);
@@ -151,20 +196,31 @@ export function scoreKeywords(merged, M, regionFilter = null) {
     const w = isVenue(it) ? 1.5 : it.platform === 'news' ? 12 : 6 + Math.log10(r + engagementOf(it) + 10) * 6;
     const sample = { title: it.title, url: it.url, platform: it.platform, image: it.image };
     const date = (it.publishedAt || it.lastSeen || '').slice(0, 10);
+    const ctx = { platform: it.platform, region: it.region, reach: r, sample, date, sector: it.sector || M.sectorOf(`${it.title} ${it.text || ''} ${it.category || ''}`), lang: it.region === 'global' || it.region === 'intl' ? 'en' : 'vi' };
     for (const h of it.hashtags || []) {
       if (M.stop.has(h)) continue;
-      add(`#${h}`, w * 0.8, { platform: it.platform, region: it.region, reach: r, sample, date });
+      add(`#${h}`, w * 0.8, ctx);
     }
     const seen = new Set();
     for (const { term } of M.termsIn(`${it.title} ${it.text || ''}`)) {
       if (seen.has(term)) continue;
       seen.add(term);
-      add(term, w, { platform: it.platform, region: it.region, reach: r, sample, date });
+      add(term, w, ctx);
     }
   }
-  // Gộp hashtag trùng nghĩa với cụm từ (vd. #hiddenbar ↔ hidden bar) đã xử lý qua keyOf.
   return [...kw.values()]
-    .map((e) => ({ ...e, keyword: e.keyword.replace(/^#(?=.*\s)/, ''), score: Math.round(e.score) }))
+    .map((e) => {
+      // Trừ thiên lệch nguồn: chỉ giảm phần điểm từ social/báo/địa điểm, giữ nguyên phần Google (nhu cầu thật)
+      if (biasFactor < 1 && M.isCrawlBiased(e.keyword)) {
+        const g = e.platforms.google || 0;
+        const scale = (x) => x * biasFactor;
+        e.score = g + scale(e.score - g);
+        for (const p of Object.keys(e.platforms)) if (p !== 'google') e.platforms[p] = scale(e.platforms[p]);
+        e.biasAdjusted = true;
+      }
+      const mainSector = Object.entries(e.sectors).sort((a, b) => b[1] - a[1])[0]?.[0] || 'fnb';
+      return { ...e, keyword: e.keyword.replace(/^#(?=.*\s)/, ''), score: Math.round(e.score), sector: mainSector };
+    })
     .sort((a, b) => b.score - a.score);
 }
 

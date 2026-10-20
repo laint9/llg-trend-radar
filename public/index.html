@@ -39,7 +39,7 @@
         <a href="#/actions" data-tip="Action đề xuất" aria-label="Action đề xuất"><svg><use href="#i-bolt"/></svg><span>Action</span></a>
         <a href="#/segments" data-tip="So sánh phân khúc" aria-label="So sánh phân khúc"><svg><use href="#i-columns"/></svg><span>Phân khúc</span></a>
         <a href="#/general" data-tip="Top xu hướng chung" aria-label="Top xu hướng chung"><svg><use href="#i-fire"/></svg><span>Xu hướng chung</span></a>
-        <a href="#/keywords" data-tip="Top 10 keyword" aria-label="Top 10 keyword"><svg><use href="#i-search"/></svg><span>Keyword</span></a>
+        <a href="#/keywords" data-tip="Top keyword đa ngành" aria-label="Top keyword đa ngành"><svg><use href="#i-search"/></svg><span>Keyword</span></a>
         <a href="#/trends" data-tip="Xu hướng chính" aria-label="Xu hướng chính"><svg><use href="#i-radar"/></svg><span>Xu hướng</span></a>
         <a href="#/ptrends" data-tip="Xu hướng từng nền tảng" aria-label="Xu hướng từng nền tảng"><svg><use href="#i-layers"/></svg><span>Nền tảng</span></a>
         <a href="#/hashtags" data-tip="Hashtag" aria-label="Hashtag"><svg><use href="#i-hash"/></svg><span>Hashtag</span></a>
@@ -113,14 +113,22 @@
         </section>
 
         <section id="s-keywords">
-          <div class="sec-head big"><div class="sec-title"><span class="sec-no">05</span><span class="sec-ic"><svg><use href="#i-search"/></svg></span><div><h2>Top 10 keyword</h2><p>Từ khoá khách hàng đang tìm và nhắc đến nhiều nhất</p></div></div></div>
+          <div class="sec-head big"><div class="sec-title"><span class="sec-no">05</span><span class="sec-ic"><svg><use href="#i-search"/></svg></span><div><h2>Top keyword</h2><p>Tổng hợp đa ngành: F&amp;B, nightlife, du lịch, lưu trú, sự kiện, dịch vụ · có góc nhìn khách quốc tế</p></div></div></div>
+          <div class="tabs" id="kw-tabs" role="tablist">
+            <button class="tab on" data-k="all"><span class="tile sm tile-violet">★</span>Tổng hợp mọi ngành</button>
+            <button class="tab" data-k="rising"><span class="tile sm tile-mint">↗</span>Đang tăng</button>
+            <button class="tab" data-k="sector"><span class="tile sm tile-peach">▦</span>Theo ngành</button>
+            <button class="tab" data-k="global"><span class="tile sm tile-blue">🌏</span>Khách quốc tế</button>
+          </div>
+          <div class="generic-line" id="kw-generic"></div>
+          <div class="kw-pane" data-pane="all">
           <div class="grid-2">
             <div class="card">
               <div class="card-head">
                 <h2>Bảng xếp hạng keyword</h2>
                 <button class="btn pill" id="csv"><svg><use href="#i-download"/></svg>CSV</button>
               </div>
-              <p class="muted small">Từ truy vấn Google thật, Google Trends, hashtag và cụm từ trên TikTok, Instagram, Facebook, Threads, YouTube, báo chí. Trọng số theo độ tiếp cận. Bấm vào keyword để xem chi tiết.</p>
+              <p class="muted small">Từ truy vấn Google thật (tiếng Việt, Anh, Hàn, Nhật), Google Trends, hashtag và cụm từ trên social, YouTube, báo chí. Keyword trùng hashtag mình dùng để crawl đã được trừ thiên lệch; từ chỉ danh mục được tách riêng. Bấm vào keyword để xem chi tiết.</p>
               <ol class="kw-list" id="kw-list"></ol>
             </div>
             <div class="stack">
@@ -135,6 +143,10 @@
               </div>
             </div>
           </div>
+          </div>
+          <div class="kw-pane" data-pane="rising" hidden><div class="card"><div class="card-head"><h2>Keyword đang tăng so với kỳ trước</h2></div><ol class="gen-list" id="kw-rising"></ol></div></div>
+          <div class="kw-pane" data-pane="sector" hidden><div class="seg-grid sector-grid" id="kw-sectors"></div></div>
+          <div class="kw-pane" data-pane="global" hidden><div id="kw-global"></div></div>
         </section>
 
         <section id="s-trends">
