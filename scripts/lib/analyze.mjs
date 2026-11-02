@@ -545,7 +545,8 @@ const GENERIC_SOUND = /original sound|âm thanh gốc|nhạc nền|son original|
 export function summarizeVideos(merged30, trendItems, refDate, M = null) {
   const ref = Date.parse(refDate);
   const ageOf = (it) => (ref - Date.parse(it.publishedAt)) / 864e5;
-  const inWindow = (it) => it.publishedAt && ageOf(it) <= VIDEO_WINDOW_DAYS && ageOf(it) >= -1 && isTopicVideo(it);
+  const inWindow = (it) =>
+    it.publishedAt && ageOf(it) <= VIDEO_WINDOW_DAYS && ageOf(it) >= -1 && isTopicVideo(it) && !(M && M.excluded(`${it.title} ${it.text || ''} ${(it.hashtags || []).join(' ')}`));
   const card = (it) => {
     const m = it.metrics || {};
     const views = m.views || 0;

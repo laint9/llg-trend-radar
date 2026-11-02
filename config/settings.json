@@ -895,7 +895,16 @@
     "\\bjobs?\\b",
     "디시",
     "dcinside",
-    "giá rẻ nhất"
+    "giá rẻ nhất",
+    "bar exam",
+    "\\battorney\\b",
+    "\\blawyer\\b",
+    "barbershop",
+    "barber",
+    "\\bbarbie\\b",
+    "crowbar",
+    "toolbar",
+    "sidebar"
   ],
   "stopwords": [
     "và",
