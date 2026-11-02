@@ -773,9 +773,11 @@ function renderVideos(d) {
     ccList('Âm thanh trending', C.sounds, (t, i) => `<li><span class="n">${t.rank || i + 1}</span><a class="w" href="${safeUrl(t.url)}" target="_blank" rel="noopener">${esc(t.title)}${t.author ? ` · ${esc(t.author)}` : ''}</a><b></b></li>`) +
     ccList('Hashtag F&amp;B trending', C.hashtags, (t, i) => `<li><span class="n">${t.rank || i + 1}</span><a class="w" href="${safeUrl(t.url)}" target="_blank" rel="noopener">#${esc(t.title.replace(/^#/, ''))}</a><b>${t.metrics?.posts ? fmt(t.metrics.posts) + ' bài' : ''}</b></li>`) +
     ccList('Video trending', C.videos, (t, i) => `<li><span class="n">${t.rank || i + 1}</span><a class="w" href="${safeUrl(t.url)}" target="_blank" rel="noopener">${esc(t.title || 'Video')}</a><b>${t.metrics?.views ? fmt(t.metrics.views) : ''}</b></li>`);
-  $('#vid-cc').innerHTML = ccHtml
-    ? `${V.creativeCenterDate ? `<p class="muted small">Dữ liệu ngày ${esc(V.creativeCenterDate)}</p>` : ''}${ccHtml}`
-    : `<p class="empty">Chưa có dữ liệu. Nguồn này crawl 7 ngày/lần qua Apify${st.tiktoktrends ? ` (trạng thái: ${esc(st.tiktoktrends)})` : ''}.</p>`;
+  const vh = V.videoHashtags || [];
+  const vhHtml = vh.length
+    ? `<ol class="sector-list">${vh.map((h, i) => `<li><span class="n">${i + 1}</span><a class="w" href="https://www.tiktok.com/tag/${encodeURIComponent(h.tag)}" target="_blank" rel="noopener">#${esc(h.tag)}</a><b>${h.videos} video · ${fmt(h.views)} xem</b></li>`).join('')}</ol>`
+    : '<p class="empty">Chưa đủ dữ liệu (cần ≥ 2 video dùng chung hashtag).</p>';
+  $('#vid-cc').innerHTML = ccHtml ? `${V.creativeCenterDate ? `<p class="muted small">Dữ liệu ngày ${esc(V.creativeCenterDate)}</p>` : ''}${ccHtml}` : vhHtml;
 }
 
 // ---------- Trang Hôm nay: top 5 từ khoá + 3 việc ưu tiên ----------

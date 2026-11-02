@@ -79,19 +79,19 @@ Vào tab **Actions → "Thu thập trending hằng ngày" → Run workflow**. Sa
 
 ## Ngân sách Apify
 
-Gói Apify FREE có **5 USD/tháng**. Tool được cấu hình để nằm trong mức này:
+Gói **Starter: 19 USD/tháng** (chu kỳ bắt đầu ngày 2 hằng tháng). Lịch mặc định ước tính ~12 USD/tháng:
 
-| Nền tảng | Lịch chạy | Chi phí ước tính/lượt |
-|---|---|---|
-| TikTok, Instagram | 3 ngày/lần | ~0,18 + 0,09 USD |
-| Facebook, Threads, Google Maps | 7 ngày/lần | ~0,05 + 0,12 + 0,24 USD |
-| Tripadvisor | 14 ngày/lần | ~0,25 USD |
+| Nền tảng | Lịch chạy |
+|---|---|
+| TikTok, Instagram Reels | Mỗi ngày |
+| TikTok Trending VN (Creative Center) | 2 ngày/lần |
+| Threads, Facebook | 3 ngày/lần |
+| Google Maps, Tripadvisor | 7 ngày/lần |
 
 - Những ngày không tới lịch, tool dùng lại dữ liệu lần crawl gần nhất.
-- Khi đã dùng ≥ 95% `apify.monthlyBudgetUsd`, tool tự dừng crawl tới tháng sau.
+- Khi đã dùng ≥ 95% `apify.monthlyBudgetUsd`, tool tự dừng crawl tới chu kỳ sau.
 - Mỗi lượt chạy có trần `maxChargeUsd`.
-- Muốn dữ liệu mỗi ngày: nâng lên gói Starter (39 USD), đặt `monthlyBudgetUsd: 39` và `everyDays: 1`.
-- Chạy thử rẻ: `APIFY_SAMPLE=4 npm run collect` (mỗi nền tảng lấy vài kết quả). Bỏ qua lịch: `APIFY_FORCE=1`.
+- Chạy thử rẻ: `APIFY_SAMPLE=4 npm run collect`. Bỏ qua lịch: `APIFY_FORCE=1`.
 
 ## Tuỳ chỉnh (không cần biết code)
 

@@ -537,11 +537,15 @@ export function segmentSummary(merged, prev, settings, M) {
  * Điểm đu trend = lượt xem / √(tuổi video theo ngày + 1) × (1 + tỉ lệ tương tác); video ở VN được ưu tiên ×1,5.
  */
 export const VIDEO_WINDOW_DAYS = 30;
+// Video liên quan ăn uống / đi chơi / du lịch (đủ rộng cho món Việt: chè, bún, bánh mì, ăn sáng…)
+const VIDEO_TOPIC = /(^|[^\p{L}])(ăn|món|quán|ngon|chè|bún|phở|cơm|bánh|lẩu|nướng|hải sản|cà phê|cafe|coffee|trà sữa|nhậu|bia|rượu|cocktail|bar|pub|club|nightlife|rooftop|nhà hàng|restaurant|dining|food|foodie|eat|drink|brunch|dinner|chef|menu|review|đi chơi|hẹn hò|date ?night|check ?in|du lịch|travel|staycation|resort|khách sạn|hotel|sài gòn|saigon|thảo điền|thaodien|quận 1)/iu;
+const VIDEO_TAG = /(anngon|anuong|monngon|reviewan|reviewquan|reviewfood|foodtour|saigonfood|saigoneats|amthuc|ansang|chengon|noodle|banhmi|cafe|coffee|bar|cocktail|nightlife|travel|dulich|saigon|thaodien|restaurant|dining|foodie)/i;
+export const isTopicVideo = (it) => VIDEO_TOPIC.test(`${it.title || ''} ${it.text || ''}`) || (it.hashtags || []).some((h) => VIDEO_TAG.test(h));
 const GENERIC_SOUND = /original sound|âm thanh gốc|nhạc nền|son original|sonido original|オリジナル楽曲|original audio/i;
-export function summarizeVideos(merged30, trendItems, refDate) {
+export function summarizeVideos(merged30, trendItems, refDate, M = null) {
   const ref = Date.parse(refDate);
   const ageOf = (it) => (ref - Date.parse(it.publishedAt)) / 864e5;
-  const inWindow = (it) => it.publishedAt && ageOf(it) <= VIDEO_WINDOW_DAYS && ageOf(it) >= -1;
+  const inWindow = (it) => it.publishedAt && ageOf(it) <= VIDEO_WINDOW_DAYS && ageOf(it) >= -1 && isTopicVideo(it);
   const card = (it) => {
     const m = it.metrics || {};
     const views = m.views || 0;
@@ -579,13 +583,27 @@ export function summarizeVideos(merged30, trendItems, refDate) {
     .map((e) => ({ ...e, isNew: (ref - Date.parse(e.firstSeen)) / 864e5 <= 7 }))
     .sort((a, b) => b.videos - a.videos || b.views - a.views)
     .slice(0, 10);
+  // Hashtag đi kèm các video trong cửa sổ 30 ngày (trọng số theo lượt xem)
+  const tagMap = new Map();
+  for (const it of merged30.items.filter((i) => ['tiktok', 'instagram'].includes(i.platform) && inWindow(i) && (i.isVideo || i.video))) {
+    for (const raw of new Set(it.hashtags || [])) {
+      const tag = String(raw).toLowerCase().replace(/^#/, '');
+      if (!tag || /\s/.test(tag) || (M && (M.stop.has(tag) || M.isGeneric(tag) || M.excluded(tag)))) continue;
+      const e = tagMap.get(tag) || { tag, videos: 0, views: 0 };
+      e.videos++;
+      e.views += it.metrics?.views || 0;
+      tagMap.set(tag, e);
+    }
+  }
+  const videoHashtags = [...tagMap.values()].filter((e) => e.videos >= 2).sort((a, b) => b.videos * Math.log10(b.views + 10) - a.videos * Math.log10(a.views + 10)).slice(0, 15);
   const cc = (kind) => (trendItems || []).filter((t) => t.kind === kind).sort((a, b) => (a.rank || 999) - (b.rank || 999) || (b.metrics?.views || 0) - (a.metrics?.views || 0)).slice(0, 10).map(({ _keys, ...t }) => t);
   return {
     window: { days: VIDEO_WINDOW_DAYS, to: refDate, from: new Date(ref - (VIDEO_WINDOW_DAYS - 1) * 864e5).toISOString().slice(0, 10) },
-    criteria: 'Video đăng trong 30 ngày tính tới ngày cập nhật mới nhất. Điểm đu trend = lượt xem ÷ √(số ngày từ lúc đăng + 1) × (1 + tỉ lệ tương tác); video ở Việt Nam được ưu tiên ×1,5. Âm thanh "gốc" của người đăng không tính là trend.',
+    criteria: 'Video đăng trong 30 ngày tính tới ngày cập nhật mới nhất, chủ đề ăn uống / đi chơi / du lịch (loại video game, MV, quảng cáo không liên quan). Điểm đu trend = lượt xem ÷ √(số ngày từ lúc đăng + 1) × (1 + tỉ lệ tương tác); video ở Việt Nam được ưu tiên ×1,5. Âm thanh "gốc" của người đăng không tính là trend.',
     tiktok,
     reels,
     sounds,
+    videoHashtags,
     creativeCenter: { videos: cc('video'), sounds: cc('sound'), hashtags: cc('hashtag') },
   };
 }

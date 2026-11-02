@@ -214,7 +214,7 @@ async function aggregate({ useAi }) {
   // Video đu trend: cố định cửa sổ 30 ngày tính từ ngày cập nhật mới nhất (dùng chung cho mọi kỳ)
   const snaps30 = await snapsIn(addDays(latest, -29), latest);
   const trendSnap = [...snaps30].reverse().find((x) => x?.tiktokTrends?.length);
-  const videos = summarizeVideos(mergeSnapshots(snaps30), trendSnap?.tiktokTrends || [], latest);
+  const videos = summarizeVideos(mergeSnapshots(snaps30), trendSnap?.tiktokTrends || [], latest, M);
   if (trendSnap) videos.creativeCenterDate = trendSnap.date;
   log(`  Video đu trend (30 ngày): TikTok ${videos.tiktok.length}, Reels ${videos.reels.length}, âm thanh ${videos.sounds.length}`);
 
