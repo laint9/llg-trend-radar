@@ -16,6 +16,10 @@ const VENUE = ['pasgo', 'googlemaps', 'tripadvisor'];
 const REGION_SHORT = { q1q2: 'Q1/Q2', hcm: 'HCM', vn: 'VN', sea: 'SEA', intl: 'Quốc tế' };
 const WX_ICON = (c) => (c >= 95 ? '⛈' : c >= 80 ? '🌧' : c >= 61 ? '🌧' : c >= 51 ? '🌦' : c >= 45 ? '🌫' : c >= 3 ? '☁' : c >= 1 ? '⛅' : '☀');
 
+// Link cũ trên Netlify → chuyển sang GitHub Pages (giữ nguyên trang đang xem)
+const NEW_HOME = 'https://laint9.github.io/llg-trend-radar/';
+if (/netlify\.app$/.test(location.hostname)) location.replace(NEW_HOME + location.hash);
+
 const state = { period: 'day', region: 'all', platform: 'google', ptPlatform: null, htPlatform: 'all', actionSrc: 'all', genTab: 'vn', genCat: 'all', kwTab: 'all', data: {}, meta: null };
 const charts = {};
 
@@ -909,6 +913,16 @@ fetch('data/meta.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : null))
   .then((m) => {
     state.meta = m;
-    if (m) $('#updated').textContent = `Cập nhật: ${new Date(m.lastUpdated).toLocaleString('vi-VN')} · Dữ liệu tới ngày ${m.latestDate}`;
+    if (m) {
+      $('#updated').textContent = `Cập nhật: ${new Date(m.lastUpdated).toLocaleString('vi-VN')} · Dữ liệu tới ngày ${m.latestDate}`;
+      // Cảnh báo khi dữ liệu trễ hơn 1 ngày so với hôm nay (giờ VN)
+      const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date());
+      const lag = Math.round((new Date(today) - new Date(m.latestDate)) / 864e5);
+      if (lag >= 2) {
+        const bar = Object.assign(document.createElement('div'), { className: 'stale-banner' });
+        bar.innerHTML = `⚠️ Dữ liệu đang trễ <b>${lag} ngày</b> (mới nhất: ${esc(m.latestDate)}). Hệ thống cập nhật tự động mỗi sáng; nếu vẫn trễ, báo team kỹ thuật kiểm tra GitHub Actions.`;
+        document.querySelector('.topbar').prepend(bar);
+      }
+    }
   })
   .finally(render);

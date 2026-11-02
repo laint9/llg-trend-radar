@@ -1,6 +1,9 @@
 [build]
   publish = "public"
   command = ""
+  # Web chính đã chuyển sang GitHub Pages. Chỉ build khi code thay đổi (bỏ qua commit dữ liệu hằng ngày)
+  # để không tốn hạn mức deploy; bản deploy kế tiếp sẽ tự chuyển hướng người dùng sang link mới.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)public/data'"
 
 [[headers]]
   for = "/data/*"

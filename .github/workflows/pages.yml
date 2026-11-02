@@ -1,0 +1,41 @@
+name: Deploy web (GitHub Pages)
+
+# Chạy khi: có code mới trên main, sau mỗi lượt thu thập dữ liệu hằng ngày, hoặc bấm tay.
+# (Commit dữ liệu do bot tạo không tự kích hoạt workflow khác, nên cần workflow_run.)
+on:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows: ["Thu thập trending hằng ngày"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

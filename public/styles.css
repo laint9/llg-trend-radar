@@ -534,3 +534,6 @@ main > section { margin-bottom: 18px; min-height: 40vh; }
   .side-bottom button { width: 46px; height: 62px; border-radius: 18px; }
   .side-bottom button svg { width: 22px; height: 22px; }
 }
+
+.stale-banner { background: var(--t-yellow); color: var(--text); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); border-radius: 14px; padding: 10px 14px; font-size: 13.5px; margin-bottom: 12px; }
+.stale-banner b { color: var(--warn); }
