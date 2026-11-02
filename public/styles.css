@@ -540,3 +540,65 @@ main > section { margin-bottom: 18px; min-height: 40vh; }
 
 .action .why { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 .action .why b, .action .kpi b { color: var(--text); font-weight: 700; }
+
+/* =========================================================================
+   v2: 5 trang + thanh điều hướng trên đầu (desktop) / dưới (mobile)
+   ========================================================================= */
+.app { max-width: 1440px; margin: 0 auto; padding: 18px 22px 40px; }
+.topnav {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px;
+  background: var(--ink); color: #fff; border-radius: 26px; padding: 10px 12px 10px 16px;
+  position: sticky; top: 12px; z-index: 40; box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.45);
+}
+.brand { display: flex; align-items: center; gap: 10px; color: #fff; min-width: 0; }
+.brand:hover { text-decoration: none; }
+.brand .logo-ring { width: 32px; height: 32px; border-width: 4px; }
+.brand b { display: block; font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+.brand small { display: block; font-size: 11.5px; color: #a9aa9f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px; }
+.mainnav { justify-self: center; display: flex; gap: 4px; background: #1f1f1f; border-radius: 999px; padding: 4px; }
+.mainnav a { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; color: #c9cabf; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.mainnav a svg { width: 18px; height: 18px; }
+.mainnav a:hover { color: #fff; text-decoration: none; background: #2b2b2b; }
+.mainnav a.on { background: #fff; color: #111; }
+.mainnav a.on svg { color: #111; }
+.topnav-right { display: flex; align-items: center; gap: 8px; }
+.topnav .seg { background: #1f1f1f; border-color: #1f1f1f; box-shadow: none; }
+.topnav .seg button { color: #c9cabf; }
+.topnav .seg button.on { background: var(--lime); color: var(--lime-ink); }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 0; background: #1f1f1f; color: #c9cabf; display: grid; place-items: center; cursor: pointer; }
+.icon-btn:hover { color: #fff; background: #2b2b2b; }
+.app .frame { margin-top: 14px; }
+.app .frame > .chips { padding-top: 0; margin-bottom: 4px; }
+.subtabs { margin: -4px 0 18px; }
+.today-act { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-bottom: 1px dashed var(--border); }
+.today-act:last-child { border-bottom: 0; }
+.today-act b { font-size: 15px; }
+#status-card summary { cursor: pointer; font-size: 15px; }
+#status-card[open] summary { margin-bottom: 4px; }
+@media (max-width: 1180px) {
+  .mainnav a { padding: 9px 12px; }
+  .brand small { display: none; }
+}
+@media (max-width: 980px) {
+  .mainnav a span { display: none; }
+  .mainnav a { padding: 10px 14px; }
+}
+
+/* Mobile: thanh 5 mục cố định dưới cùng, nằm trên nút "Powered by Netlify"/an toàn với cạnh dưới */
+@media (max-width: 760px) {
+  .app { padding: 10px 10px 140px; }
+  .topnav { grid-template-columns: 1fr auto; top: 8px; border-radius: 22px; padding: 8px 8px 8px 12px; gap: 8px; }
+  .brand small { display: block; max-width: 150px; }
+  .topnav .seg button { padding: 6px 10px; font-size: 13px; }
+  .icon-btn { width: 36px; height: 36px; }
+  .mainnav {
+    position: fixed; left: 8px; right: 8px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 50;
+    justify-content: space-between; background: var(--ink); border-radius: 24px; padding: 8px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+  .mainnav a { flex: 1; flex-direction: column; gap: 4px; padding: 8px 2px; border-radius: 16px; font-size: 11px; }
+  .mainnav a span { display: block; }
+  .mainnav a svg { width: 22px; height: 22px; }
+  .mainnav a.on { background: var(--lime); color: var(--lime-ink); }
+  .mainnav a.on svg { color: var(--lime-ink); }
+  .app .frame { padding: 16px 12px 24px; border-radius: 24px; }
+}

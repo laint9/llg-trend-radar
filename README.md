@@ -1,5 +1,9 @@
 # LLG Trend Radar
 
+**Web:** https://laint9.github.io/llg-trend-radar/ (GitHub Pages, tự cập nhật sau mỗi lượt thu thập dữ liệu)
+
+**5 trang:** Hôm nay · Từ khoá & Hashtag · Xu hướng (Ngành mình / Phân khúc / Xu hướng chung) · Nền tảng · Kế hoạch (Action / Ý tưởng / Thời tiết)
+
 Web tool tổng hợp **trending theo ngày / tuần / tháng** cho nhà hàng tầm trung–cao, cocktail bar, hidden bar, cocktail club, fun dining và nightlife. Khu vực chính là **Quận 1 và Quận 2**, có thêm dữ liệu tham khảo từ HCM, Việt Nam và Đông Nam Á.
 
 Mục đích: giúp team Marketing hiểu nhu cầu khách hàng để sản xuất nội dung phù hợp.

@@ -121,14 +121,6 @@ function renderKeywords(d) {
     if (li) showKeyword(list[+li.dataset.i]);
   };
 
-  // Keyword theo nền tảng
-  $('#kw-platform').innerHTML = Object.entries(d.keywordsByPlatform || {})
-    .filter(([, l]) => l.length)
-    .map(([p, l]) => `<p class="small" style="margin:6px 0">${pdot(p)} ${l.slice(0, 6).map((k) => esc(k.keyword)).join(' · ')}</p>`)
-    .join('') || '<p class="empty">Chưa có dữ liệu.</p>';
-  if (d.ai?.emergingKeywords?.length) {
-    $('#kw-platform').innerHTML += `<p class="small" style="margin-top:10px"><b>Keyword mới nổi (AI):</b> ${d.ai.emergingKeywords.map(esc).join(' · ')}</p>`;
-  }
 }
 
 const FLAG = { vi: '🇻🇳', en: '🇬🇧', ko: '🇰🇷', ja: '🇯🇵' };
@@ -145,6 +137,7 @@ const sectorTag = (d, id) => {
 function renderKeywordTabs(d) {
   document.querySelectorAll('#kw-tabs .tab').forEach((b) => b.classList.toggle('on', b.dataset.k === state.kwTab));
   document.querySelectorAll('.kw-pane').forEach((p) => (p.hidden = p.dataset.pane !== state.kwTab));
+  $('#kw-generic').hidden = state.kwTab === 'hashtag';
   $('#kw-generic').innerHTML = (d.genericKeywords || []).length
     ? `<span class="lbl">Danh mục chung (đã tách khỏi top):</span> ${d.genericKeywords.map((k) => `<span class="tagpill">${esc(k.keyword)} <b>${fmt(k.score)}</b></span>`).join('')}`
     : '';
@@ -254,7 +247,6 @@ function renderTrends(d) {
 
   const themes = (state.region !== 'all' ? d.themesByRegion?.[state.region] : d.themes) || [];
   const max = Math.max(...themes.map((t) => t.score), 1);
-  renderThemeRadar(themes);
   $('#themes').innerHTML = themes.length
     ? themes
         .map(
@@ -301,35 +293,6 @@ function venueCard(it, i) {
       <div class="src"><span>${esc(it.address || it.source || '')}</span><span>${rtag(it.region)}</span></div>
     </div>
   </article>`;
-}
-
-function renderThemeRadar(themes) {
-  charts.radar?.destroy();
-  const list = themes.slice(0, 8);
-  if (list.length < 3) return;
-  const shortLabel = (l) => l.split(/[&,/]/)[0].trim();
-  // Chuẩn hoá về thang 0–100 để chủ đề nhỏ vẫn thấy được hình dạng
-  const max = Math.max(...list.map((t) => t.score), 1);
-  const norm = (v) => Math.round(Math.sqrt(v / max) * 100);
-  const prev = list.map((t) => (typeof t.change === 'number' ? t.score / (1 + t.change / 100) : t.change === 'new' ? 0 : null));
-  const hasPrev = prev.some((v) => v != null);
-  const text = cssVar('--text');
-  document.querySelector('#theme-legend-prev').hidden = !hasPrev;
-  charts.radar = new Chart($('#theme-radar'), {
-    type: 'radar',
-    data: {
-      labels: list.map((t) => shortLabel(t.label)),
-      datasets: [
-        { label: 'Kỳ này', data: list.map((t) => norm(t.score)), backgroundColor: 'rgba(198,240,78,0.85)', borderColor: '#a8d62a', borderWidth: 1, pointRadius: 0 },
-        ...(hasPrev ? [{ label: 'Kỳ trước', data: prev.map((v) => (v == null ? null : norm(v))), backgroundColor: 'transparent', borderColor: text, borderWidth: 1.5, pointRadius: 0 }] : []),
-      ],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmt(c.datasetIndex === 0 ? list[c.dataIndex].score : prev[c.dataIndex] || 0)}` } } },
-      scales: { r: { beginAtZero: true, max: 100, ticks: { display: false }, grid: { color: cssVar('--border') }, angleLines: { color: cssVar('--border') }, pointLabels: { color: cssVar('--muted'), font: { size: 12, family: 'Be Vietnam Pro' } } } },
-    },
-  });
 }
 
 function postCard(it, i) {
@@ -467,7 +430,6 @@ function renderIdeas(d) {
 // ---------- Phân khúc ----------
 function renderSegments(d) {
   const segs = d.segments || [];
-  $('#s-segments').hidden = !segs.length;
   const ai = new Map((d.ai?.segmentInsights || []).map((x) => [x.segment, x]));
   $('#segments').innerHTML = segs
     .map((g) => {
@@ -498,11 +460,7 @@ const CAT_TONE = { sport: 'mint', music: 'violet', film: 'pink', tech: 'blue', f
 const catTile = (it, no) => `<span class="tile tile-${CAT_TONE[it.category] || 'violet'}">${esc(it.categoryIcon || '✨')}${no ? `<span class="no">${no}</span>` : ''}</span>`;
 function renderGeneral(d) {
   const G = d.general;
-  if (!G) {
-    $('#s-general').hidden = true;
-    return;
-  }
-  $('#s-general').hidden = false;
+  if (!G) return;
   const ai = d.ai || {};
   const cats = G.categories || [];
   $('#gen-summary').innerHTML = `
@@ -700,10 +658,11 @@ function renderPlatformTrends(d) {
     if (t.newVenues?.length) html += `<h3 class="mt">Địa điểm mới xuất hiện trong kỳ</h3><div class="posts">${t.newVenues.map(venueCard).join('')}</div>`;
     else if (t.newSinceNote) html += `<p class="muted small mt">${esc(t.newSinceNote)}.</p>`;
     if (t.deals?.length) html += `<h3 class="mt">Deal đang được đẩy</h3><div class="posts">${t.deals.map(venueCard).join('')}</div>`;
-  } else if (t.themes?.[0]?.evidence?.length) {
-    html += `<h3 class="mt">Nội dung tiêu biểu cho chủ đề "${esc(t.themes[0].label)}"</h3><div class="posts">${t.themes[0].evidence.map(postCard).join('')}</div>`;
   }
   $('#pt-content').innerHTML = html;
+  // Danh sách nội dung/địa điểm nổi bật bên dưới đi theo nền tảng đang chọn
+  state.platform = p;
+  renderPlatformContent(d);
 }
 
 // ---------- Hashtag ----------
@@ -739,10 +698,6 @@ function renderHashtags(d) {
   if (copy) copy.onclick = async () => {
     try { await navigator.clipboard.writeText($('#ht-set').textContent); copy.textContent = 'Đã sao chép ✓'; } catch { copy.textContent = 'Không sao chép được, hãy bôi đen để copy'; }
   };
-  const max = Math.max(...list.map((h) => h.score), 1);
-  $('#ht-cloud').innerHTML = list.length
-    ? list.slice(0, 50).map((h) => `<a href="https://www.tiktok.com/tag/${encodeURIComponent(h.tag)}" target="_blank" rel="noopener" style="font-size:${12 + (h.score / max) * 16}px">#${esc(h.tag)}</a>`).join('')
-    : '<p class="empty">—</p>';
 }
 function downloadHashtagCsv(d) {
   const rows = [['Hạng', 'Hashtag', 'Số bài', 'Reach TB', 'Tổng reach', 'Tương tác', 'Thay đổi', 'Nền tảng', 'Bài top']];
@@ -786,6 +741,19 @@ function openModal(html) {
   $('#modal').showModal();
 }
 
+// ---------- Trang Hôm nay: top 5 từ khoá + 3 việc ưu tiên ----------
+function renderToday(d) {
+  const kws = currentKeywords(d).slice(0, 5);
+  $('#today-hot').innerHTML = kws.length
+    ? kws.map((k, i) => `<li><span class="tile tile-${['violet', 'blue', 'peach', 'mint', 'pink'][i]}">${i + 1}</span><div><b class="t">${esc(k.keyword)}</b><div class="kw-meta" style="margin-top:4px">${sectorTag(d, k.sector)}${langFlags(k.langs)}</div></div><div class="val">${fmt(k.score)} ${delta(k.change)}</div></li>`).join('')
+    : '<li class="empty">Chưa có dữ liệu.</li>';
+  const order = { cao: 0, 'trung bình': 1, thấp: 2 };
+  const acts = [...(d.ai?.actions || []).map((a) => ({ ...a, source: 'ai' })), ...(d.actions || [])].sort((a, b) => (order[a.priority] ?? 1) - (order[b.priority] ?? 1)).slice(0, 3);
+  $('#today-actions').innerHTML = acts.length
+    ? acts.map((a) => `<div class="today-act"><div class="kw-meta"><span class="prio ${esc((a.priority || '').split(' ')[0])}">${esc(a.priority)}</span><span class="rtag">⏱ ${esc(a.timeline || '')}</span>${a.source === 'ai' ? '<span class="src-ai">AI</span>' : ''}</div><b>${esc(a.title)}</b>${a.why ? `<div class="muted small">${esc(a.why)}</div>` : ''}</div>`).join('')
+    : '<p class="empty">Chưa có đề xuất.</p>';
+}
+
 async function render() {
   let d;
   try {
@@ -797,6 +765,7 @@ async function render() {
   renderRegions(d);
   renderKpis(d);
   renderAiSummary(d);
+  renderToday(d);
   renderKeywords(d);
   renderKeywordTabs(d);
   renderKwChart(d);
@@ -851,6 +820,7 @@ $('#kw-tabs').onclick = (e) => {
   const b = e.target.closest('[data-k]');
   if (!b) return;
   state.kwTab = b.dataset.k;
+  history.replaceState(null, '', `#/keywords/${b.dataset.k}`);
   renderKeywordTabs(state.data[state.period]);
   requestAnimationFrame(() => charts.kw?.resize?.());
 };
@@ -859,66 +829,59 @@ $('#modal-close').onclick = () => $('#modal').close();
 $('#modal').addEventListener('click', (e) => e.target.id === 'modal' && $('#modal').close());
 
 initTheme();
-// ---------- Trang riêng cho từng section (hash router #/trang) ----------
+// ---------- 5 trang (hash router #/trang/tab-con) ----------
 const PAGES = [...document.querySelectorAll('main > section')].map((el) => ({
   slug: el.id.replace(/^s-/, ''),
   el,
-  no: el.querySelector('.sec-no')?.textContent || '',
   title: el.querySelector('.sec-title h2')?.textContent || '',
-  sub: el.querySelector('.sec-title p')?.textContent || '',
-  icon: el.querySelector('.sec-ic use')?.getAttribute('href') || '#i-home',
 }));
-function renderShortcuts() {
-  $('#shortcuts').innerHTML = PAGES.filter((p) => p.slug !== 'summary')
-    .map((p) => `<a class="shortcut" href="#/${p.slug}"><span class="sec-ic"><svg><use href="${p.icon}"/></svg></span><div><span class="sc-no">${esc(p.no)}</span><b>${esc(p.title)}</b><small>${esc(p.sub)}</small></div><span class="sc-go">→</span></a>`)
-    .join('');
+// Link cũ (12 mục) → trang & tab mới
+const LEGACY = {
+  summary: ['today'], sources: ['today'], actions: ['plan', 'actions'], ideas: ['plan', 'ideas'], weather: ['plan', 'weather'],
+  segments: ['trends', 'segments'], general: ['trends', 'general'], ptrends: ['platforms'], hashtags: ['keywords', 'hashtag'],
+};
+const REGION_PAGES = new Set(['today', 'keywords', 'trends', 'platforms']);
+function setSub(group, sub) {
+  const box = document.querySelector(`.subtabs[data-group="${group}"]`);
+  if (!box) return;
+  const btns = [...box.querySelectorAll('[data-sub]')];
+  const key = btns.some((b) => b.dataset.sub === sub) ? sub : btns[0].dataset.sub;
+  btns.forEach((b) => b.classList.toggle('on', b.dataset.sub === key));
+  box.parentElement.querySelectorAll('[data-subpane]').forEach((p) => (p.hidden = p.dataset.subpane !== key));
+  requestAnimationFrame(() => Object.values(charts).forEach((c) => c?.resize?.()));
 }
+document.querySelectorAll('.subtabs').forEach((box) =>
+  box.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-sub]');
+    if (!b) return;
+    const page = box.closest('section').id.replace(/^s-/, '');
+    history.replaceState(null, '', `#/${page}/${b.dataset.sub}`);
+    setSub(box.dataset.group, b.dataset.sub);
+  }),
+);
 function route() {
-  const raw = location.hash.replace(/^#\/?/, '').replace(/^s-/, '');
-  const page = PAGES.find((p) => p.slug === raw) || PAGES[0];
+  let [slug, sub] = location.hash.replace(/^#\/?/, '').replace(/^s-/, '').split('/');
+  if (LEGACY[slug]) [slug, sub] = [LEGACY[slug][0], LEGACY[slug][1] || sub];
+  const page = PAGES.find((p) => p.slug === slug) || PAGES[0];
   PAGES.forEach((p) => p.el.classList.toggle('page-off', p !== page));
-  document.querySelectorAll('.side-nav a, .side-bottom a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === `#/${page.slug}`));
-  document.title = page.slug === 'summary' ? 'LLG Trend Radar' : `${page.title} · Trend Radar`;
-  // Bộ lọc khu vực chỉ hiện ở trang có áp dụng (tránh hiểu nhầm là đã lọc)
-  const REGION_PAGES = new Set(['summary', 'keywords', 'trends', 'hashtags', 'platforms']);
+  document.querySelectorAll('#mainnav a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === `#/${page.slug}`));
+  document.title = page.slug === 'today' ? 'LLG Trend Radar' : `${page.title} · Trend Radar`;
   $('#regions').hidden = !REGION_PAGES.has(page.slug);
+  if (page.slug === 'keywords' && sub && state.data[state.period]) {
+    state.kwTab = sub;
+    renderKeywordTabs(state.data[state.period]);
+  } else if (page.slug === 'keywords' && sub) state.kwTab = sub;
+  if (page.slug === 'trends') setSub('trends', sub);
+  if (page.slug === 'plan') setSub('plan', sub);
   const i = PAGES.indexOf(page);
   const prev = PAGES[i - 1];
   const next = PAGES[i + 1];
   $('#pager').innerHTML = `${prev ? `<a class="btn" href="#/${prev.slug}">← ${esc(prev.title)}</a>` : '<span></span>'}<span class="muted small">Trang ${i + 1}/${PAGES.length}</span>${next ? `<a class="btn pill" href="#/${next.slug}">${esc(next.title)} →</a>` : '<span></span>'}`;
   window.scrollTo({ top: 0 });
-  // Mobile: cuộn thanh điều hướng để icon trang hiện tại nằm giữa
-  if (matchMedia('(max-width: 760px)').matches) {
-    const on = document.querySelector('.side-nav a.on');
-    const nav = document.querySelector('.side-nav');
-    if (on && nav) nav.scrollTo({ left: on.offsetLeft - nav.clientWidth / 2 + on.clientWidth / 2, behavior: 'smooth' });
-  }
-  // Biểu đồ vẽ lúc đang ẩn → cập nhật kích thước khi trang hiện ra
   requestAnimationFrame(() => Object.values(charts).forEach((c) => c?.resize?.()));
 }
 window.addEventListener('hashchange', route);
-renderShortcuts();
 route();
-
-// ---------- Tooltip nhãn cho icon sidebar ----------
-const tip = Object.assign(document.createElement('div'), { id: 'navtip', role: 'tooltip' });
-document.body.append(tip);
-document.querySelectorAll('.sidebar [data-tip]').forEach((el) => {
-  const show = () => {
-    if (matchMedia('(max-width: 760px)').matches) return;
-    const r = el.getBoundingClientRect();
-    tip.textContent = el.dataset.tip;
-    tip.style.top = `${r.top + r.height / 2}px`;
-    tip.style.left = `${r.right + 14}px`;
-    tip.classList.add('show');
-  };
-  const hide = () => tip.classList.remove('show');
-  el.addEventListener('mouseenter', show);
-  el.addEventListener('focus', show);
-  el.addEventListener('mouseleave', hide);
-  el.addEventListener('blur', hide);
-  el.addEventListener('click', hide);
-});
 
 fetch('data/meta.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : null))
