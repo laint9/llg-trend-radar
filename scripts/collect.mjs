@@ -13,7 +13,7 @@ import { pasgo } from './sources/venues.mjs';
 import { youtubeTrending, generalNews, buildClassifier } from './sources/general.mjs';
 import { summarizeGeneral } from './lib/general.mjs';
 import { buildActions, upcomingEvents } from './lib/actions.mjs';
-import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends, segmentSummary, pickCard, venueScore, rankRefs, isQualityRef } from './lib/analyze.mjs';
+import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends, segmentSummary, pickCard, venueScore, rankRefs, isQualityRef, summarizeVideos } from './lib/analyze.mjs';
 import { resolveProvider, generateInsights } from './lib/ai.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
@@ -32,7 +32,7 @@ async function previousApify() {
   for (const d of dates) {
     const snap = await readJson(join(DAILY_DIR, `${d}.json`));
     for (const [p, date] of Object.entries(snap?.apifyRuns || {})) if (!lastRun[p] || date > lastRun[p]) lastRun[p] = date;
-    for (const it of snap?.items || []) {
+    for (const it of [...(snap?.items || []), ...(snap?.tiktokTrends || []).map((x) => ({ ...x, platform: 'tiktoktrends' }))]) {
       if (!settings.apify?.platforms?.[it.platform]) continue;
       if (carry[it.platform]?.date && carry[it.platform].date !== d) continue; // chỉ lấy từ snapshot mới nhất có nền tảng đó
       (carry[it.platform] ||= { date: d, items: [] }).items.push({ ...it, carried: true });
@@ -125,7 +125,11 @@ async function collect() {
     }
   }
   const general = { youtube: ytt?.items || [], news: gnews || [] };
-  const snap = { date: today, generatedAt: new Date().toISOString(), apifyRuns, status, general, items: [...items.values()], searchQueries: queries || [], googleTrending: trending || [], weather: weatherData };
+  // Trend TikTok (Creative Center) lưu riêng, không trộn vào phân tích từ khoá/chủ đề
+  const allItems = [...items.values()];
+  const tiktokTrends = allItems.filter((i) => i.platform === 'tiktoktrend' || i.platform === 'tiktoktrends').map((i) => ({ ...i, platform: 'tiktoktrend' }));
+  if (tiktokTrends[0]?._keys) log(`  TikTok trends: ${tiktokTrends.length} mục, field mẫu: ${tiktokTrends[0]._keys.join(', ')}`);
+  const snap = { date: today, generatedAt: new Date().toISOString(), apifyRuns, status, general, tiktokTrends, items: allItems.filter((i) => !['tiktoktrend', 'tiktoktrends'].includes(i.platform)), searchQueries: queries || [], googleTrending: trending || [], weather: weatherData };
   await writeJson(join(DAILY_DIR, `${today}.json`), snap);
   log(`Đã lưu snapshot: ${items.size} nội dung, ${queries?.length || 0} truy vấn, ${trending?.length || 0} trending`);
 
@@ -176,6 +180,12 @@ function aiPayload(s) {
       keywords: g.keywords.map((k) => k.keyword), hashtags: g.hashtags.map((h) => '#' + h.tag), searches: g.searches,
       topContent: g.top.map((x) => `${x.title} (${x.platform}, reach ${x.reach})`),
     })),
+    trendVideos: {
+      tiktok: s.videos.tiktok.slice(0, 8).map((v) => `${v.title} (${v.reach} view, ${v.ageDays} ngày${v.music ? `, âm thanh: ${v.music}` : ''})`),
+      reels: s.videos.reels.slice(0, 8).map((v) => `${v.title} (${v.reach} view${v.music ? `, âm thanh: ${v.music}` : ''})`),
+      sounds: s.videos.sounds.map((x) => `${x.music} – ${x.videos} video`),
+      creativeCenter: [...s.videos.creativeCenter.sounds, ...s.videos.creativeCenter.hashtags].slice(0, 12).map((t) => `${t.kind}: ${t.title}`),
+    },
     generalTrends: {
       googleSearchesVN: s.general.searchesVN.slice(0, 25).map((t) => `${t.title} [${t.trafficLabel || t.traffic}] (${t.categoryLabel}${t.sensitive ? ', NHẠY CẢM' : ''})`),
       youtubeTrendingVN: s.general.youtube.slice(0, 20).map((v) => `#${v.bestRank} ${v.title} – ${v.channel} (${v.categoryLabel}, ${v.views} views)`),
@@ -200,6 +210,13 @@ async function aggregate({ useAi }) {
   const ai = useAi ? resolveProvider(settings) : { provider: 'none' };
   const regen = settings.ai?.regenerateEveryDays || { day: 1, week: 1, month: 3 };
   log(`Tổng hợp (mốc ${latest}), AI: ${ai.provider}${ai.model ? ` / ${ai.model}` : ''}`);
+
+  // Video đu trend: cố định cửa sổ 30 ngày tính từ ngày cập nhật mới nhất (dùng chung cho mọi kỳ)
+  const snaps30 = await snapsIn(addDays(latest, -29), latest);
+  const trendSnap = [...snaps30].reverse().find((x) => x?.tiktokTrends?.length);
+  const videos = summarizeVideos(mergeSnapshots(snaps30), trendSnap?.tiktokTrends || [], latest);
+  if (trendSnap) videos.creativeCenterDate = trendSnap.date;
+  log(`  Video đu trend (30 ngày): TikTok ${videos.tiktok.length}, Reels ${videos.reels.length}, âm thanh ${videos.sounds.length}`);
 
   for (const period of ['day', 'week', 'month']) {
     const w = periodWindow(period, latest);
@@ -309,6 +326,7 @@ async function aggregate({ useAi }) {
       hashtags,
       general,
       segments,
+      videos,
       platformTrends: pTrends,
       upcomingEvents: upcomingEvents(settings, latest),
       regions: Object.fromEntries(Object.entries(settings.regions).map(([k, v]) => [k, v.label])),

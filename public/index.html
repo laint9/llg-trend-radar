@@ -125,7 +125,7 @@
 
         <section id="s-trends">
           <div class="sec-head big"><div class="sec-title"><span class="sec-no">03</span><span class="sec-ic"><svg><use href="#i-fire"/></svg></span><div><h2>Xu hướng</h2><p>Xu hướng của ngành mình, so sánh phân khúc, và xu hướng chung của xã hội để đu trend</p></div></div></div>
-          <div class="tabs subtabs" data-group="trends" role="tablist"><button class="tab on" data-sub="industry"><span class="tile sm tile-violet">✦</span>Ngành mình</button><button class="tab" data-sub="segments"><span class="tile sm tile-peach">▥</span>Phân khúc</button><button class="tab" data-sub="general"><span class="tile sm tile-blue">🌏</span>Xu hướng chung</button></div>
+          <div class="tabs subtabs" data-group="trends" role="tablist"><button class="tab on" data-sub="industry"><span class="tile sm tile-violet">✦</span>Ngành mình</button><button class="tab" data-sub="segments"><span class="tile sm tile-peach">▥</span>Phân khúc</button><button class="tab" data-sub="general"><span class="tile sm tile-blue">🌏</span>Xu hướng chung</button><button class="tab" data-sub="videos"><span class="tile sm tile-pink">🎬</span>Video đu trend</button></div>
           <div data-subpane="industry">
             <div id="ai-trends" class="trend-grid"></div>
             <div class="grid-2">
@@ -154,6 +154,17 @@
             <div class="chips" id="gen-filter"></div>
             <div class="tabs" id="gen-tabs" role="tablist"></div>
             <div id="gen-content"></div>
+          </div>
+          <div data-subpane="videos" hidden>
+            <p class="card small criteria" id="vid-criteria"></p>
+            <div class="grid-2">
+              <div class="card"><div class="card-head"><h2>♪ Top 10 TikTok đu trend</h2></div><ol class="vid-list" id="vid-tiktok"></ol></div>
+              <div class="card"><div class="card-head"><h2>◎ Top 10 Reels Instagram</h2></div><ol class="vid-list" id="vid-reels"></ol></div>
+            </div>
+            <div class="grid-2">
+              <div class="card lime-card"><h2>🎵 Âm thanh đang được dùng nhiều</h2><p class="small" style="margin:-6px 0 10px">Từ các video TikTok/Reels trong 30 ngày (không tính âm thanh gốc)</p><ol class="sound-list" id="vid-sounds"></ol></div>
+              <div class="card"><h2>🔥 Trending TikTok Việt Nam</h2><p class="muted small" style="margin:-6px 0 10px">TikTok Creative Center · F&amp;B · 7 ngày</p><div id="vid-cc"></div></div>
+            </div>
           </div>
         </section>
 

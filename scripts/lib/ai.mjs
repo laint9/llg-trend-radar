@@ -162,6 +162,7 @@ Nguyên tắc:
 - keywordInsights: KHÔNG giải thích các từ chỉ danh mục chung (genericKeywords); tập trung keyword cụ thể. Dùng keywordsBySector để nhìn đa ngành (F&B, nightlife, du lịch, lưu trú, sự kiện, dịch vụ).
 - globalInsight: dựa trên globalTourists (truy vấn Google bằng tiếng Anh/Hàn/Nhật, tin tiếng Anh, Tripadvisor) để nói khách quốc tế đang tìm gì về Sài Gòn/Q1/Q2 và cơ hội cho bar/nhà hàng.
 - segmentInsights: phân tích SONG SONG và CÂN BẰNG 5 phân khúc: Bar & Nightlife, Cocktail & Mixology, Fine dining & Omakase, Fun dining (ẩm thực trải nghiệm, KHÔNG gợi ý keyword fine dining cho fun dining), Nhà hàng casual & quán ăn (dựa trên dữ liệu segments). Không thiên vị bar.
+- trendVideos (top TikTok/Reels 30 ngày, âm thanh đang được nhiều video dùng, trending TikTok VN): dùng để gợi ý cách đu trend cụ thể (dùng âm thanh nào, format video nào) trong contentIdeas và trendOpportunities.
 - generalSummary + trendOpportunities: dựa trên generalTrends (Google Trends toàn quốc, YouTube Thịnh hành, tin nổi bật, SEA), KHÔNG giới hạn ngành F&B. Chọn trend có thể đu được (thể thao: chiếu trận/combo xem bóng; âm nhạc/showbiz: cocktail lấy cảm hứng, playlist, after-party; phim/game: theme night; lễ hội…). Đánh dấu risk "tránh" cho chủ đề NHẠY CẢM (tai nạn, thiên tai có thương vong, chính trị, tôn giáo, tang lễ) và không đề xuất khai thác thương mại các chủ đề đó.
 - weatherInsights: liên hệ thời tiết 7 ngày tới (đặc biệt mưa buổi tối 17–23h, nắng nóng) với hành vi đi chơi và gợi ý content/ưu đãi.`;
 

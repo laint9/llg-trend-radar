@@ -602,3 +602,26 @@ main > section { margin-bottom: 18px; min-height: 40vh; }
   .mainnav a.on svg { color: var(--lime-ink); }
   .app .frame { padding: 16px 12px 24px; border-radius: 24px; }
 }
+
+/* ---------- Video đu trend ---------- */
+.criteria { background: var(--t-yellow); border-color: transparent; line-height: 1.6; }
+.vid-list, .sound-list { list-style: none; margin: 0; padding: 0; }
+.vid { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+.vid:last-child { border-bottom: 0; }
+.vthumb { width: 64px; height: 86px; border-radius: 12px; overflow: hidden; position: relative; display: grid; place-items: center; background: var(--surface-2); }
+.vthumb img { width: 100%; height: 100%; object-fit: cover; }
+.vrank { position: absolute; top: 4px; left: 4px; background: var(--lime); color: var(--lime-ink); font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 999px; }
+.vbody { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.vbody .t { font-weight: 600; font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.vbody .m { display: flex; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); }
+.vbody .m b { color: var(--text); }
+.vmusic { font-size: 12.5px; color: var(--accent); overflow-wrap: anywhere; }
+.vscore { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 14px; }
+.vscore small { display: block; font-weight: 500; font-size: 11px; color: var(--muted); }
+.sound-list li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dashed rgba(28, 36, 0, 0.2); }
+.sound-list li:last-child { border-bottom: 0; }
+.sound-list .n { font-weight: 800; font-size: 12px; }
+.sound-list .val { text-align: right; font-weight: 700; font-size: 13px; }
+.sound-list .val small { display: block; font-weight: 500; opacity: 0.7; }
+.vthumb img { position: absolute; inset: 0; }
+.vplay { font-size: 22px; opacity: 0.6; }

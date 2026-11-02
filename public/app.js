@@ -708,7 +708,7 @@ function downloadHashtagCsv(d) {
 
 function renderStatus(d) {
   const s = d.sourceStatus || {};
-  const names = { googleTrends: 'Google Trends', googleAutocomplete: 'Google Autocomplete', googleNews: 'Google News', rss: 'RSS báo', youtube: 'YouTube', weather: 'Thời tiết', pasgo: 'PasGo', youtubeTrending: 'YouTube Thịnh hành', generalNews: 'Tin nổi bật (chung)', tiktok: 'TikTok (Apify)', instagram: 'Instagram (Apify)', facebook: 'Facebook (Apify)', threads: 'Threads (Apify)', googlemaps: 'Google Maps (Apify)', tripadvisor: 'Tripadvisor (Apify)' };
+  const names = { googleTrends: 'Google Trends', googleAutocomplete: 'Google Autocomplete', googleNews: 'Google News', rss: 'RSS báo', youtube: 'YouTube', weather: 'Thời tiết', pasgo: 'PasGo', youtubeTrending: 'YouTube Thịnh hành', generalNews: 'Tin nổi bật (chung)', tiktok: 'TikTok (Apify)', instagram: 'Instagram (Apify)', facebook: 'Facebook (Apify)', threads: 'Threads (Apify)', googlemaps: 'Google Maps (Apify)', tripadvisor: 'Tripadvisor (Apify)', tiktoktrends: 'TikTok Trending VN (Apify)' };
   $('#status').innerHTML = Object.entries(names)
     .map(([k, n]) => {
       const v = s[k] || '—';
@@ -741,6 +741,43 @@ function openModal(html) {
   $('#modal').showModal();
 }
 
+// ---------- Video đu trend (cửa sổ 30 ngày tính từ ngày cập nhật mới nhất) ----------
+function vidRow(v, i) {
+  const m = v.metrics || {};
+  const img = v.image ? `<img src="${safeUrl(v.image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '';
+  return `<li class="vid">
+    <a class="vthumb tile-${esc(v.platform)}" href="${safeUrl(v.url)}" target="_blank" rel="noopener"><span class="vplay">▶</span>${img}<span class="vrank">${i + 1}</span></a>
+    <div class="vbody">
+      <a class="t" href="${safeUrl(v.url)}" target="_blank" rel="noopener">${esc(v.title)}</a>
+      <div class="m"><span><b>${fmt(m.views || v.reach)}</b> xem</span>${m.likes ? `<span><b>${fmt(m.likes)}</b> thích</span>` : ''}${v.er != null ? `<span>ER <b>${v.er}%</b></span>` : ''}<span>${v.ageDays === 0 ? 'hôm nay' : `${v.ageDays} ngày trước`}</span></div>
+      ${v.music ? `<div class="vmusic">🎵 ${esc(v.music)}${v.musicAuthor ? ` · ${esc(v.musicAuthor)}` : ''}</div>` : ''}
+      <div class="kw-meta">${v.intl ? '<span class="rtag sec-blue">Quốc tế</span>' : rtag(v.region)}${(v.hashtags || []).slice(0, 3).map((h) => `<span class="rtag">#${esc(h)}</span>`).join('')}${v.author ? `<span class="rtag">@${esc(v.author)}</span>` : ''}</div>
+    </div>
+    <div class="vscore" title="Điểm đu trend">${fmt(v.trendScore)}<small>điểm</small></div>
+  </li>`;
+}
+function renderVideos(d) {
+  const V = d.videos;
+  if (!V) return;
+  const st = d.sourceStatus || {};
+  $('#vid-criteria').innerHTML = `<b>Tiêu chuẩn:</b> ${esc(V.criteria)} <span class="muted">Cửa sổ: ${fmtDate(V.window.from)} – ${fmtDate(V.window.to)}.</span>`;
+  const empty = (p, extra) => `<li class="empty">Chưa có video trong 30 ngày. ${st[p] ? `Trạng thái nguồn: ${esc(st[p])}.` : ''} ${extra || ''}</li>`;
+  $('#vid-tiktok').innerHTML = V.tiktok.length ? V.tiktok.map(vidRow).join('') : empty('tiktok');
+  $('#vid-reels').innerHTML = V.reels.length ? V.reels.map(vidRow).join('') : empty('instagram', 'Instagram đã chuyển sang crawl Reels; dữ liệu có từ lượt crawl kế tiếp.');
+  $('#vid-sounds').innerHTML = V.sounds.length
+    ? V.sounds.map((x, i) => `<li><span class="n">${i + 1}</span><div><a href="${safeUrl(x.sample?.url)}" target="_blank" rel="noopener"><b>${esc(x.music)}</b></a>${x.author ? `<div class="small">${esc(x.author)}</div>` : ''}</div><div class="val">${x.videos} video${x.isNew ? ' <span class="badge-new">MỚI</span>' : ''}<small>${fmt(x.views)} xem</small></div></li>`).join('')
+    : '<li class="empty">Chưa đủ dữ liệu âm thanh (cần lượt crawl TikTok/Reels mới).</li>';
+  const C = V.creativeCenter || {};
+  const ccList = (title, list, fmtItem) => (list?.length ? `<h3 class="mt">${title}</h3><ol class="sector-list">${list.map(fmtItem).join('')}</ol>` : '');
+  const ccHtml =
+    ccList('Âm thanh trending', C.sounds, (t, i) => `<li><span class="n">${t.rank || i + 1}</span><a class="w" href="${safeUrl(t.url)}" target="_blank" rel="noopener">${esc(t.title)}${t.author ? ` · ${esc(t.author)}` : ''}</a><b></b></li>`) +
+    ccList('Hashtag F&amp;B trending', C.hashtags, (t, i) => `<li><span class="n">${t.rank || i + 1}</span><a class="w" href="${safeUrl(t.url)}" target="_blank" rel="noopener">#${esc(t.title.replace(/^#/, ''))}</a><b>${t.metrics?.posts ? fmt(t.metrics.posts) + ' bài' : ''}</b></li>`) +
+    ccList('Video trending', C.videos, (t, i) => `<li><span class="n">${t.rank || i + 1}</span><a class="w" href="${safeUrl(t.url)}" target="_blank" rel="noopener">${esc(t.title || 'Video')}</a><b>${t.metrics?.views ? fmt(t.metrics.views) : ''}</b></li>`);
+  $('#vid-cc').innerHTML = ccHtml
+    ? `${V.creativeCenterDate ? `<p class="muted small">Dữ liệu ngày ${esc(V.creativeCenterDate)}</p>` : ''}${ccHtml}`
+    : `<p class="empty">Chưa có dữ liệu. Nguồn này crawl 7 ngày/lần qua Apify${st.tiktoktrends ? ` (trạng thái: ${esc(st.tiktoktrends)})` : ''}.</p>`;
+}
+
 // ---------- Trang Hôm nay: top 5 từ khoá + 3 việc ưu tiên ----------
 function renderToday(d) {
   const kws = currentKeywords(d).slice(0, 5);
@@ -766,6 +803,7 @@ async function render() {
   renderKpis(d);
   renderAiSummary(d);
   renderToday(d);
+  renderVideos(d);
   renderKeywords(d);
   renderKeywordTabs(d);
   renderKwChart(d);

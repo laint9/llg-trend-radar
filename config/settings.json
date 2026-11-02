@@ -306,8 +306,9 @@
         "input": {
           "hashtags": "{{hashtags}}",
           "resultsLimit": 6,
-          "resultsType": "posts"
-        }
+          "resultsType": "reels"
+        },
+        "_note": "resultsType = reels: lấy Reels (có lượt xem + âm thanh) để làm Top 10 Reels đu trend."
       },
       "facebook": {
         "enabled": true,
@@ -391,6 +392,27 @@
           "currency": "VND",
           "includeTags": true,
           "maxPhotosPerPlace": 0
+        }
+      },
+      "tiktoktrends": {
+        "enabled": true,
+        "kind": "trend",
+        "actor": "clockworks~tiktok-trends-scraper",
+        "everyDays": 7,
+        "maxChargeUsd": 0.5,
+        "_note": "TikTok Creative Center: video, âm thanh, hashtag F&B đang trending tại Việt Nam (7 ngày). ~0,1 USD/lượt.",
+        "input": {
+          "adsScrapeHashtags": true,
+          "adsCountryCode": "VN",
+          "adsTimeRange": "7",
+          "adsHashtagIndustry": "Food & Beverage",
+          "adsScrapeSounds": true,
+          "adsSoundsCountryCode": "VN",
+          "adsRankType": "popular",
+          "adsScrapeVideos": true,
+          "adsVideosCountryCode": "VN",
+          "adsSortVideosBy": "vv",
+          "resultsPerPage": 10
         }
       }
     }

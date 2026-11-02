@@ -531,3 +531,61 @@ export function segmentSummary(merged, prev, settings, M) {
     };
   });
 }
+
+/**
+ * Video đu trend: tính trong cửa sổ 30 ngày tính từ ngày cập nhật mới nhất (không phụ thuộc kỳ Ngày/Tuần/Tháng).
+ * Điểm đu trend = lượt xem / √(tuổi video theo ngày + 1) × (1 + tỉ lệ tương tác); video ở VN được ưu tiên ×1,5.
+ */
+export const VIDEO_WINDOW_DAYS = 30;
+const GENERIC_SOUND = /original sound|âm thanh gốc|nhạc nền|son original|sonido original|オリジナル楽曲|original audio/i;
+export function summarizeVideos(merged30, trendItems, refDate) {
+  const ref = Date.parse(refDate);
+  const ageOf = (it) => (ref - Date.parse(it.publishedAt)) / 864e5;
+  const inWindow = (it) => it.publishedAt && ageOf(it) <= VIDEO_WINDOW_DAYS && ageOf(it) >= -1;
+  const card = (it) => {
+    const m = it.metrics || {};
+    const views = m.views || 0;
+    const eng = (m.likes || 0) + (m.comments || 0) + (m.shares || 0);
+    const er = views ? eng / views : null;
+    const base = views || reachOf(it);
+    const age = Math.max(0, ageOf(it));
+    const score = (base / Math.sqrt(age + 1)) * (1 + (er || 0)) * (isVN(it) ? 1.5 : 1);
+    return {
+      ...pickCard(it),
+      ageDays: Math.round(age),
+      er: er != null ? Math.round(er * 1000) / 10 : null,
+      trendScore: Math.round(score),
+      music: it.musicOriginal || GENERIC_SOUND.test(it.music || '') ? null : it.music,
+      musicAuthor: it.musicAuthor || null,
+      duration: it.duration || null,
+    };
+  };
+  const top = (list) => list.filter(inWindow).map(card).filter((c) => c.trendScore > 0).sort((a, b) => b.trendScore - a.trendScore).slice(0, 10);
+  const tiktok = top(merged30.items.filter((i) => i.platform === 'tiktok'));
+  const reels = top(merged30.items.filter((i) => i.platform === 'instagram' && (i.isVideo || i.video)));
+  // Âm thanh được nhiều video dùng trong 30 ngày (bỏ "âm thanh gốc")
+  const snd = new Map();
+  for (const it of merged30.items.filter((i) => ['tiktok', 'instagram'].includes(i.platform) && inWindow(i) && i.music && !i.musicOriginal && !GENERIC_SOUND.test(i.music))) {
+    const k = it.music.toLowerCase();
+    const e = snd.get(k) || { music: it.music, author: it.musicAuthor, videos: 0, views: 0, platforms: {}, sample: null, firstSeen: it.publishedAt };
+    e.videos++;
+    e.views += it.metrics?.views || 0;
+    e.platforms[it.platform] = (e.platforms[it.platform] || 0) + 1;
+    if (!e.sample || (it.metrics?.views || 0) > (e.sample.views || 0)) e.sample = { url: it.url, title: it.title, views: it.metrics?.views || 0 };
+    if (it.publishedAt < e.firstSeen) e.firstSeen = it.publishedAt;
+    snd.set(k, e);
+  }
+  const sounds = [...snd.values()]
+    .map((e) => ({ ...e, isNew: (ref - Date.parse(e.firstSeen)) / 864e5 <= 7 }))
+    .sort((a, b) => b.videos - a.videos || b.views - a.views)
+    .slice(0, 10);
+  const cc = (kind) => (trendItems || []).filter((t) => t.kind === kind).sort((a, b) => (a.rank || 999) - (b.rank || 999) || (b.metrics?.views || 0) - (a.metrics?.views || 0)).slice(0, 10).map(({ _keys, ...t }) => t);
+  return {
+    window: { days: VIDEO_WINDOW_DAYS, to: refDate, from: new Date(ref - (VIDEO_WINDOW_DAYS - 1) * 864e5).toISOString().slice(0, 10) },
+    criteria: 'Video đăng trong 30 ngày tính tới ngày cập nhật mới nhất. Điểm đu trend = lượt xem ÷ √(số ngày từ lúc đăng + 1) × (1 + tỉ lệ tương tác); video ở Việt Nam được ưu tiên ×1,5. Âm thanh "gốc" của người đăng không tính là trend.',
+    tiktok,
+    reels,
+    sounds,
+    creativeCenter: { videos: cc('video'), sounds: cc('sound'), hashtags: cc('hashtag') },
+  };
+}

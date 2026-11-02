@@ -61,6 +61,43 @@ function normalize(platform, raw, region) {
     publishedAt,
     hashtags: hashtags.slice(0, 20),
     metrics,
+    // Video & âm thanh (để làm "Video đu trend": top TikTok/Reels, âm thanh đang hot)
+    isVideo: platform === 'tiktok' || raw.type === 'Video' || raw.productType === 'clips' || !!raw.videoUrl || !!raw.videoPlayCount,
+    music: pick(raw, ['musicMeta.musicName', 'musicInfo.song_name', 'musicInfo.songName', 'music.title', 'audio.title']) || null,
+    musicAuthor: pick(raw, ['musicMeta.musicAuthor', 'musicInfo.artist_name', 'musicInfo.artistName', 'music.author']) || null,
+    musicOriginal: !!pick(raw, ['musicMeta.musicOriginal', 'musicInfo.uses_original_audio']),
+    duration: num(pick(raw, ['videoMeta.duration', 'videoDuration', 'duration'])) || null,
+  };
+}
+
+/**
+ * TikTok Creative Center (clockworks~tiktok-trends-scraper): video / âm thanh / hashtag đang trending tại VN.
+ * Cấu trúc output có thể khác giữa các phiên bản actor → nhận diện theo field, giữ thêm vài field gốc để kiểm tra.
+ */
+export function normalizeTrend(raw) {
+  const str = (paths) => { const v = pick(raw, paths); return v == null ? null : String(v); };
+  const type = String(raw.type || raw.dataType || raw.adsType || '').toLowerCase();
+  const isSound = /sound|song|music/.test(type) || !!pick(raw, ['songId', 'soundId', 'clipId', 'musicId', 'song_id']);
+  const isHashtag = !isSound && (/hashtag/.test(type) || !!pick(raw, ['hashtagName', 'hashtag_name', 'hashtag']));
+  const kind = isSound ? 'sound' : isHashtag ? 'hashtag' : 'video';
+  const title = str(['title', 'songName', 'song_name', 'hashtagName', 'hashtag_name', 'name', 'videoTitle', 'text', 'desc']) || '';
+  return {
+    id: hash(`tiktoktrend:${kind}:${str(['url', 'link', 'itemUrl', 'videoUrl', 'webVideoUrl']) || title}`),
+    platform: 'tiktoktrend',
+    kind,
+    title: title.slice(0, 160),
+    author: str(['author', 'artist', 'authorName', 'creator', 'nickName', 'authorMeta.name']),
+    url: str(['url', 'link', 'itemUrl', 'videoUrl', 'webVideoUrl', 'detailUrl']) || (kind === 'hashtag' && title ? `https://www.tiktok.com/tag/${encodeURIComponent(title.replace(/^#/, ''))}` : null),
+    image: str(['cover', 'coverUrl', 'videoCover', 'thumbnail', 'image', 'imageUrl', 'videoMeta.coverUrl']),
+    rank: num(pick(raw, ['rank', 'ranking', 'position'])) || null,
+    rankChange: num(pick(raw, ['rankDiff', 'rank_diff', 'rankChange'])) || null,
+    metrics: {
+      views: num(pick(raw, ['videoViews', 'viewCount', 'views', 'vv', 'playCount', 'video_views', 'publishCnt'])),
+      likes: num(pick(raw, ['likes', 'likeCount', 'diggCount', 'like'])),
+      posts: num(pick(raw, ['videoCount', 'postCount', 'posts', 'publishCount', 'publish_cnt', 'useCount'])),
+    },
+    country: str(['countryCode', 'country', 'region']) || 'VN',
+    _keys: Object.keys(raw).slice(0, 30),
   };
 }
 
@@ -185,6 +222,7 @@ export async function apify(settings, token, { today, lastRun = {} } = {}) {
         .slice(0, limit)
         .map((r) => {
           if (p.kind === 'venue') return normalizeVenue(platform, r);
+          if (p.kind === 'trend') return normalizeTrend(r);
           const it = normalize(platform, r, 'vn');
           it.region = guessRegion(`${it.text} ${it.hashtags.join(' ')} ${it.author || ''}`);
           return it;
