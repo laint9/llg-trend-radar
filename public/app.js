@@ -229,10 +229,16 @@ function chartOpts({ legend = false } = {}) {
   };
 }
 
+// Thẻ AI có nhắc tới khu vực đang chọn không (AI ghi regions dạng "q1q2"/"Q1/Q2"/"HCM"…)
+const REGION_ALIASES = { q1q2: /q1|q2|quận 1|quận 2|thảo điền|district 1/i, hcm: /hcm|sài gòn|saigon|hồ chí minh|tp\./i, vn: /vn|việt nam|vietnam/i, sea: /sea|đông nam á|bangkok|singapore|asia/i, global: /quốc tế|global|intl|tourist/i };
+const matchRegion = (regions) => state.region === 'all' || (regions || []).some((r) => r === state.region || REGION_ALIASES[state.region]?.test(r));
+
 function renderTrends(d) {
   const ai = d.ai;
-  $('#ai-trends').innerHTML = ai?.trends?.length
-    ? ai.trends
+  const aiTrends = (ai?.trends || []).filter((t) => matchRegion(t.regions));
+  const regionNote = state.region !== 'all' ? `<p class="muted small card" style="grid-column:1/-1;margin:0">Đang lọc khu vực: <b>${esc(d.regions?.[state.region] || state.region)}</b>. ${aiTrends.length ? `Hiển thị ${aiTrends.length}/${ai?.trends?.length || 0} xu hướng AI có liên quan khu vực này; ` : 'Chưa có xu hướng AI riêng cho khu vực này; '}biểu đồ chủ đề bên dưới tính riêng cho khu vực.</p>` : '';
+  $('#ai-trends').innerHTML = regionNote + (aiTrends.length
+    ? aiTrends
         .map(
           (t, i) => `<article class="card trend">
         <div class="trend-top"><span class="tile">${['✦', '◆', '●', '▲'][i % 4]}</span><span class="small rel-${esc((t.relevance || '').split(' ')[0])}">● Liên quan: ${esc(t.relevance || '')}</span></div>
@@ -244,9 +250,9 @@ function renderTrends(d) {
       </article>`,
         )
         .join('')
-    : '';
+    : '');
 
-  const themes = d.themes || [];
+  const themes = (state.region !== 'all' ? d.themesByRegion?.[state.region] : d.themes) || [];
   const max = Math.max(...themes.map((t) => t.score), 1);
   renderThemeRadar(themes);
   $('#themes').innerHTML = themes.length
@@ -345,7 +351,7 @@ function postCard(it, i) {
       <a class="t" href="${safeUrl(it.url)}" target="_blank" rel="noopener">${esc(it.title)}</a>
       ${metrics ? `<div class="m">${metrics}</div>` : ''}
       ${it.hashtags?.length ? `<div class="h">${it.hashtags.slice(0, 5).map((h) => '#' + esc(h)).join(' ')}</div>` : ''}
-      <div class="src"><span>${esc(it.author || it.source || '')}</span><span>${rtag(it.region)} ${fmtDate(it.publishedAt)}</span></div>
+      <div class="src"><span>${esc(it.author || it.source || '')}</span><span>${it.intl ? '<span class="rtag sec-blue">Quốc tế</span> ' : ''}${rtag(it.region)} ${fmtDate(it.publishedAt)}</span></div>
     </div>
   </article>`;
 }
@@ -609,7 +615,8 @@ function renderActions(d) {
         <h3>${esc(a.title)}</h3>
         <p>${esc(a.detail)}</p>
         ${a.platforms?.length ? `<div class="tags">${a.platforms.map((p) => `<span class="tagpill">${esc(p)}</span>`).join('')}</div>` : ''}
-        ${a.kpi ? `<div class="kpi">🎯 KPI: ${esc(a.kpi)}</div>` : ''}
+        ${a.why ? `<div class="why">📊 <b>Vì sao đề xuất:</b> ${esc(a.why)}</div>` : ''}
+        ${a.metric || a.kpi ? `<div class="kpi">🎯 <b>Chỉ số theo dõi:</b> ${esc(a.metric || a.kpi)}</div>` : ''}
         ${a.evidence?.length ? `<div class="links small">${a.evidence.map((u, i) => `<a href="${safeUrl(u)}" target="_blank" rel="noopener">Nguồn ${i + 1} ↗</a>`).join(' ')}</div>` : ''}
         <label><input type="checkbox" ${isDone(d, a) ? 'checked' : ''}> Đã xử lý (lưu trên máy này)</label>
       </article>`;
@@ -721,9 +728,10 @@ function renderHashtags(d) {
         .map((h, i) => `<tr><td>${i + 1}</td><td><b>#${esc(h.tag)}</b> ${delta(h.change)}${h.topPost ? `<div class="small"><a href="${safeUrl(h.topPost.url)}" target="_blank" rel="noopener">Bài top ↗</a></div>` : ''}</td><td class="n">${h.posts}</td><td class="n">${fmt(h.avgReach)}</td><td class="n">${fmt(h.reach)}</td><td>${Object.keys(h.platforms).map(pdot).join(' ')}</td></tr>`)
         .join('')}</tbody></table>`
     : `<p class="empty">Chưa có dữ liệu hashtag. Hashtag được lấy từ TikTok, Instagram, Facebook, Threads (Apify) và YouTube (YouTube API key)${d.sourceStatus?.tiktok ? `. Trạng thái TikTok: ${esc(d.sourceStatus.tiktok)}` : ''}.</p>`;
-  const sug = state.htPlatform === 'all' ? H.suggested || [] : (H.byPlatform[state.htPlatform] || []).slice(0, 10).map((h) => h.tag);
+  // Đúng 5 hashtag/bộ (Instagram giới hạn 5 hashtag/bài; TikTok khuyến nghị 3–5)
+  const sug = state.htPlatform === 'all' ? H.suggested || [] : H.suggestedBy?.[state.htPlatform] || (H.byPlatform[state.htPlatform] || []).slice(0, 5).map((h) => h.tag);
   const aiSug = state.htPlatform === 'all' ? [] : ((d.ai?.platformTrends || []).find((x) => x.platform === state.htPlatform)?.hashtags || []).map((h) => h.replace(/^#/, ''));
-  const set = [...new Set([...sug, ...aiSug])];
+  const set = [...new Set([...sug, ...aiSug])].slice(0, 5);
   $('#ht-suggest').innerHTML = `
     ${set.length ? `<div class="copy-box" id="ht-set">${set.map((t) => '#' + esc(t)).join(' ')}</div><button class="btn" id="ht-copy">Sao chép bộ hashtag</button>` : '<p class="empty">Chưa đủ dữ liệu để gợi ý.</p>'}
     ${d.ai?.hashtagStrategy ? `<p class="small" style="margin-top:12px">💡 ${esc(d.ai.hashtagStrategy)}</p>` : ''}`;
@@ -871,6 +879,9 @@ function route() {
   PAGES.forEach((p) => p.el.classList.toggle('page-off', p !== page));
   document.querySelectorAll('.side-nav a, .side-bottom a').forEach((a) => a.classList.toggle('on', a.getAttribute('href') === `#/${page.slug}`));
   document.title = page.slug === 'summary' ? 'LLG Trend Radar' : `${page.title} · Trend Radar`;
+  // Bộ lọc khu vực chỉ hiện ở trang có áp dụng (tránh hiểu nhầm là đã lọc)
+  const REGION_PAGES = new Set(['summary', 'keywords', 'trends', 'hashtags', 'platforms']);
+  $('#regions').hidden = !REGION_PAGES.has(page.slug);
   const i = PAGES.indexOf(page);
   const prev = PAGES[i - 1];
   const next = PAGES[i + 1];

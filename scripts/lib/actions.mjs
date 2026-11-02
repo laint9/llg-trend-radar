@@ -31,6 +31,7 @@ export function buildActions(s, settings, today) {
         ? 'Chốt concept, set menu/cocktail đặc biệt, chạy teaser & mở đặt bàn ngay. Đẩy lên PasGo/Google Business Profile.'
         : 'Lên concept, menu/cocktail chủ đề, lịch đăng teaser (T-14, T-7, T-3, T-1), chuẩn bị ads & landing đặt bàn.',
       kpi: 'Lượt đặt bàn dịp lễ, CTR quảng cáo, lượt lưu/chia sẻ bài teaser',
+      why: `Lịch marketing: ${e.name} vào ${e.date.slice(8)}/${e.date.slice(5, 7)}, còn ${e.daysLeft} ngày (cửa sổ chuẩn bị ${e.leadDays || 14} ngày).`,
       platforms: ['Facebook', 'Instagram', 'TikTok', 'PasGo'],
     });
   }
@@ -47,6 +48,9 @@ export function buildActions(s, settings, today) {
       title: rising.length ? 'Bắt keyword tìm kiếm đang tăng' : 'Phủ keyword Q1/Q2 người dùng đang tìm',
       detail: `Đưa các keyword vào mô tả Google Business Profile, bài đăng GBP, tiêu đề web/blog và nhóm quảng cáo Search: ${kwSet.map((k) => `"${k.keyword}"`).join(', ')}.`,
       kpi: 'Lượt hiển thị GBP, thứ hạng Maps cho keyword, CPC/CTR Search Ads',
+      why: rising.length
+        ? `Các truy vấn Google này mới xuất hiện hoặc tăng ≥ 30% so với kỳ trước: ${rising.map((k) => `${k.keyword} (${k.change === 'new' ? 'mới' : '+' + k.change + '%'})`).join(', ')}.`
+        : 'Đây là các truy vấn Google thật đứng đầu ở khu vực Q1/Q2 trong kỳ.',
       platforms: ['Google', 'Google Maps'],
     });
   }
@@ -61,6 +65,7 @@ export function buildActions(s, settings, today) {
       title: 'Làm content trả lời đúng câu hỏi khách đang tìm',
       detail: `Video ngắn/carousel/bài SEO trả lời trực tiếp: ${info.map((q) => `"${q.query}"`).join(', ')}. Mở đầu bằng chính câu hỏi làm hook.`,
       kpi: 'Lượt xem 3s, lượt lưu, traffic organic',
+      why: `${info.length} truy vấn Google dạng câu hỏi (là gì/ở đâu/review/giá…) đang được người dùng gõ.`,
       platforms: ['TikTok', 'Instagram', 'Google'],
     });
   }
@@ -76,6 +81,7 @@ export function buildActions(s, settings, today) {
       title: `Series content theo chủ đề "${hotTheme.label}"`,
       detail: `Chủ đề đang ${hotTheme.change === 'new' ? 'mới nổi' : typeof hotTheme.change === 'number' ? `${hotTheme.change >= 0 ? 'tăng' : 'giảm'} ${Math.abs(hotTheme.change)}%` : 'dẫn đầu'}${bestPlatform ? `, mạnh nhất trên ${PL[bestPlatform] || bestPlatform}` : ''}. Làm 3–5 bài nối tiếp, lồng điểm khác biệt của venue mình.`,
       kpi: 'Engagement rate, lượt chia sẻ, tin nhắn hỏi đặt bàn',
+      why: `Chủ đề có điểm ${Math.round(hotTheme.score)}${typeof hotTheme.change === 'number' ? `, ${hotTheme.change >= 0 ? 'tăng' : 'giảm'} ${Math.abs(hotTheme.change)}% so với kỳ trước` : hotTheme.change === 'new' ? ', mới xuất hiện' : ''} (tổng hợp tương tác social, báo chí và truy vấn tìm kiếm).`,
       platforms: bestPlatform ? [PL[bestPlatform] || bestPlatform] : [],
       evidence: (hotTheme.evidence || []).slice(0, 3).map((e) => e.url).filter(Boolean),
     });
@@ -90,6 +96,7 @@ export function buildActions(s, settings, today) {
       title: 'Cập nhật bộ hashtag cho bài đăng kỳ này',
       detail: `Dùng bộ: ${s.hashtags.suggested.slice(0, 10).map((t) => '#' + t).join(' ')}. Kết hợp 1–2 hashtag thương hiệu riêng.`,
       kpi: 'Reach từ hashtag/Explore, lượt xem từ người chưa follow',
+      why: 'Bộ 5 hashtag chọn từ dữ liệu kỳ này: 3 hashtag có reach trung bình cao nhất, 1 hashtag đang lên, 1 hashtag địa phương.',
       platforms: ['Instagram', 'TikTok', 'Threads'],
     });
   }
@@ -104,6 +111,7 @@ export function buildActions(s, settings, today) {
       title: `Ưu tiên ${PL[pts[0].platform]} cho nội dung xu hướng`,
       detail: `Reach trung bình/bài trên ${PL[pts[0].platform]} ≈ ${pts[0].avgReach.toLocaleString('vi-VN')}, cao nhất trong các nền tảng theo dõi (tiếp theo: ${PL[pts[1].platform]}). Tăng tần suất và cân nhắc boost bài tốt nhất.`,
       kpi: 'Reach/bài, CPM, chi phí/lượt đặt bàn',
+      why: `So sánh reach trung bình/bài giữa các nền tảng trong dữ liệu thu thập kỳ này.`,
       platforms: [PL[pts[0].platform]],
     });
   }
@@ -117,6 +125,7 @@ export function buildActions(s, settings, today) {
       title: `Thời tiết: ${w.title}`,
       detail: `${w.detail} Gợi ý: ${(w.ideas || []).slice(0, 2).join('; ')}.`,
       kpi: 'Lượt đặt bàn khung 18–21h, tỉ lệ dùng mã ưu đãi',
+      why: `Dự báo Open-Meteo cho Q1: ${w.title}.`,
       platforms: ['Facebook', 'Instagram', 'Zalo OA'],
     });
   }
@@ -131,6 +140,7 @@ export function buildActions(s, settings, today) {
       title: 'Benchmark ưu đãi đang chạy trên PasGo',
       detail: `Dạng ưu đãi phổ biến: ${pg.dealTypes.slice(0, 5).map((d) => `${d.name} (${d.n})`).join(', ')}. Loại hình đang được đẩy: ${(pg.categories || []).slice(0, 4).map((c) => c.name).join(', ')}. So sánh với ưu đãi của mình, cân nhắc mở deal độc quyền PasGo cho khung giờ thấp điểm.`,
       kpi: 'Lượt đặt qua PasGo, tỉ lệ lấp bàn giờ thấp điểm',
+      why: `Đếm từ ${pg.items} địa điểm/deal PasGo đang đề xuất trong kỳ.`,
       platforms: ['PasGo'],
       evidence: (pg.deals || []).slice(0, 3).map((d) => d.url),
     });
@@ -145,6 +155,7 @@ export function buildActions(s, settings, today) {
         title: `Địa điểm đang tăng review nhanh trên ${PL[p]}`,
         detail: `${t.rising.slice(0, 4).map((v) => `${v.title} (+${v.reviewsGrowth} review)`).join(', ')}. Xem họ đang làm gì (menu, event, khuyến khích review) và đẩy chương trình xin review sau bữa ăn của mình.`,
         kpi: 'Số review mới/tuần, điểm rating trung bình',
+        why: 'Số review tăng giữa các lần crawl (tín hiệu địa điểm đang thu hút khách).',
         platforms: [PL[p]],
         evidence: t.rising.slice(0, 3).map((v) => v.url),
       });
@@ -167,6 +178,6 @@ export function buildActions(s, settings, today) {
     add({ priority: 'thấp', team: 'Marketing lead', timeline: 'Tháng này', title: 'Khai báo tên thương hiệu & đối thủ trong config', detail: 'Điền brand.names và brand.competitors trong config/settings.json để tool tự cảnh báo khi được nhắc đến và theo dõi đối thủ trên Maps/Tripadvisor.', kpi: '—' });
   }
 
-  return A.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]).map((a, i) => ({ id: `r${i + 1}`, ...a }));
+  return A.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]).map(({ kpi, ...a }, i) => ({ id: `r${i + 1}`, metric: kpi, ...a }));
 }
 

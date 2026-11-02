@@ -145,6 +145,11 @@ export function mergeSnapshots(snaps) {
  * opts.generic: 'exclude' (mặc định, bỏ từ chỉ danh mục) | 'only' (chỉ lấy từ danh mục) | 'all'.
  * opts.biasFactor: hệ số cho phần điểm social/báo của keyword trùng từ khoá crawl.
  */
+// Quận/huyện TP.HCM ngoài khu vực phục vụ chính (Q1, Q2/Thảo Điền)
+export const OTHER_DISTRICT = /(quận|q\.?|district)\s?(3|4|5|6|7|8|9|10|11|12)(?!\d)|bình thạnh|phú nhuận|gò vấp|tân bình|tân phú|bình tân|bình chánh|nhà bè|hóc môn|củ chi/i;
+
+export const FOREIGN_PLACE = /\b(charlotte|nc|nyc|new york|los angeles|chicago|houston|dallas|atlanta|miami|boston|san francisco|seattle|las vegas|london|paris|sydney|melbourne|toronto|vancouver|dubai|tokyo|osaka|seoul|busan|hong kong|taipei|kuala lumpur|jakarta|bali|manila|singapore|bangkok|phuket|near me)\b/i;
+
 export function scoreKeywords(merged, M, regionFilter = null, { generic = 'exclude', biasFactor = 0.35 } = {}) {
   const kw = new Map();
   const add = (label, score, { platform, region, reach = 0, sample, date, sector, lang = 'vi' }) => {
@@ -174,7 +179,10 @@ export function scoreKeywords(merged, M, regionFilter = null, { generic = 'exclu
     const avgPos = q.positions.reduce((a, b) => a + b, 0) / q.positions.length;
     const echo = normalizeText(q.query) === normalizeText(q.input) ? 0.5 : 1; // gợi ý trùng với từ gõ vào: giảm trọng số
     // Truy vấn về thành phố khác (không phải TP.HCM): chỉ để tham khảo → giảm trọng số
-    const otherCity = /hà nội|ha noi|hanoi|đà lạt|da lat|dalat|nha trang|đà nẵng|da nang|vũng tàu|phú quốc|phu quoc|hội an|hoi an|cần thơ|huế|hạ long/i.test(q.query) ? 0.3 : 1;
+    const otherCity = /hà nội|ha noi|hanoi|đà lạt|da lat|dalat|nha trang|đà nẵng|da nang|vũng tàu|phú quốc|phu quoc|hội an|hoi an|cần thơ|huế|hạ long/i.test(q.query)
+      ? 0.3
+      : FOREIGN_PLACE.test(q.query) ? 0.15 // truy vấn về thành phố nước ngoài (vd "fun dining charlotte nc")
+      : OTHER_DISTRICT.test(q.query) ? 0.4 : 1; // quận ngoài Q1/Q2: chỉ tham khảo
     const base = (11 - avgPos) * 8 * echo * otherCity * Math.min(1 + 0.25 * ((q.hits || 1) - 1), 2);
     const sector = q.sector || M.sectorOf(q.query);
     q.dates.forEach((date) => add(q.query, base, { platform: 'google', region: q.region, date, sector, lang: q.lang || 'vi' }));
@@ -224,6 +232,26 @@ export function scoreKeywords(merged, M, regionFilter = null, { generic = 'exclu
     .sort((a, b) => b.score - a.score);
 }
 
+/**
+ * Bài đủ tiêu chuẩn làm "nội dung tiêu biểu"/trích dẫn: đủ reach/tương tác, ưu tiên Việt Nam.
+ * Báo chí luôn đạt (đã lọc liên quan); địa điểm không dùng làm trích dẫn nội dung.
+ */
+export const QUALITY = { minViews: 3000, minEngagement: 100, minYoutubeViews: 5000 };
+export function isQualityRef(it) {
+  if (isVenue(it)) return false;
+  if (it.platform === 'news') return true;
+  const m = it.metrics || {};
+  const eng = engagementOf(it);
+  if (it.platform === 'youtube') return (m.views || 0) >= QUALITY.minYoutubeViews;
+  return (m.views || 0) >= QUALITY.minViews || eng >= QUALITY.minEngagement;
+}
+export const isVN = (it) => !['intl', 'sea', 'global'].includes(it.region);
+/** Sắp xếp trích dẫn: bài VN đạt chuẩn trước, rồi tới bài quốc tế đạt chuẩn; bỏ bài không đạt. */
+export function rankRefs(items, scoreFn = (it) => reachOf(it) + engagementOf(it) * 20) {
+  const ok = items.filter(isQualityRef);
+  return [...ok.filter(isVN).sort((a, b) => scoreFn(b) - scoreFn(a)), ...ok.filter((i) => !isVN(i)).sort((a, b) => scoreFn(b) - scoreFn(a))];
+}
+
 export function scoreThemes(merged, settings, M) {
   return settings.themes
     .map((t) => {
@@ -237,7 +265,7 @@ export function scoreThemes(merged, settings, M) {
         const s = 1 + Math.log10(reachOf(it) + engagementOf(it) + 1);
         score += s;
         platforms[it.platform] = (platforms[it.platform] || 0) + s;
-        evidence.push({ ...pickCard(it), _s: s });
+        if (isQualityRef(it)) evidence.push({ ...pickCard(it), _s: s + (isVN(it) ? 100 : 0), intl: !isVN(it) });
       }
       const queries = merged.queries.filter((q) => [...terms].some((term) => normalizeText(q.query).includes(term)));
       for (const q of queries) {
@@ -263,7 +291,7 @@ export function pickCard(it) {
   return {
     id: it.id, platform: it.platform, region: it.region, title: it.title, text: it.text?.slice(0, 220),
     url: it.url, image: it.image, video: it.video, author: it.author, source: it.source,
-    publishedAt: it.publishedAt, metrics: it.metrics, reach: reachOf(it), hashtags: (it.hashtags || []).slice(0, 8),
+    publishedAt: it.publishedAt, metrics: it.metrics, reach: reachOf(it), hashtags: (it.hashtags || []).slice(0, 8), intl: !isVN(it),
     ...(isVenue(it) && {
       kind: it.kind, category: it.category, deal: it.deal, address: it.address, rating: it.rating ?? it.metrics?.rating,
       priceLevel: it.priceLevel, sections: it.sections, reviewsGrowth: it.reviewsGrowth || 0, firstSeen: it.firstSeen,
@@ -324,7 +352,8 @@ export function summarizeHashtags(merged, prev, M) {
       if (!SOCIAL.includes(it.platform)) continue;
       for (const raw of new Set(it.hashtags || [])) {
         const tag = normalizeText(raw).replace(/^#/, '');
-        if (!tag || tag.length < 2 || M.stop.has(tag) || M.excluded(tag)) continue;
+        // Tag YouTube có dấu cách không phải hashtag thật
+        if (!tag || tag.length < 2 || /\s/.test(tag) || M.stop.has(tag) || M.excluded(tag)) continue;
         const e = tags.get(tag) || { tag, posts: 0, reach: 0, engagement: 0, platforms: {}, regions: {}, topPost: null };
         const r = reachOf(it);
         e.posts++;
@@ -332,7 +361,8 @@ export function summarizeHashtags(merged, prev, M) {
         e.engagement += engagementOf(it);
         e.platforms[it.platform] = (e.platforms[it.platform] || 0) + 1;
         e.regions[it.region] = (e.regions[it.region] || 0) + 1;
-        if (!e.topPost || r > e.topPost.reach) e.topPost = { title: it.title, url: it.url, reach: r, platform: it.platform };
+        if (isVN(it)) e.vnPosts = (e.vnPosts || 0) + 1;
+        if (isQualityRef(it) && (!e.topPost || r > e.topPost.reach)) e.topPost = { title: it.title, url: it.url, reach: r, platform: it.platform, publishedAt: it.publishedAt };
         tags.set(tag, e);
       }
     }
@@ -355,12 +385,23 @@ export function summarizeHashtags(merged, prev, M) {
   const byPlatform = Object.fromEntries(
     SOCIAL.map((p) => [p, list.filter((h) => h.platforms[p]).slice(0, 20).map((h) => ({ tag: h.tag, posts: h.platforms[p], avgReach: h.avgReach, change: h.change }))]),
   );
-  // Bộ hashtag gợi ý: hiệu quả cao (reach TB) + đang lên + gắn địa phương
-  const local = list.filter((h) => /saigon|sài ?gòn|hcm|q1|quan1|quận ?[12]|thaodien|thảo ?điền|district/.test(h.tag)).slice(0, 3);
-  const performers = [...list].filter((h) => h.posts >= 2).sort((a, b) => b.avgReach - a.avgReach).slice(0, 5);
-  const rising = list.filter((h) => h.change === 'new' || h.change > 50).slice(0, 4);
-  const suggested = [...new Map([...performers, ...rising, ...local].map((h) => [h.tag, h])).values()].slice(0, 12).map((h) => h.tag);
-  return { total: list.length, top: list.slice(0, 60), byPlatform, suggested };
+  // Bộ 5 hashtag (Instagram giới hạn 5 hashtag/bài; TikTok khuyến nghị 3–5):
+  // 3 hashtag hiệu quả (reach TB cao, dùng ≥ 2 bài) + 1 đang lên + 1 gắn địa phương
+  const LOCAL = /saigon|sài ?gòn|hcm|q1|quan1|quận ?[12]|thaodien|thảo ?điền|district|hochiminh/;
+  const pickSet = (all) => {
+    // Chỉ gợi ý hashtag: dùng ở bài Việt Nam, chữ Latin/tiếng Việt, không quá chung chung
+    const pool = all.filter((h) => (h.vnPosts || 0) > 0 && /^[a-z0-9_àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]+$/.test(h.tag) && !M.isGeneric(h.tag));
+    const set = [];
+    const push = (h) => h && !set.includes(h.tag) && set.length < 5 && set.push(h.tag);
+    pool.filter((h) => h.posts >= 2 && !LOCAL.test(h.tag)).sort((a, b) => b.avgReach - a.avgReach).slice(0, 3).forEach(push);
+    push(pool.find((h) => (h.change === 'new' || h.change > 50) && !set.includes(h.tag)));
+    push(pool.filter((h) => LOCAL.test(h.tag)).sort((a, b) => b.score - a.score)[0]);
+    for (const h of pool) push(h); // bù cho đủ 5
+    return set;
+  };
+  const suggested = pickSet(list);
+  const suggestedBy = Object.fromEntries(SOCIAL.map((p) => [p, pickSet(list.filter((h) => h.platforms[p]).map((h) => ({ ...h, posts: h.platforms[p] })))]));
+  return { total: list.length, top: list.slice(0, 60), byPlatform, suggested, suggestedBy };
 }
 
 /** Xu hướng riêng từng nền tảng. */
@@ -463,7 +504,7 @@ export function segmentSummary(merged, prev, settings, M) {
     const social = cur.items.filter((i) => SOCIAL.includes(i.platform));
     const reach = cur.items.reduce((s, i) => s + reachOf(i), 0);
     const eng = social.reduce((s, i) => s + engagementOf(i), 0);
-    const kws = scoreKeywords(cur, M).slice(0, 8).map(({ keyword, score }) => ({ keyword, score }));
+    const kws = scoreKeywords({ ...cur, items: cur.items.filter(isVN) }, M).filter((k) => !FOREIGN_PLACE.test(k.keyword) && !OTHER_DISTRICT.test(k.keyword)).slice(0, 8).map(({ keyword, score }) => ({ keyword, score }));
     const tagCount = {};
     for (const it of social) for (const h of new Set(it.hashtags || [])) if (!M.stop.has(h)) tagCount[h] = (tagCount[h] || 0) + 1;
     const score = Math.round(cur.items.length * 2 + cur.queries.length * 3 + Math.log10(reach + 10) * 10);
@@ -481,15 +522,11 @@ export function segmentSummary(merged, prev, settings, M) {
       hashtags: Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([tag, n]) => ({ tag, n })),
       searches: cur.queries
         .map((q) => ({ query: q.query, pos: q.positions.reduce((a, b) => a + b, 0) / q.positions.length, region: q.region }))
-        .filter((q) => !settings.autocompleteSeeds.some((s) => normalizeText(s) === normalizeText(q.query)))
+        .filter((q) => !settings.autocompleteSeeds.some((s) => normalizeText(s) === normalizeText(q.query)) && !OTHER_DISTRICT.test(q.query) && !FOREIGN_PLACE.test(q.query))
         .sort((a, b) => a.pos - b.pos)
         .slice(0, 8)
         .map((q) => q.query),
-      top: [...cur.items]
-        .filter((i) => !isVenue(i))
-        .sort((a, b) => reachOf(b) - reachOf(a) || String(b.publishedAt).localeCompare(String(a.publishedAt)))
-        .slice(0, 4)
-        .map(pickCard),
+      top: rankRefs(cur.items).slice(0, 4).map(pickCard),
       topVenues: cur.items.filter(isVenue).sort((a, b) => venueScore(b) - venueScore(a)).slice(0, 3).map(pickCard),
     };
   });

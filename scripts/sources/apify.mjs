@@ -152,7 +152,9 @@ export async function apify(settings, token, { today, lastRun = {} } = {}) {
       return [];
     }
     try {
+      const since = new Date(Date.now() - (settings.maxPostAgeDays || 30) * 864e5).toISOString().slice(0, 10);
       const vars = {
+        since,
         hashtags: p.hashtags || [],
         queries: p.queries || p.hashtags || [],
         urls: (p.urls || []).map((url) => ({ url })),

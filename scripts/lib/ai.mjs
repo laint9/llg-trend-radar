@@ -55,7 +55,7 @@ const SCHEMA = {
           headline: { type: 'string', description: '1 câu: xu hướng nổi bật nhất trên nền tảng này' },
           trends: { type: 'array', items: { type: 'string' }, description: '2-4 xu hướng cụ thể' },
           formats: { type: 'array', items: { type: 'string' }, description: 'Định dạng nội dung/ưu đãi hiệu quả trên nền tảng này' },
-          hashtags: { type: 'array', items: { type: 'string' } },
+          hashtags: { type: 'array', items: { type: 'string' }, description: 'Đúng 5 hashtag (Instagram giới hạn 5/bài)' },
         },
       },
     },
@@ -77,11 +77,11 @@ const SCHEMA = {
     },
     segmentInsights: {
       type: 'array',
-      description: 'Đúng 4 mục, mỗi phân khúc một mục: bar, cocktail, fine, casual',
+      description: 'Đúng 5 mục, mỗi phân khúc một mục: bar, cocktail, fine (fine dining/omakase), fun (fun dining = ẩm thực kết hợp trải nghiệm/show/tương tác, KHÁC fine dining), casual',
       items: {
         type: 'object', additionalProperties: false, required: ['segment', 'headline', 'needs', 'contentIdeas'],
         properties: {
-          segment: { type: 'string', enum: ['bar', 'cocktail', 'fine', 'casual'] },
+          segment: { type: 'string', enum: ['bar', 'cocktail', 'fine', 'fun', 'casual'] },
           headline: { type: 'string', description: '1 câu: xu hướng nổi bật nhất của phân khúc này' },
           needs: { type: 'array', items: { type: 'string' }, description: '2-3 nhu cầu khách hàng' },
           contentIdeas: { type: 'array', items: { type: 'string' }, description: '2-3 ý tưởng content cụ thể' },
@@ -110,7 +110,7 @@ const SCHEMA = {
       type: 'array',
       description: '6-10 action cụ thể cho team Marketing, sắp theo ưu tiên',
       items: {
-        type: 'object', additionalProperties: false, required: ['priority', 'title', 'detail', 'team', 'platforms', 'timeline', 'kpi'],
+        type: 'object', additionalProperties: false, required: ['priority', 'title', 'detail', 'why', 'team', 'platforms', 'timeline', 'metric'],
         properties: {
           priority: { type: 'string', enum: ['cao', 'trung bình', 'thấp'] },
           title: { type: 'string' },
@@ -118,7 +118,8 @@ const SCHEMA = {
           team: { type: 'string', description: 'Content / Social / SEO-Ads / Promo / BD / CX / Marketing lead' },
           platforms: { type: 'array', items: { type: 'string' } },
           timeline: { type: 'string', description: 'Hôm nay / Tuần này / Tháng này / trước ngày cụ thể' },
-          kpi: { type: 'string' },
+          why: { type: 'string', description: 'Vì sao đề xuất: dẫn dữ liệu cụ thể trong payload (keyword/trend/thời tiết/sự kiện nào, tăng bao nhiêu)' },
+          metric: { type: 'string', description: 'Chỉ số nên theo dõi (vd: lượt đặt bàn khung 18–21h, lượt lưu bài, CTR quảng cáo). KHÔNG đặt con số mục tiêu (%, số lượng) vì không có dữ liệu nền của thương hiệu' },
         },
       },
     },
@@ -150,6 +151,9 @@ Nguyên tắc:
 - Viết tiếng Việt, ngắn gọn, cụ thể, có thể hành động ngay.
 - Chỉ dựa trên dữ liệu được cung cấp. Không bịa số liệu, tên địa điểm hay đường link. evidenceUrls phải là URL có trong dữ liệu.
 - Ưu tiên insight liên quan Q1/Q2 và phân khúc trung - cao cấp. Ghi rõ khi một xu hướng chỉ là tham khảo từ SEA.
+- HIỂU NGHĨA BÓNG, ẨN DỤ VÀ VĂN PHONG GIỚI TRẺ VIỆT NAM, không hiểu theo nghĩa đen. Ví dụ: "ấm lòng" = cảm động/tử tế (KHÔNG phải món ăn nóng); "cháy", "đỉnh nóc kịch trần", "hết nước chấm" = rất hay; "chill" = thư giãn; "flex" = khoe; "xu cà na" = xui xẻo; "gu" = sở thích; "đu trend" = bắt trend; "check-in" = chụp ảnh tại địa điểm; "nhậu" = uống rượu bia cùng bạn. Nếu một bài chỉ trùng TỪ với chủ đề nhưng nội dung không liên quan F&B/nightlife/dịch vụ thì KHÔNG dùng làm dẫn chứng.
+- evidenceUrls: CHỈ dùng bài ở Việt Nam (không có nhãn "QUỐC TẾ"), cùng ngành và đúng ý nghĩa xu hướng; bài quốc tế chỉ được nhắc khi ghi rõ "tham khảo quốc tế" trong mô tả. Không có dẫn chứng phù hợp thì để mảng rỗng.
+- Action: KHÔNG tự đặt con số mục tiêu (%, số view, số bàn…) vì không có dữ liệu nền của thương hiệu. Trường "why" phải dẫn dữ liệu cụ thể trong payload; trường "metric" chỉ nêu chỉ số cần theo dõi.
 - keywordInsights: giải thích ngắn vì sao từng keyword trong top 10 quan trọng và nên dùng thế nào.
 - contentIdeas: 6-10 ý tưởng, mỗi ý ghi rõ nền tảng (TikTok/Instagram/Facebook/Threads/Google-SEO), định dạng (Reels, carousel, video ngắn, bài SEO…), câu hook mở đầu.
 - platformTrends: phân tích riêng từng nền tảng có dữ liệu (TikTok, Facebook, Instagram, Threads, YouTube, Google, báo chí, PasGo, Google Maps, Tripadvisor) theo GÓC NHÌN ĐA NGÀNH dịch vụ: F&B nói chung (nhà hàng, quán ăn, cafe, fine dining), nightlife/bar, du lịch & khách quốc tế, lưu trú/staycation, sự kiện & giải trí, dịch vụ & lifestyle (dựa trên sectorMix và keywords có nhãn ngành). KHÔNG chỉ tập trung nightlife; headline phải phản ánh ngành chiếm tỷ trọng lớn nhất hoặc tăng mạnh nhất trên nền tảng đó, trends nên trải ra ít nhất 2-3 ngành khi có dữ liệu. Với nền tảng đặt bàn/review, tập trung vào loại hình đang được đẩy, dạng ưu đãi và địa điểm đang lên.
@@ -157,7 +161,7 @@ Nguyên tắc:
 - actions: việc cụ thể team Marketing nên làm ngay, có ưu tiên, team phụ trách, thời hạn, KPI. Tham khảo ruleActions và upcomingEvents nhưng viết chi tiết, sắc hơn; không lặp y nguyên.
 - keywordInsights: KHÔNG giải thích các từ chỉ danh mục chung (genericKeywords); tập trung keyword cụ thể. Dùng keywordsBySector để nhìn đa ngành (F&B, nightlife, du lịch, lưu trú, sự kiện, dịch vụ).
 - globalInsight: dựa trên globalTourists (truy vấn Google bằng tiếng Anh/Hàn/Nhật, tin tiếng Anh, Tripadvisor) để nói khách quốc tế đang tìm gì về Sài Gòn/Q1/Q2 và cơ hội cho bar/nhà hàng.
-- segmentInsights: phân tích SONG SONG và CÂN BẰNG 4 phân khúc: Bar & Nightlife, Cocktail & Mixology, Nhà hàng cao cấp/Fun dining, Nhà hàng casual & quán ăn (dựa trên dữ liệu segments). Không thiên vị bar.
+- segmentInsights: phân tích SONG SONG và CÂN BẰNG 5 phân khúc: Bar & Nightlife, Cocktail & Mixology, Fine dining & Omakase, Fun dining (ẩm thực trải nghiệm, KHÔNG gợi ý keyword fine dining cho fun dining), Nhà hàng casual & quán ăn (dựa trên dữ liệu segments). Không thiên vị bar.
 - generalSummary + trendOpportunities: dựa trên generalTrends (Google Trends toàn quốc, YouTube Thịnh hành, tin nổi bật, SEA), KHÔNG giới hạn ngành F&B. Chọn trend có thể đu được (thể thao: chiếu trận/combo xem bóng; âm nhạc/showbiz: cocktail lấy cảm hứng, playlist, after-party; phim/game: theme night; lễ hội…). Đánh dấu risk "tránh" cho chủ đề NHẠY CẢM (tai nạn, thiên tai có thương vong, chính trị, tôn giáo, tang lễ) và không đề xuất khai thác thương mại các chủ đề đó.
 - weatherInsights: liên hệ thời tiết 7 ngày tới (đặc biệt mưa buổi tối 17–23h, nắng nóng) với hành vi đi chơi và gợi ý content/ưu đãi.`;
 

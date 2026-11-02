@@ -286,7 +286,8 @@
           "shouldDownloadVideos": false,
           "shouldDownloadCovers": false,
           "shouldDownloadSlideshowImages": false,
-          "shouldDownloadAvatars": false
+          "shouldDownloadAvatars": false,
+          "oldestPostDateUnified": "{{since}}"
         }
       },
       "instagram": {
@@ -320,7 +321,8 @@
         "maxChargeUsd": 0.12,
         "input": {
           "startUrls": "{{urls}}",
-          "resultsLimit": 10
+          "resultsLimit": 10,
+          "onlyPostsNewerThan": "{{since}}"
         }
       },
       "threads": {
@@ -564,10 +566,9 @@
     },
     {
       "id": "finedining",
-      "label": "Fine / Fun dining & Omakase",
+      "label": "Fine dining & Omakase",
       "terms": [
         "fine dining",
-        "fun dining",
         "omakase",
         "tasting menu",
         "chef's table",
@@ -820,6 +821,22 @@
         "fan meeting",
         "countdown"
       ]
+    },
+    {
+      "id": "fundining",
+      "label": "Fun dining & ẩm thực trải nghiệm",
+      "terms": [
+        "fun dining",
+        "fundining",
+        "dinner show",
+        "show ẩm thực",
+        "trải nghiệm ẩm thực",
+        "interactive dining",
+        "immersive dining",
+        "themed dinner",
+        "nhà hàng concept",
+        "nhà hàng chủ đề"
+      ]
     }
   ],
   "_excludeNote": "Regex (không phân biệt hoa thường). Truy vấn/keyword khớp sẽ bị loại khỏi phân tích.",
@@ -882,7 +899,37 @@
     "viral",
     "tiktok",
     "reels",
-    "explore"
+    "explore",
+    "learnontiktok",
+    "ancungtiktok",
+    "reviewanngon",
+    "xuhuongtiktok",
+    "trend",
+    "tiktokviral",
+    "foryourpage",
+    "capcut",
+    "reel",
+    "instagood",
+    "photooftheday",
+    "love",
+    "food",
+    "foodie",
+    "foodporn",
+    "yummy",
+    "delicious",
+    "instafood",
+    "shorts",
+    "youtubeshorts",
+    "htv",
+    "vtv",
+    "creatorsearchinsights",
+    "tiktokshop",
+    "fypシ",
+    "dailyvlog",
+    "vlog",
+    "travelvlog",
+    "asmr",
+    "mukbang"
   ],
   "segments": [
     {
@@ -941,12 +988,11 @@
     },
     {
       "id": "fine",
-      "label": "Nhà hàng cao cấp / Fun dining",
+      "label": "Fine dining & Omakase",
       "icon": "🍽",
       "tone": "peach",
       "terms": [
         "fine dining",
-        "fun dining",
         "omakase",
         "tasting menu",
         "chef's table",
@@ -963,6 +1009,28 @@
         "teppanyaki",
         "nhà hàng sang trọng",
         "finedining"
+      ]
+    },
+    {
+      "id": "fun",
+      "label": "Fun dining & ẩm thực trải nghiệm",
+      "icon": "🎭",
+      "tone": "pink",
+      "terms": [
+        "fun dining",
+        "fundining",
+        "dinner show",
+        "show ẩm thực",
+        "trải nghiệm ẩm thực",
+        "ẩm thực tương tác",
+        "interactive dining",
+        "immersive dining",
+        "themed dinner",
+        "nhà hàng concept",
+        "ăn tối kết hợp show",
+        "nhà hàng chủ đề",
+        "bữa tối nghệ thuật",
+        "fun dining experiences"
       ]
     },
     {
@@ -1357,5 +1425,7 @@
   "keywordBias": {
     "_note": "Keyword trùng với hashtag/từ khoá mình dùng để crawl bị nhân hệ số này (phần điểm từ social/báo), vì nội dung lấy về đương nhiên chứa chúng.",
     "factor": 0.35
-  }
+  },
+  "maxPostAgeDays": 30,
+  "_maxPostAgeNote": "Bài social/YouTube cũ hơn số ngày này bị loại khỏi phân tích (tránh bài từ năm cũ)."
 }

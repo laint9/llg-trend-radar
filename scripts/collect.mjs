@@ -13,7 +13,7 @@ import { pasgo } from './sources/venues.mjs';
 import { youtubeTrending, generalNews, buildClassifier } from './sources/general.mjs';
 import { summarizeGeneral } from './lib/general.mjs';
 import { buildActions, upcomingEvents } from './lib/actions.mjs';
-import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends, segmentSummary, pickCard, venueScore } from './lib/analyze.mjs';
+import { buildMatchers, mergeSnapshots, scoreKeywords, scoreThemes, rankPlatforms, periodWindow, PLATFORMS, reachOf, summarizeHashtags, platformTrends, segmentSummary, pickCard, venueScore, rankRefs, isQualityRef } from './lib/analyze.mjs';
 import { resolveProvider, generateInsights } from './lib/ai.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, v]) => [k, v ?? true]));
@@ -85,7 +85,15 @@ async function collect() {
     if (before !== social.items.length) log(`  Lọc bỏ ${before - social.items.length} bài Facebook/Threads không liên quan`);
   }
   // Nền tảng chưa tới lịch crawl: dùng lại dữ liệu lần gần nhất
-  const carried = (social?.skipped || []).flatMap((p) => prevApify.carry[p]?.items || []);
+  const maxAge = settings.maxPostAgeDays || 30;
+  const fresh = (it) => !it.publishedAt || it.kind === 'venue' || it.kind === 'deal' || (Date.parse(today) - Date.parse(it.publishedAt)) / 864e5 <= maxAge;
+  if (social?.items) {
+    const n = social.items.length;
+    social.items = social.items.filter(fresh);
+    if (n !== social.items.length) log(`  Loại ${n - social.items.length} bài social cũ hơn ${maxAge} ngày`);
+  }
+  if (yt?.items) yt.items = yt.items.filter(fresh);
+  const carried = (social?.skipped || []).flatMap((p) => prevApify.carry[p]?.items || []).filter(fresh);
   const apifyRuns = { ...prevApify.lastRun, ...(social?.ran || {}) };
   delete status.apify;
 
@@ -127,7 +135,7 @@ async function collect() {
 }
 
 function aiPayload(s) {
-  const slim = (x) => ({ title: x.title, url: x.url, region: x.region, reach: x.reach, author: x.author, hashtags: x.hashtags?.slice(0, 5) });
+  const slim = (x) => ({ title: x.title, url: x.url, region: x.intl ? 'QUỐC TẾ (chỉ tham khảo)' : x.region, reach: x.reach, publishedAt: x.publishedAt?.slice(0, 10), author: x.author, hashtags: x.hashtags?.slice(0, 5) });
   return {
     period: { from: s.from, to: s.to },
     topKeywords: s.topKeywords.slice(0, 20).map((k) => ({ keyword: k.keyword, score: k.score, change: k.change, platforms: Object.keys(k.platforms), regions: Object.keys(k.regions) })),
@@ -136,7 +144,8 @@ function aiPayload(s) {
     googleSearchQueries: s.platforms.google.queries.slice(0, 30).map((q) => `${q.query} (${q.region})`),
     googleTrendingVN: s.platforms.google.trending.slice(0, 15).map((t) => `${t.title} [${t.trafficLabel}]${t.relevant ? ' *liên quan*' : ''}`),
     googleTrendingSEA: s.platforms.google.trendingSea.slice(0, 8).map((t) => `${t.title} (${t.geo})`),
-    topContent: Object.fromEntries(PLATFORMS.filter((p) => p !== 'google').map((p) => [p, (s.platforms[p] || []).slice(0, p === 'news' ? 15 : 6).map(slim)])),
+    // Chỉ gửi bài đạt chuẩn (đủ reach/tương tác, còn mới); bài VN trước
+    topContent: Object.fromEntries(PLATFORMS.filter((p) => p !== 'google').map((p) => [p, rankRefs(s.platforms[p] || []).slice(0, p === 'news' ? 15 : 6).map(slim)])),
     weather: { next7: s.weather.days.filter((d) => d.date >= today).slice(0, 7), ruleInsights: s.weather.insights.map((i) => i.title) },
     platformTrends: Object.fromEntries(
       Object.entries(s.platformTrends).map(([p, t]) => [
@@ -197,6 +206,9 @@ async function aggregate({ useAi }) {
     const snaps = await snapsIn(w.from, w.to);
     const prevSnaps = await snapsIn(w.prevFrom, w.prevTo);
     const merged = mergeSnapshots(snaps);
+    // Bỏ bài social quá cũ so với cuối kỳ (snapshot cũ có thể còn bài từ năm trước)
+    const ageLimit = (settings.maxPostAgeDays || 30) + (period === 'month' ? 30 : period === 'week' ? 7 : 0);
+    merged.items = merged.items.filter((it) => !it.publishedAt || it.kind === 'venue' || it.kind === 'deal' || it.platform === 'news' || (Date.parse(w.to) - Date.parse(it.publishedAt)) / 864e5 <= ageLimit);
     const prev = prevSnaps.length ? mergeSnapshots(prevSnaps) : null;
 
     const bias = { biasFactor: settings.keywordBias?.factor ?? 0.35 };
@@ -252,6 +264,13 @@ async function aggregate({ useAi }) {
       return { ...t, change: !themesPrev ? null : p ? Math.round(((t.score - p) / p) * 100) : 'new' };
     });
     const platforms = rankPlatforms(merged, M);
+    // Chủ đề theo từng khu vực (bộ lọc khu vực ở trang Xu hướng chính)
+    const themesByRegion = Object.fromEntries(
+      Object.keys(settings.regions).map((r) => [
+        r,
+        scoreThemes({ items: merged.items.filter((i) => i.region === r), queries: merged.queries.filter((q) => q.region === r), trending: [] }, settings, M).slice(0, 10),
+      ]),
+    );
     const hashtags = summarizeHashtags(merged, prev, M);
     const general = summarizeGeneral(snaps, prevSnaps, settings, classify);
     const segments = segmentSummary(merged, prev, settings, M);
@@ -284,6 +303,7 @@ async function aggregate({ useAi }) {
       keywordsByPlatform,
       keywordHistory,
       themes,
+      themesByRegion,
       platforms,
       weather: { location: wx.location, days: wx.days, insights: weatherInsights(wx, latest) },
       hashtags,
@@ -305,6 +325,14 @@ async function aggregate({ useAi }) {
       try {
         const label = { day: `Ngày ${w.to}`, week: `7 ngày ${w.from} → ${w.to}`, month: `30 ngày ${w.from} → ${w.to}` }[period];
         const insights = await generateInsights(ai, aiPayload(summary), label);
+        // Kiểm tra trích dẫn của AI: chỉ giữ link bài VN đạt chuẩn có trong dữ liệu gửi đi
+        const payload = aiPayload(summary);
+        const allowed = new Set(
+          [...Object.values(payload.topContent).flat(), ...payload.themes.flatMap((t) => t.evidence)]
+            .filter((x) => x && x.url && !String(x.region).startsWith('QUỐC TẾ'))
+            .map((x) => x.url),
+        );
+        for (const t of insights?.trends || []) t.evidenceUrls = (t.evidenceUrls || []).filter((u) => allowed.has(u));
         summary.ai = { provider: ai.provider, model: ai.model, generatedAt: new Date().toISOString(), to: summary.to, ...insights };
       } catch (e) {
         log(`  ! AI ${period}: ${e.message}`);
