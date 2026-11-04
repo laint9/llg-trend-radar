@@ -179,7 +179,8 @@
 
         <section id="s-plan">
           <div class="sec-head big"><div class="sec-title"><span class="sec-no">05</span><span class="sec-ic"><svg><use href="#i-bolt"/></svg></span><div><h2>Kế hoạch</h2><p>Việc nên làm, ý tưởng content và gợi ý theo thời tiết</p></div></div></div>
-          <div class="tabs subtabs" data-group="plan" role="tablist"><button class="tab on" data-sub="actions"><span class="tile sm tile-pink">⚡</span>Action đề xuất</button><button class="tab" data-sub="ideas"><span class="tile sm tile-yellow">💡</span>Ý tưởng content</button><button class="tab" data-sub="weather"><span class="tile sm tile-blue">☁</span>Thời tiết</button></div>
+          <div class="chips outlet-chips" id="outlet-filter" aria-label="Outlet"></div>
+          <div class="tabs subtabs" data-group="plan" role="tablist"><button class="tab on" data-sub="actions"><span class="tile sm tile-pink">⚡</span>Action đề xuất</button><button class="tab" data-sub="ideas"><span class="tile sm tile-yellow">💡</span>Ý tưởng content</button><button class="tab" data-sub="weather"><span class="tile sm tile-blue">☁</span>Thời tiết</button><button class="tab" data-sub="voice"><span class="tile sm tile-violet">🗣</span>Tone of voice</button></div>
           <div data-subpane="actions">
             <div class="sec-head"><span class="muted small">Sắp theo mức ưu tiên, kèm lý do và chỉ số theo dõi</span><div class="seg small-seg" id="action-src"><button data-v="all" class="on">Tất cả</button><button data-v="ai">AI</button><button data-v="rule">Tự động</button></div></div>
             <div class="actions" id="actions"></div>
@@ -192,6 +193,7 @@
             </div>
             <div class="trend-grid" id="wx-insights"></div>
           </div>
+          <div data-subpane="voice" hidden><div class="voice-grid" id="voice"></div></div>
         </section>
         <nav class="pager" id="pager" aria-label="Chuyển trang"></nav>
       </main>

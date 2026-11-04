@@ -445,7 +445,20 @@
   },
   "brand": {
     "_note": "Điền tên thương hiệu của mình và đối thủ để tool cảnh báo khi được nhắc đến hoặc khi đối thủ đang hot.",
-    "names": [],
+    "names": [
+      "Lại La",
+      "Laila",
+      "laila.saigon",
+      "EM*Me",
+      "Emme",
+      "em.me_house",
+      "a.dau",
+      "adau",
+      "adau_kitchen",
+      "Ba Hoa",
+      "Bahoa",
+      "bahoa.sgn"
+    ],
     "competitors": []
   },
   "marketingCalendar": {
@@ -1472,5 +1485,476 @@
     "factor": 0.35
   },
   "maxPostAgeDays": 30,
-  "_maxPostAgeNote": "Bài social/YouTube cũ hơn số ngày này bị loại khỏi phân tích (tránh bài từ năm cũ)."
+  "_maxPostAgeNote": "Bài social/YouTube cũ hơn số ngày này bị loại khỏi phân tích (tránh bài từ năm cũ).",
+  "outlets": {
+    "_note": "Hồ sơ thương hiệu 4 outlet Lại La Group, tổng hợp từ file bàn giao Marketing/Media và Instagram (03/11/2026). AI dùng để viết action và ý tưởng content đúng tone of voice + hình ảnh. Team cập nhật khi có chương trình mới.",
+    "list": [
+      {
+        "id": "laila",
+        "name": "Lại La – Modern Cocktail Club",
+        "short": "Lại La",
+        "instagram": "https://www.instagram.com/laila.saigon/",
+        "tone": "violet",
+        "segment": "Cocktail club / nightlife (hip-hop, DJ)",
+        "location": "26 Hồ Tùng Mậu, phường Sài Gòn (Quận 1)",
+        "hours": "Mỗi ngày 8PM – late",
+        "audience": "Giới trẻ, dân văn phòng thích quẩy, nhóm bạn, ladies, khách quốc tế",
+        "voice": "Quẩy, trendy, nghịch ngợm. 3 trụ: (1) Gợi tò mò, bí ẩn – đặt câu hỏi, teasing, súc tích; (2) Hài hước, dí dỏm, tinh nghịch – bắt trend, teencode Việt, chơi chữ tiếng Anh (Saturdate, It’s wwine o’clock); (3) Quan tâm & đối thoại – hỏi han trực tiếp (YOLO, cuối tuần, chữa lành). Bản tiếng Việt không dịch sát, được \"out\" ra để chơi chữ/bắt trend tiếng Việt.",
+        "signature": "Kết caption bằng 'Lại La Lại La ~' rồi khối thông tin: LẠI LA MODERN COCKTAIL CLUB · 📍26 Ho Tung Mau, Sai Gon Ward, HCMC · 🤙🏻Reservation: +84 90 8330300 · 🪩Everyday: 8PM - late",
+        "programs": [
+          "Ladies Night free-flow thứ Năm",
+          "Banking Night free-flow thứ Tư (dân ngân hàng) tới 12AM",
+          "Sing Together 9PM Chủ Nhật",
+          "DJ hip-hop line-up hằng tuần",
+          "Sự kiện mùa: Halloween, Friendshift, sinh nhật quán",
+          "Merch theo mùa"
+        ],
+        "visual": "Club tối, đèn đỏ/neon, DJ, đám đông nhảy; poster sự kiện đỏ/tím/vàng retro-pop, typography to đậm. Reels tuần nên có: khách tương tác trực tiếp với camera, khách hát đồng thanh, nhạc đúng gu (80s–90s–00s, Old School Hip-hop, R&B), khách nữ nhảy, khách tương tác với DJ, reaction khi DJ transition. Quay bằng DJI Action 5 / DJI 360, ảnh Sony; video ≥1080p, chữ trong safe zone, đúng font/màu brand. Recap Friendshift: thumb riêng guest, ảnh dọc cả team + guest, đủ các ly cocktail của guest.",
+        "hashtags": [
+          "laila",
+          "club",
+          "cocktail",
+          "dj",
+          "hiphop"
+        ],
+        "avoid": "Giọng nghiêm túc, khô khan, sang trọng kiểu fine dining; quảng cáo lý tính sản phẩm; độc thoại; xưng \"mấy bà, mấy bảnh\"; dịch word-by-word EN→VN; thiếu \"Lại La Lại La ~\".",
+        "personality": "Người bạn ~25 tuổi: nhiều năng lượng, trendy; hài hước, phóng khoáng, quậy & nghịch theo hướng thân thiện; người hoạt náo kết nối mọi người.",
+        "audienceDetail": "70% nữ / 30% nam, 25–40 tuổi, ngành sáng tạo tại TP.HCM, thu nhập khá–cao; mê nghệ thuật, không gian, thời trang, âm nhạc; thích cocktail, networking, party; biết đến qua truyền miệng và IG/TikTok.",
+        "pronouns": "Lại La / \"quán\" – bạn (hạn chế dùng \"khách\") hoặc Đồng-Quẩy (Dance-Buddies); \"mình\" khi nói bao hàm tất cả. KHÔNG xưng \"mấy bà, mấy bảnh\".",
+        "language": "Bài ngắn, giải trí: tiếng Anh. Bài dài/nhiều thông tin hoặc có ưu đãi: song ngữ, tiếng Anh trước – tiếng Việt sau (ngăn bằng \"-\"). Story daily: ưu tiên tiếng Anh, trừ câu viral/joke gốc Việt.",
+        "toneRules": [
+          {
+            "rule": "Gợi tò mò, bí ẩn",
+            "do": "Ưu tiên câu hỏi; teasing, inspire từ không gian; ngắn gọn",
+            "dont": "Quảng cáo đặc tính lý tính của sản phẩm; nhiều thông tin bán hàng",
+            "examples": [
+              "If you’re all about unique experience with high-taste music and exquisite cocktails, you’re the CHOSEN one. Come and find out why 👽",
+              "Nếu bạn cũng muốn có những trải nghiệm 1-0-2 với nhạc hay và cocktail ngon thì biết phải tới đâu rồi đó 👽"
+            ]
+          },
+          {
+            "rule": "Hài hước, dí dỏm, tinh nghịch",
+            "do": "Bắt trend, custom thông điệp theo trend; teencode Việt hoặc chơi chữ tiếng Anh",
+            "dont": "Thông tin nghiêm túc, khô khan; xưng \"mấy bà, mấy bảnh\"",
+            "examples": [
+              "Calling all ladies for this Thursday’s night out! Dress to impress, flip the \"Slayyy\" switch, and make the dance floor yours.",
+              "Thứ Năm này, Lại La gọi tên các em xinh! Diện đồ thật cháy, bật chế độ \"Slayyy\" và đến làm chủ sàn nhảy."
+            ]
+          },
+          {
+            "rule": "Quan tâm & đối thoại",
+            "do": "Đối thoại trực tiếp bằng câu hỏi quan tâm",
+            "dont": "Độc thoại từ brand, thiếu tương tác",
+            "examples": [
+              "Gather the squad and land at Lai La before 10:30 PM every Thursday to get served by our crew. The flight is ready, are you 😎"
+            ]
+          }
+        ],
+        "vocabulary": [
+          "Dance-Buddies",
+          "Đồng-Quẩy",
+          "da house",
+          "squad",
+          "em xinh",
+          "Slayyy"
+        ],
+        "pillars": [
+          {
+            "name": "Sản phẩm / Dịch vụ",
+            "share": 40,
+            "angles": [
+              "Lịch DJ mỗi tuần",
+              "Seasonal cocktail",
+              "Staff vui vẻ qua daily / video tình huống đu trend",
+              "Official merch",
+              "Seasonal merch"
+            ]
+          },
+          {
+            "name": "Sự kiện",
+            "share": 40,
+            "angles": [
+              "Ladies Night",
+              "Friendshift – Bartender",
+              "Friendshift – Guest DJ",
+              "Sự kiện claim quyền lợi hãng rượu tài trợ"
+            ]
+          },
+          {
+            "name": "Không gian",
+            "share": 20,
+            "angles": [
+              "Khách trong không gian (ưu tiên khách nữ)",
+              "Reel DJ đánh nhạc",
+              "Các góc đặc trưng"
+            ]
+          }
+        ],
+        "cadence": "Tối thiểu 16 bài/tháng (≥4 bài/tuần trên IG), tháng nào cũng đủ 3 pillar.",
+        "channels": "Instagram là kênh chính (≥4 bài/tuần); Facebook share lại từ IG; TikTok: video DJ, khách, không gian kèm địa chỉ quán.",
+        "captionRules": [
+          "Title chuẩn sự kiện: \"🛸👨‍🚀 FRIENDSHIFT ALERTS\" (khách mời đơn) / \"🛸👨‍🚀 THE ULTIMATE FRIENDSHIFT ALERTS - TÊN CHỦ ĐỀ\" (nhóm)",
+          "Câu mở phải có năng lượng, không dừng ở nghĩa đen (vd \"Clear the way! Uncle Boo is set to take over the spotlight at Lại La 💥\")",
+          "Tag đủ nick outlet & guest (kèm outlet của guest); luôn có 🗓️ ngày và ⏰ giờ; luôn có CTA (\"Tag your squad…\")",
+          "Bài có ưu đãi (Ladies Night…) viết song ngữ; bản Việt không dịch sát, chơi chữ kiểu Việt",
+          "LUÔN kết bằng \"Lại La Lại La ~\" trước footer"
+        ],
+        "hashtagRule": "Giữ cố định bộ hashtag, chỉ thay 1–2 hashtag cuối theo chủ đề (ưu tiên hashtag nhiều lượt dùng và đúng chủ đề).",
+        "mediaAvoid": "Source quay nhầm; khách không nhảy/không sung; dính vape/thuốc lá rõ; trùng món hoặc trùng nhạc; ảnh có chai rượu tài trợ chỉ dùng cho bộ gửi nhà tài trợ.",
+        "checklist": "Không sai chính tả/giá/ngày giờ; check-in đúng location Laila; đủ hashtag; CTA; video có tiếng, ≥1080p; nhạc/hình có bản quyền.",
+        "source": "File bàn giao Marketing + Media Lại La + Instagram (03/11/2026)"
+      },
+      {
+        "id": "emme",
+        "name": "EM*Me House – hidden cocktail bar",
+        "short": "Emme",
+        "instagram": "https://www.instagram.com/em.me_house/",
+        "tone": "peach",
+        "segment": "Hidden bar / cocktail kể chuyện (Tatler Best 20 Bars & Best Innovation Bar 2026)",
+        "location": "70 Hàm Nghi, Quận 1 (cạnh a.dau)",
+        "hours": "6PM – 0:30AM (CN–T5), 6PM – 1AM (T6–T7); DM/gọi trước khi đến",
+        "audience": "Người thích cocktail sáng tạo, hẹn hò, tâm sự, khách yêu không gian hoài niệm",
+        "voice": "\"The Lover\" kể chuyện: hài hước dí dỏm, tinh tế lãng mạn, ấm áp chân thành; hoài niệm tuổi học trò & ký ức. Tiếng Việt, vocab nghen/hen/gụ/zui, kết bằng P/s nhắn nhủ.",
+        "signature": "Kết bằng khối: EM*Me house · 📒 Please dm/call before coming · 🏡 District 1, Saigon · 🌙 6pm - 0:30am - monday to thursday · 🌙 6pm - 1:00 am - friday to sunday",
+        "programs": [
+          "Menu concept 'The Memory Archive: Remember When…' (cocktail như cuộn băng cassette ký ức)",
+          "COCKTELL Series (cocktail kể chuyện)",
+          "Guestshift với bartender khách mời",
+          "Life at Emme (đời sống đội ngũ)",
+          "Cocktail chủ đề lễ (30/4, Christmas)",
+          "Giải thưởng Tatler 2026"
+        ],
+        "visual": "Tông ấm, chất film, ánh nến/đèn vàng; đạo cụ hoài niệm: TV cũ, cassette, đĩa than, thư tay, giấy kraft; chân dung bartender đời thường; layout tạp chí.",
+        "hashtags": [
+          "emme",
+          "emmehouse",
+          "hiddengems",
+          "hiddenbar",
+          "cocktail"
+        ],
+        "avoid": "Giọng ồn ào, khuyến mãi dồn dập, free-flow; slang quá teen; sến súa, ủy mị, sáo rỗng; tục tĩu; tự khen thô; dùng từ \"khách\"; ảnh neon chói.",
+        "personality": "\"The Lover\": người đàn ông khoảng 30 tuổi, ổn định công việc & tài chính; hài hước, lãng mạn, ấm áp; nhìn mọi thứ tinh tế, vui vẻ.",
+        "audienceDetail": "70% nữ / 30% nam, 25–34 tuổi, làm ngành sáng tạo tại TP.HCM; biết đến qua truyền miệng và IG/TikTok; thích hidden bar vì không thương mại, gần gũi cả không gian lẫn câu chuyện thương hiệu.",
+        "language": "Tiếng Việt.",
+        "toneRules": [
+          {
+            "rule": "Hài hước",
+            "do": "Yếu tố bất ngờ, mỉa mai, châm biếm nhẹ; dí dỏm, chơi chữ",
+            "dont": "Tục tĩu, xúc phạm; hài gượng, quá lố; twist chữ quá nhiều gây khó hiểu",
+            "examples": [
+              "Bếp không có gì nhiều ngoài những người đờn ông thích chuyện bếp núc. Quần áo lúc nào cũng thơm mùi đồ ăn, nói chung là “ngon”!",
+              "Theo Định luật Bảo toàn Niềm zui (do tui mới phát minh): Niềm zui không tự sinh ra hay mất đi, mà nó chỉ chuyển từ ly thứ hai... sang ly thứ ba."
+            ]
+          },
+          {
+            "rule": "Tinh tế",
+            "do": "Miêu tả khoảnh khắc ngọt ngào, lãng mạn; ngôn ngữ tình cảm, bay bổng; khai thác chi tiết cảm động trong tình yêu",
+            "dont": "Sáo rỗng, ủy mị; ngôn từ chợ búa, sến súa",
+            "examples": [
+              "Tuần rồi em đi làm có mệt hông? Tối nay về sớm ăn cơm nghen. Có anh chờ!",
+              "Hồi đó có ai tán cờ-rớt giống Emme hông? Tan học đứng đợi trước cổng trường, dúi vào tay người ta ly trà sữa trân châu…"
+            ]
+          },
+          {
+            "rule": "Ấm áp",
+            "do": "Ngôn từ thân thương, trìu mến, chân thành; gợi khung cảnh gần gũi, yên bình; đan xen câu hỏi thăm",
+            "dont": "Cảm giác thương mại; câu chuyện khó đồng cảm",
+            "examples": [
+              "Tiếng xì xèo của đồ ăn, tiếng tí tách nơi bếp than hay tiếng xắt rau củ lách cách… đều là những âm thanh dễ chịu khi ghé a.dau.",
+              "Sài Gòn mùa này mưa nắng thất thường quá bạn hen. Nhưng mưa cũng là cái cớ hay ho để mình hẹn nhau (tại 70 Hàm Nghi 😉)."
+            ]
+          }
+        ],
+        "vocabulary": [
+          "nghen",
+          "hen",
+          "cờ-rớt (crush)",
+          "gụ",
+          "zui",
+          "hông",
+          "mình (= chúng ta)"
+        ],
+        "cadence": "8 bài/tháng; IG 2 bài/tuần, Threads 1 bài/tuần; tháng nào cũng đủ 4 pillar.",
+        "channels": "Instagram là kênh chính (tối ưu định dạng cho IG); Facebook share lại từ IG; Threads: bài đơn giản theo nền tảng 1 bài/tuần; TikTok: đăng lại từ IG.",
+        "hashtagRule": "Giữ cố định bộ hashtag, chỉ thay 1–2 hashtag cuối theo chủ đề (ưu tiên hashtag nhiều lượt dùng và đúng chủ đề).",
+        "checklist": "Không sai chính tả/giá/ngày giờ; câu phải có chủ ngữ rõ ràng, không cụm danh từ lửng lơ; check-in đúng location; đủ hashtag; CTA đặt bàn trước.",
+        "pronouns": "Emme / \"Quán\" – bạn, mọi người (hạn chế dùng \"khách\"); tui – người ta; bài Story/Concept dùng anh – em; \"mình\" khi nói bao hàm tất cả. Không dùng slang quá teen.",
+        "pillars": [
+          {
+            "name": "Brand concept / Story",
+            "share": 30,
+            "angles": [
+              "Hình thành & phát triển thương hiệu (series A→E)",
+              "Câu chuyện hai người yêu nhau qua bài thơ",
+              "Giới thiệu concept menu mới"
+            ]
+          },
+          {
+            "name": "Sản phẩm / Dịch vụ",
+            "share": 30,
+            "angles": [
+              "Series COCKTELL – cách tạo từng ly",
+              "Nguyên liệu cấu thành",
+              "Seasonal cocktail",
+              "Staff vui vẻ qua daily / video tình huống đu trend"
+            ]
+          },
+          {
+            "name": "Không gian",
+            "share": 20,
+            "angles": [
+              "Khách xuất hiện trong không gian",
+              "Các góc đặc trưng"
+            ]
+          },
+          {
+            "name": "Sự kiện",
+            "share": 20,
+            "angles": [
+              "Acoustic hằng tháng",
+              "Guestshift",
+              "Sinh nhật quán, Tết, 14/2, 8/3, 30/4, 20/10…"
+            ]
+          }
+        ],
+        "captionRules": [
+          "Title chuẩn: \"[COCKTELL] EP.xx - TÊN LY\" / \"GUESTSHIFT: \\\"TÊN CHỦ ĐỀ\\\" 🏡❤️\"",
+          "COCKTELL: mở bằng ký ức → giới thiệu ly (câu có chủ ngữ: \"Khi thưởng thức, bạn sẽ cảm nhận…\") → LUÔN có đoạn nêu tên & concept menu → P/s mời ghé",
+          "Thông báo (Acoustic…): dẫn ngắn liên quan chủ đề, không lặp ý; nhấn ⏰ giờ, 🗓️ ngày; P/s nhắc đặt bàn trước",
+          "Guestshift: chủ đề sự kiện là trọng tâm; giới thiệu guest + outlet của guest (@tag), cảm hứng menu; có ngày giờ",
+          "Tránh tự khen thô (\"ly cồn ngon hết hồn\")"
+        ],
+        "source": "File bàn giao Marketing Emme & a.dau + Instagram (03/11/2026)"
+      },
+      {
+        "id": "adau",
+        "name": "a.dau – my dear's kitchen",
+        "short": "a.dau",
+        "instagram": "https://www.instagram.com/adau_kitchen/",
+        "tone": "mint",
+        "segment": "Nhà hàng món Việt kiểu bếp nhà, hidden (set menu cho 2)",
+        "location": "Căn số 8, lầu 2, CC 70 Hàm Nghi, Bến Nghé, Quận 1",
+        "hours": "6PM – 11PM; gửi xe tại 9 Nguyễn Công Trứ",
+        "audience": "Cặp đôi, hẹn hò, bạn bè thân, khách thích món Việt tinh tế và câu chuyện",
+        "voice": "\"The Lover\" của căn bếp: hài hước dí dỏm, tinh tế lãng mạn, ấm áp như bữa cơm nhà; concept tình yêu & các giai đoạn hai người (từ về chung nhà đến gia đình nhỏ, cả tình yêu tan vỡ). Tiếng Việt, vocab nghen/hen, miêu tả món gợi giác quan.",
+        "signature": "Kết bằng khối: 📍Căn số 8, lầu 2, CC 70 Hàm Nghi, Bến Nghé, Quận 1 · ⏰ 6pm - 11pm · 🛵 hướng dẫn gửi xe · ☎️ 093.886.6155",
+        "programs": [
+          "Menu 'The Memory Archive: If Only…' (lát cắt cuộc đời)",
+          "Set menu cho 2 người kèm quà nhỏ",
+          "Câu chuyện có thật của khách (chia tay, hẹn hò)",
+          "Setup hoa, Cooking with ♥️, a.dau daily"
+        ],
+        "visual": "Tối, ấm, ánh nến, chất film điện ảnh; chữ viết tay trên giấy, quote; cận cảnh món ăn bếp nhà, bàn hai người; ảnh đội bếp.",
+        "hashtags": [
+          "adaukitchen",
+          "vietnamesefood",
+          "vietnamesecuisine",
+          "vietnameserestaurant",
+          "hiddengem"
+        ],
+        "avoid": "Giọng quảng cáo, giá giảm sốc, ồn ào; slang quá teen; sến súa, ủy mị; ẩn dụ nhạy cảm (chính trị, vượt biên…); câu thiếu chủ ngữ; tiếng Anh chen không cần thiết; ảnh sáng gắt.",
+        "personality": "\"The Lover\": người đàn ông khoảng 30 tuổi, ổn định công việc & tài chính; hài hước, lãng mạn, ấm áp; nhìn mọi thứ tinh tế, vui vẻ.",
+        "audienceDetail": "70% nữ / 30% nam, 25–34 tuổi, làm ngành sáng tạo tại TP.HCM; biết đến qua truyền miệng và IG/TikTok; thích hidden bar vì không thương mại, gần gũi cả không gian lẫn câu chuyện thương hiệu.",
+        "language": "Tiếng Việt.",
+        "toneRules": [
+          {
+            "rule": "Hài hước",
+            "do": "Yếu tố bất ngờ, mỉa mai, châm biếm nhẹ; dí dỏm, chơi chữ",
+            "dont": "Tục tĩu, xúc phạm; hài gượng, quá lố; twist chữ quá nhiều gây khó hiểu",
+            "examples": [
+              "Bếp không có gì nhiều ngoài những người đờn ông thích chuyện bếp núc. Quần áo lúc nào cũng thơm mùi đồ ăn, nói chung là “ngon”!",
+              "Theo Định luật Bảo toàn Niềm zui (do tui mới phát minh): Niềm zui không tự sinh ra hay mất đi, mà nó chỉ chuyển từ ly thứ hai... sang ly thứ ba."
+            ]
+          },
+          {
+            "rule": "Tinh tế",
+            "do": "Miêu tả khoảnh khắc ngọt ngào, lãng mạn; ngôn ngữ tình cảm, bay bổng; khai thác chi tiết cảm động trong tình yêu",
+            "dont": "Sáo rỗng, ủy mị; ngôn từ chợ búa, sến súa",
+            "examples": [
+              "Tuần rồi em đi làm có mệt hông? Tối nay về sớm ăn cơm nghen. Có anh chờ!",
+              "Hồi đó có ai tán cờ-rớt giống Emme hông? Tan học đứng đợi trước cổng trường, dúi vào tay người ta ly trà sữa trân châu…"
+            ]
+          },
+          {
+            "rule": "Ấm áp",
+            "do": "Ngôn từ thân thương, trìu mến, chân thành; gợi khung cảnh gần gũi, yên bình; đan xen câu hỏi thăm",
+            "dont": "Cảm giác thương mại; câu chuyện khó đồng cảm",
+            "examples": [
+              "Tiếng xì xèo của đồ ăn, tiếng tí tách nơi bếp than hay tiếng xắt rau củ lách cách… đều là những âm thanh dễ chịu khi ghé a.dau.",
+              "Sài Gòn mùa này mưa nắng thất thường quá bạn hen. Nhưng mưa cũng là cái cớ hay ho để mình hẹn nhau (tại 70 Hàm Nghi 😉)."
+            ]
+          }
+        ],
+        "vocabulary": [
+          "nghen",
+          "hen",
+          "cờ-rớt (crush)",
+          "gụ",
+          "zui",
+          "hông",
+          "mình (= chúng ta)"
+        ],
+        "cadence": "8 bài/tháng; IG 2 bài/tuần, Threads 1 bài/tuần; tháng nào cũng đủ 4 pillar.",
+        "channels": "Instagram là kênh chính (tối ưu định dạng cho IG); Facebook share lại từ IG; Threads: bài đơn giản theo nền tảng 1 bài/tuần; TikTok: đăng lại từ IG.",
+        "hashtagRule": "Giữ cố định bộ hashtag, chỉ thay 1–2 hashtag cuối theo chủ đề (ưu tiên hashtag nhiều lượt dùng và đúng chủ đề).",
+        "checklist": "Không sai chính tả/giá/ngày giờ; câu phải có chủ ngữ rõ ràng, không cụm danh từ lửng lơ; check-in đúng location; đủ hashtag; CTA đặt bàn trước.",
+        "pronouns": "a.dau / \"Bếp\" – bạn, mọi người (hạn chế dùng \"khách\"); tui – người ta; bài Story/Concept dùng anh – em; \"mình\" khi nói bao hàm tất cả. Không dùng slang quá teen.",
+        "pillars": [
+          {
+            "name": "Brand concept / Story",
+            "share": 30,
+            "angles": [
+              "Hình thành & phát triển thương hiệu (series A→E)",
+              "Câu chuyện concept tình yêu tan vỡ qua chi tiết ở quán"
+            ]
+          },
+          {
+            "name": "Sản phẩm / Dịch vụ",
+            "share": 30,
+            "angles": [
+              "Series Inspire món",
+              "Nguyên liệu cấu thành",
+              "Seasonal menu",
+              "Staff vui vẻ qua daily / video tình huống đu trend"
+            ]
+          },
+          {
+            "name": "Không gian",
+            "share": 20,
+            "angles": [
+              "Khách xuất hiện trong không gian",
+              "Các góc đặc trưng"
+            ]
+          },
+          {
+            "name": "Sự kiện",
+            "share": 20,
+            "angles": [
+              "Guest chef / 4 Hands / 6 Hands",
+              "Sinh nhật quán, Tết, 14/2, 8/3, 30/4, 20/10…"
+            ]
+          }
+        ],
+        "captionRules": [
+          "Title chuẩn, hấp dẫn, có góc chơi chữ: \"NEW MENU ALERT: ‘tên món’ - màn minh oan cho bánh thập cẩm!\", \"[4 HANDS] TÊN CHỦ ĐỀ!\", set menu: title IN HOA có tên menu",
+          "Inspire món: luôn nêu món thuộc giai đoạn cảm xúc nào trong menu; miêu tả nguyên liệu bằng câu có chủ ngữ, gợi giác quan; luôn có đoạn giải thích cảm hứng menu",
+          "Set menu/Seasonal: mở đầu đúng tone (không chung chung); luôn có thời gian bán, giá (++/2 Pax, chưa VAT & SVC), quà kèm, CTA đặt chỗ",
+          "Guest chef: tag chef, ẩn dụ vui nhưng tránh ẩn dụ nhạy cảm (vd \"vượt biên\"); có ngày giờ, giá, P/s nhắc đặt bàn",
+          "Hạn chế chen tiếng Anh không cần thiết (dùng \"ảo thuật\" thay \"magic\")"
+        ],
+        "source": "File bàn giao Marketing Emme & a.dau + Instagram (03/11/2026)"
+      },
+      {
+        "id": "bahoa",
+        "name": "Ba Hoa – Born to \"Cheers\"",
+        "short": "Ba Hoa",
+        "instagram": "https://www.instagram.com/bahoa.sgn/",
+        "tone": "pink",
+        "segment": "Fun dining ồn ào nhất Sài Gòn (nướng lửa, DJ, tiệc bạn bè)",
+        "location": "Số 12, đường 38, phường An Khánh (Thảo Điền, Q2 cũ)",
+        "hours": "5:30PM – 12AM (nghỉ thứ Ba); đặt bàn TableCheck, hotline 0797 33 22 99",
+        "audience": "Nhóm bạn, tiệc sinh nhật, team công ty, khách thích không khí náo nhiệt",
+        "voice": "ỒN, LOUD, chơi lớn. 3 trụ giọng: (1) Hài hước – chơi chữ, nói láy, châm biếm, câu viral đúng lúc; (2) Khoa trương – cường điệu, nói quá, VIẾT HOA chữ cần nhấn như đang hét to; (3) Gần gũi – câu chủ động, có chủ ngữ, viết như đang nói chuyện, thêm từ cảm thán.",
+        "signature": "Kết bằng khối: BA HOA - SAIGON'S LOUDEST TABLE · 📍No.12, 38 Street, An Khanh Ward, HCMC · 🕰️5:30PM - 12AM (Tuesdays closed) · 📞Hotline: 0797 33 22 99",
+        "programs": [
+          "Weekly line-up theo ngày (F*cking Monday…)",
+          "Eat LOUD – món nướng lửa",
+          "Drunk G.O, DJ",
+          "Booking tổ chức tiệc",
+          "Halloween / sự kiện concept",
+          "Merch"
+        ],
+        "visual": "Màu pop đỏ – xanh dương – hồng, logo đôi môi; lửa nướng, khói; ảnh nhóm bạn nâng ly, loa phóng thanh, DJ; poster lịch tuần kiểu bảng màu.",
+        "hashtags": [
+          "bahoa",
+          "bahoasaigon",
+          "fundining",
+          "asianfusion",
+          "vietnamfood"
+        ],
+        "avoid": "Giọng thì thầm, lãng mạn trầm lắng kiểu fine dining; caption miêu tả khô, dài dòng; câu sáo rỗng; thiếu CTA; bắt trend cợt nhả; ảnh tối mờ.",
+        "personality": "\"Người bạn của mọi nhà\": nhiều năng lượng, phóng khoáng; \"cây hài\" của nhóm, luôn ba hoa, khơi chuyện; người hoạt náo kết nối mọi người.",
+        "pronouns": "Ba Hoa / we – you",
+        "language": "Ưu tiên tiếng Anh; chỉ song ngữ (EN + VN) cho thông báo quan trọng hoặc bán merch.",
+        "toneRules": [
+          {
+            "rule": "Hài hước",
+            "do": "Chơi chữ, nói láy, châm biếm; dùng câu đang viral để gần khách",
+            "dont": "Viết quá nghiêm túc/chuẩn chỉnh; bắt trend quá đà, cợt nhả, lạm dụng câu viral",
+            "examples": [
+              "The only kind of pressure that matters at Ba Hoa is Beer Pressure.",
+              "Calories don’t count at Ba Hoa cuz our non-stop laughter burns them all anyway 🤷🏻‍♂️"
+            ]
+          },
+          {
+            "rule": "Khoa trương",
+            "do": "Miêu tả cường điệu, nói quá; IN HOA ý muốn nhấn mạnh",
+            "dont": "Thông tin khô không cảm xúc; câu chung chung, sáo rỗng, nói sự thật hiển nhiên",
+            "examples": [
+              "NASA IS CALLING. The crunch of this wing was just heard on Mars!"
+            ]
+          },
+          {
+            "rule": "Gần gũi",
+            "do": "Câu chủ động, có chủ ngữ vị ngữ, viết như nói chuyện, thêm cảm thán",
+            "dont": "Câu bị động, nặng văn viết; câu không chủ ngữ/không xưng hô",
+            "examples": [
+              "There is no \"stranger\" at Ba Hoa, we just have friends who haven’t had a drink together yet!",
+              "We apologize for the great food. We know it is very difficult for you to move on 😉"
+            ]
+          }
+        ],
+        "pillars": [
+          {
+            "name": "Sản phẩm",
+            "share": 40,
+            "angles": [
+              "Signature menu",
+              "Seasonal dishes",
+              "Câu chuyện/cảm hứng sau món ăn",
+              "Chef’s/Staff recommendations"
+            ]
+          },
+          {
+            "name": "Vibe quán",
+            "share": 40,
+            "angles": [
+              "Chef biểu diễn (múa lửa)",
+              "Không gian Ba Hoa",
+              "Key moment: rung chuông/cụng ly",
+              "Recap phản ứng khách với màn trình diễn",
+              "Khách tổ chức dịp đặc biệt",
+              "KOL/Creator reup"
+            ]
+          },
+          {
+            "name": "Sự kiện",
+            "share": 20,
+            "angles": [
+              "Teasing",
+              "Thông báo sự kiện",
+              "Thông báo khách mời",
+              "Reminder",
+              "Recap"
+            ]
+          }
+        ],
+        "cadence": "Tối thiểu 12 bài/tháng (3–4 bài/tuần), tháng nào cũng đủ 3 pillar.",
+        "channels": "Instagram là kênh chính (tối ưu định dạng cho IG, ≥4 bài/tuần); Facebook share lại từ IG; TikTok: video chef, khách, không gian kèm địa chỉ; Threads: key moment + caption gợi tương tác/bình luận.",
+        "captionRules": [
+          "Thông báo sự kiện mở bằng title chuẩn: \"👄 THE LOUD ANNOUNCEMENT\" (khách mời đơn) / \"👄 THE LOUDER ANNOUNCEMENT\" (nhóm khách mời)",
+          "Câu mở phải có góc kể chuyện/phóng đại, không dừng ở nghĩa đen (vd \"After months of begging @chef…, he finally agreed to visit the Ba Hoa madhouse!\")",
+          "Luôn có CTA cuối (vd \"Grab your crew and ride the wave 🌊\", \"Catch the show while it’s hot!\")",
+          "Tag đủ nick outlet & khách mời theo thứ tự xuất hiện trên clip",
+          "Luôn ghi 🗓️ ngày và ⏰ giờ diễn ra sự kiện",
+          "Key moment: ngắn, punchline gọn (\"Your mama said don’t play with fire but Ba Hoa’s chef said BET 🫣\"), không miêu tả dài dòng",
+          "Tách dòng dễ đọc, emoji vừa phải (không spam), headline thu hút"
+        ],
+        "checklist": "Không sai chính tả/giá/ngày/địa chỉ; check-in đúng location Ba Hoa trên map; đủ bộ hashtag; logo đúng safe zone; video ≥1080p và có tiếng; chỉ dùng ảnh/nhạc có bản quyền.",
+        "hashtagRule": "Giữ cố định 3 hashtag đầu, chỉ thay 1–2 hashtag cuối theo chủ đề (ưu tiên hashtag nhiều lượt dùng và đúng chủ đề).",
+        "source": "File bàn giao Marketing Ba Hoa + Instagram (03/11/2026)",
+        "audienceDetail": "60% nữ / 40% nam, 25–40 tuổi (late Millennials + Gen Z), làm kinh doanh/sáng tạo tại TP.HCM, thu nhập khá–cao; thích trải nghiệm ẩm thực gắn với giải trí, kết nối, nghệ thuật, văn hoá; biết đến qua truyền miệng và IG/TikTok."
+      }
+    ]
+  }
 }

@@ -20,7 +20,7 @@ const WX_ICON = (c) => (c >= 95 ? '⛈' : c >= 80 ? '🌧' : c >= 61 ? '🌧' : 
 const NEW_HOME = 'https://laint9.github.io/llg-trend-radar/';
 if (/netlify\.app$/.test(location.hostname)) location.replace(NEW_HOME + location.hash);
 
-const state = { period: 'day', region: 'all', platform: 'google', ptPlatform: null, htPlatform: 'all', actionSrc: 'all', genTab: 'vn', genCat: 'all', kwTab: 'all', data: {}, meta: null };
+const state = { period: 'day', region: 'all', platform: 'google', ptPlatform: null, htPlatform: 'all', actionSrc: 'all', genTab: 'vn', genCat: 'all', kwTab: 'all', outlet: 'all', data: {}, meta: null };
 const charts = {};
 
 // ---------- helpers ----------
@@ -412,19 +412,83 @@ function renderWeather(d) {
     .join('');
 }
 
-function renderIdeas(d) {
-  const ideas = d.ai?.contentIdeas || [];
-  $('#ideas').innerHTML = ideas.length
-    ? ideas
+// ---------- Outlet (Lại La Group) ----------
+const outletOf = (d, id) => (d.outlets || []).find((o) => o.id === id);
+const outletTag = (d, id) => {
+  if (!id || id === 'all') return '<span class="rtag">Cả group</span>';
+  const o = outletOf(d, id);
+  return o ? `<span class="otag tile-${esc(o.tone)}">${esc(o.short)}</span>` : '';
+};
+// Action chung của group (outlet = 'all' hoặc không gắn) luôn hiện khi lọc theo outlet
+const inOutlet = (x) => state.outlet === 'all' || !x.outlet || x.outlet === 'all' || x.outlet === state.outlet;
+function renderOutletFilter(d) {
+  const os = d.outlets || [];
+  $('#outlet-filter').innerHTML = os.length
+    ? [['all', 'Tất cả outlet'], ...os.map((o) => [o.id, o.short])].map(([id, l]) => `<button class="chip ${id === state.outlet ? 'on' : ''}" data-o="${esc(id)}">${esc(l)}</button>`).join('')
+    : '';
+  $('#outlet-filter').onclick = (e) => {
+    const b = e.target.closest('[data-o]');
+    if (!b) return;
+    state.outlet = b.dataset.o;
+    renderOutletFilter(d);
+    renderActions(d);
+    renderIdeas(d);
+    renderVoice(d);
+  };
+}
+
+// Hồ sơ tone of voice từng outlet (từ file bàn giao Marketing/Media)
+function renderVoice(d) {
+  const os = (d.outlets || []).filter((o) => state.outlet === 'all' || o.id === state.outlet);
+  const row = (label, v) => (v ? `<div class="vrow"><div class="lbl">${label}</div><div>${esc(v)}</div></div>` : '');
+  const list = (label, xs) => (xs?.length ? `<div class="vrow"><div class="lbl">${label}</div><ul class="ideas">${xs.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>` : '');
+  $('#voice').innerHTML = os.length
+    ? os
         .map(
-          (x, i) => `<article class="card trend">
-        <div class="trend-top"><span class="tile">💡</span><div class="kw-meta"><span class="rtag">${esc(x.platform)}</span><span class="rtag">${esc(x.format)}</span></div></div>
-        <h3>“${esc(x.hook)}”</h3><p>${esc(x.idea)}</p>
-        ${x.keywords?.length ? `<div class="h small" style="color:var(--accent)">${x.keywords.map(esc).join(' · ')}</div>` : ''}
-      </article>`,
+          (o) => `<article class="card voice t-${esc(o.tone)}">
+      <div class="trend-top"><span class="otag tile-${esc(o.tone)}">${esc(o.short)}</span>${o.instagram ? `<a class="rtag" href="${esc(o.instagram)}" target="_blank" rel="noopener">Instagram ↗</a>` : ''}</div>
+      <h3>${esc(o.name)}</h3><p class="muted small">${esc(o.segment || '')}</p>
+      ${row('Tính cách', o.personality)}${row('Khách hàng', o.audienceDetail || o.audience)}${row('Xưng hô', o.pronouns)}${row('Ngôn ngữ', o.language)}${row('Giọng điệu', o.voice)}
+      ${(o.toneRules || []).length ? `<div class="vrow"><div class="lbl">Quy tắc giọng điệu</div>${o.toneRules
+        .map((t) => `<div class="trule"><b>${esc(t.rule)}</b><div class="do">✅ ${esc(t.do)}</div><div class="dont">⛔ ${esc(t.dont)}</div>${(t.examples || []).map((e) => `<blockquote>${esc(e)}</blockquote>`).join('')}</div>`)
+        .join('')}</div>` : ''}
+      ${o.vocabulary?.length ? `<div class="vrow"><div class="lbl">Từ vựng thương hiệu</div><div class="tags">${o.vocabulary.map((v) => `<span class="tagpill">${esc(v)}</span>`).join('')}</div></div>` : ''}
+      ${(o.pillars || []).length ? `<div class="vrow"><div class="lbl">Content pillars</div>${o.pillars.map((p) => `<div class="pillar"><div class="prow"><b>${esc(p.name)}</b><span>${p.share}%</span></div><div class="pbar"><i style="width:${Number(p.share) || 0}%"></i></div><div class="muted small">${esc((p.angles || []).join(' · '))}</div></div>`).join('')}</div>` : ''}
+      ${row('Tần suất', o.cadence)}${row('Kênh', o.channels)}${list('Quy tắc caption', o.captionRules)}
+      ${o.signature ? `<div class="vrow"><div class="lbl">Câu chốt / footer</div><pre class="cap-text">${esc(o.signature.replace(/^Kết[^:]*:\s*/, '').replace(/ · /g, '\n'))}</pre></div>` : ''}
+      ${o.hashtags?.length ? `<div class="vrow"><div class="lbl">Hashtag cố định</div><div class="tags">${o.hashtags.map((h) => `<span class="tagpill accent">#${esc(h)}</span>`).join('')}</div>${o.hashtagRule ? `<div class="muted small">${esc(o.hashtagRule)}</div>` : ''}</div>` : ''}
+      ${row('Hình ảnh', o.visual)}${row('Media cần loại bỏ', o.mediaAvoid)}${row('Checklist trước khi đăng', o.checklist)}
+      ${o.avoid ? `<div class="vrow avoid"><div class="lbl">Tránh</div><div>${esc(o.avoid)}</div></div>` : ''}
+      ${o.source ? `<div class="muted small">Nguồn: ${esc(o.source)}</div>` : ''}
+    </article>`,
         )
         .join('')
-    : '<p class="empty card">Ý tưởng content được AI tạo khi bật một provider AI (xem README). Trong lúc chờ, hãy dùng Top 10 keyword, chủ đề nóng và insight thời tiết ở trên để lên ý tưởng.</p>';
+    : '<p class="empty card">Chưa có hồ sơ outlet.</p>';
+}
+
+function renderIdeas(d) {
+  const all = d.ai?.contentIdeas || [];
+  const ideas = all.filter((x) => state.outlet === 'all' || x.outlet === state.outlet);
+  $('#ideas').innerHTML = ideas.length
+    ? ideas
+        .map((x, i) => {
+          const o = outletOf(d, x.outlet);
+          return `<article class="card trend idea">
+        <div class="trend-top">${outletTag(d, x.outlet)}<div class="kw-meta"><span class="rtag">${esc(x.platform)}</span><span class="rtag">${esc(x.format)}</span></div></div>
+        <h3>“${esc(x.hook)}”</h3><p>${esc(x.idea)}</p>
+        ${x.captionDraft ? `<details class="cap"><summary>✍️ Caption nháp ${o ? `(giọng ${esc(o.short)})` : ''}</summary><pre class="cap-text" id="cap-${i}">${esc(x.captionDraft)}</pre><button class="btn pill cap-copy" data-cap="cap-${i}">Sao chép caption</button></details>` : ''}
+        ${x.visual ? `<div class="vis">🎬 <b>Hình ảnh:</b> ${esc(x.visual)}</div>` : ''}
+        ${x.hashtags?.length ? `<div class="tags">${x.hashtags.slice(0, 5).map((h) => `<span class="tagpill accent">#${esc(String(h).replace(/^#/, ''))}</span>`).join('')}</div>` : ''}
+        ${x.basedOn ? `<div class="why">📊 <b>Dựa trên:</b> ${esc(x.basedOn)}</div>` : ''}
+      </article>`;
+        })
+        .join('')
+    : `<p class="empty card">${all.length ? 'Chưa có ý tưởng cho outlet này trong kỳ.' : 'Ý tưởng content được AI tạo khi bật một provider AI (xem README).'}</p>`;
+  $('#ideas').onclick = async (e) => {
+    const b = e.target.closest('.cap-copy');
+    if (!b) return;
+    try { await navigator.clipboard.writeText(document.getElementById(b.dataset.cap).textContent); b.textContent = 'Đã sao chép ✓'; } catch { b.textContent = 'Hãy bôi đen để copy'; }
+  };
 }
 
 // ---------- Phân khúc ----------
@@ -561,7 +625,7 @@ function renderActions(d) {
     .join('');
   const ai = (d.ai?.actions || []).map((a, i) => ({ ...a, source: 'ai', id: `ai${i}` }));
   const rule = d.actions || [];
-  const list = state.actionSrc === 'ai' ? ai : state.actionSrc === 'rule' ? rule : [...ai, ...rule];
+  const list = (state.actionSrc === 'ai' ? ai : state.actionSrc === 'rule' ? rule : [...ai, ...rule]).filter(inOutlet);
   const order = { cao: 0, 'trung bình': 1, thấp: 2 };
   list.sort((a, b) => (order[a.priority] ?? 1) - (order[b.priority] ?? 1));
   $('#actions').innerHTML = list.length
@@ -569,7 +633,7 @@ function renderActions(d) {
         .map((a) => {
           const pcls = (a.priority || '').split(' ')[0];
           return `<article class="card action p-${esc(pcls)} ${isDone(d, a) ? 'done' : ''}" data-id="${esc(a.id)}">
-        <div class="kw-meta"><span class="prio ${esc(pcls)}">${esc(a.priority)}</span><span class="rtag">${esc(a.team || '')}</span><span class="rtag">⏱ ${esc(a.timeline || '')}</span>${a.source === 'ai' ? '<span class="src-ai">AI</span>' : ''}</div>
+        <div class="kw-meta">${outletTag(d, a.outlet)}<span class="prio ${esc(pcls)}">${esc(a.priority)}</span><span class="rtag">${esc(a.team || '')}</span><span class="rtag">⏱ ${esc(a.timeline || '')}</span>${a.source === 'ai' ? '<span class="src-ai">AI</span>' : ''}</div>
         <h3>${esc(a.title)}</h3>
         <p>${esc(a.detail)}</p>
         ${a.platforms?.length ? `<div class="tags">${a.platforms.map((p) => `<span class="tagpill">${esc(p)}</span>`).join('')}</div>` : ''}
@@ -805,6 +869,8 @@ async function render() {
   renderKpis(d);
   renderAiSummary(d);
   renderToday(d);
+  renderOutletFilter(d);
+  renderVoice(d);
   renderVideos(d);
   renderKeywords(d);
   renderKeywordTabs(d);

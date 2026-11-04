@@ -180,6 +180,7 @@ function aiPayload(s) {
       keywords: g.keywords.map((k) => k.keyword), hashtags: g.hashtags.map((h) => '#' + h.tag), searches: g.searches,
       topContent: g.top.map((x) => `${x.title} (${x.platform}, reach ${x.reach})`),
     })),
+    outlets: (settings.outlets?.list || []).map(({ instagram, tone, ...o }) => o),
     trendVideos: {
       tiktok: s.videos.tiktok.slice(0, 8).map((v) => `${v.title} (${v.reach} view, ${v.ageDays} ngày${v.music ? `, âm thanh: ${v.music}` : ''})`),
       reels: s.videos.reels.slice(0, 8).map((v) => `${v.title} (${v.reach} view${v.music ? `, âm thanh: ${v.music}` : ''})`),
@@ -330,6 +331,7 @@ async function aggregate({ useAi }) {
       platformTrends: pTrends,
       upcomingEvents: upcomingEvents(settings, latest),
       regions: Object.fromEntries(Object.entries(settings.regions).map(([k, v]) => [k, v.label])),
+      outlets: settings.outlets?.list || [],
       sourceStatus: latestSnap.status,
       ai: null,
     };

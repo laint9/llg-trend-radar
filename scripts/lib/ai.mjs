@@ -110,8 +110,9 @@ const SCHEMA = {
       type: 'array',
       description: '6-10 action cụ thể cho team Marketing, sắp theo ưu tiên',
       items: {
-        type: 'object', additionalProperties: false, required: ['priority', 'title', 'detail', 'why', 'team', 'platforms', 'timeline', 'metric'],
+        type: 'object', additionalProperties: false, required: ['outlet', 'priority', 'title', 'detail', 'why', 'team', 'platforms', 'timeline', 'metric'],
         properties: {
+          outlet: { type: 'string', enum: [...['laila', 'emme', 'adau', 'bahoa'], 'all'], description: "Outlet áp dụng; 'all' nếu áp dụng chung cho cả group" },
           priority: { type: 'string', enum: ['cao', 'trung bình', 'thấp'] },
           title: { type: 'string' },
           detail: { type: 'string' },
@@ -132,18 +133,26 @@ const SCHEMA = {
     },
     contentIdeas: {
       type: 'array',
+      description: '8-12 ý tưởng, mỗi outlet 2-3 ý tưởng, viết đúng tone of voice & hình ảnh của outlet đó',
       items: {
-        type: 'object', additionalProperties: false, required: ['platform', 'format', 'hook', 'idea', 'keywords'],
+        type: 'object', additionalProperties: false,
+        required: ['outlet', 'platform', 'format', 'hook', 'idea', 'captionDraft', 'visual', 'hashtags', 'basedOn', 'keywords'],
         properties: {
+          outlet: { type: 'string', enum: ['laila', 'emme', 'adau', 'bahoa'] },
           platform: { type: 'string' }, format: { type: 'string' }, hook: { type: 'string' },
-          idea: { type: 'string' }, keywords: { type: 'array', items: { type: 'string' } },
+          idea: { type: 'string' },
+          captionDraft: { type: 'string', description: 'Caption nháp hoàn chỉnh theo đúng giọng outlet (ngôn ngữ, cách xưng hô, câu chốt, khối thông tin cuối như signature)' },
+          visual: { type: 'string', description: 'Hướng hình ảnh/quay dựng theo phong cách visual của outlet: bối cảnh, ánh sáng, màu, đạo cụ, shot list ngắn' },
+          hashtags: { type: 'array', items: { type: 'string' }, description: 'Đúng 5 hashtag: giữ các hashtag cố định của outlet + hashtag trend phù hợp' },
+          basedOn: { type: 'string', description: 'Dựa trên dữ liệu nào (keyword/trend/video/âm thanh/thời tiết/sự kiện)' },
+          keywords: { type: 'array', items: { type: 'string' } },
         },
       },
     },
   },
 };
 
-const SYSTEM = `Bạn là chuyên gia phân tích xu hướng social & search cho một nhóm thương hiệu F&B/nightlife tại TP.HCM: nhà hàng tầm trung - cao cấp và nhà hàng casual, cocktail bar, hidden bar, cocktail club, fun dining và các dịch vụ nightlife. Theo dõi song song 4 phân khúc: bar, cocktail, nhà hàng cao cấp, nhà hàng casual. Khu vực phục vụ chính: Quận 1 và Quận 2 (Thảo Điền, Thủ Thiêm). Dữ liệu từ HCM, Việt Nam và Đông Nam Á chỉ để tham khảo xu hướng.
+const SYSTEM = `Bạn là chuyên gia phân tích xu hướng social & search cho một nhóm thương hiệu F&B/nightlife tại TP.HCM: nhà hàng tầm trung - cao cấp và nhà hàng casual, cocktail bar, hidden bar, cocktail club, fun dining và các dịch vụ nightlife. Theo dõi song song 5 phân khúc: bar, cocktail, fine dining, fun dining, nhà hàng casual. Nhóm thương hiệu: Lại La Group gồm 4 outlet Lại La, EM*Me, a.dau, Ba Hoa. Khu vực phục vụ chính: Quận 1 và Quận 2 (Thảo Điền, Thủ Thiêm). Dữ liệu từ HCM, Việt Nam và Đông Nam Á chỉ để tham khảo xu hướng.
 
 Nhiệm vụ: đọc dữ liệu đã thu thập (keyword đã chấm điểm, nội dung top theo độ tiếp cận, báo chí, Google Trends, thời tiết) và viết insight giúp team Marketing hiểu nhu cầu khách hàng để sản xuất nội dung.
 
@@ -155,7 +164,9 @@ Nguyên tắc:
 - evidenceUrls: CHỈ dùng bài ở Việt Nam (không có nhãn "QUỐC TẾ"), cùng ngành và đúng ý nghĩa xu hướng; bài quốc tế chỉ được nhắc khi ghi rõ "tham khảo quốc tế" trong mô tả. Không có dẫn chứng phù hợp thì để mảng rỗng.
 - Action: KHÔNG tự đặt con số mục tiêu (%, số view, số bàn…) vì không có dữ liệu nền của thương hiệu. Trường "why" phải dẫn dữ liệu cụ thể trong payload; trường "metric" chỉ nêu chỉ số cần theo dõi.
 - keywordInsights: giải thích ngắn vì sao từng keyword trong top 10 quan trọng và nên dùng thế nào.
-- contentIdeas: 6-10 ý tưởng, mỗi ý ghi rõ nền tảng (TikTok/Instagram/Facebook/Threads/Google-SEO), định dạng (Reels, carousel, video ngắn, bài SEO…), câu hook mở đầu.
+- outlets (Lại La Group): Lại La (cocktail club, quẩy, song ngữ EN→VN, 'Lại La Lại La ~'), EM*Me (hidden bar kể chuyện hoài niệm, tiếng Việt, 'House of words'), a.dau (bếp món Việt tình cảm, chuyện tình yêu, câu hỏi gợi cảm xúc), Ba Hoa (fun dining ỒN nhất Sài Gòn, chơi chữ, song ngữ VN→EN). Hồ sơ chi tiết ở trường outlets trong dữ liệu: PHẢI viết đúng voice, signature, visual, hashtag cố định và tránh những điều ở 'avoid' của từng outlet. Không trộn giọng giữa các outlet. Nếu outlet có hồ sơ bàn giao (personality, pronouns, language, toneRules, pillars, captionRules, hashtagRule, channels) thì đó là chuẩn ưu tiên cao nhất: dùng đúng ngôn ngữ chính, cách xưng hô, làm theo từng toneRules (do/dont, bắt chước nhịp của examples nhưng KHÔNG chép lại), chọn ý tưởng theo pillars/angles, tuân thủ captionRules (title chuẩn, CTA, ngày giờ, tag) và kênh phù hợp trong channels.
+- contentIdeas: 8-12 ý tưởng, MỖI OUTLET 2-3 Ý TƯỞNG phù hợp concept & chương trình của outlet (vd Lại La: Ladies Night/Sing Together/DJ; Emme: Memory Archive/COCKTELL; a.dau: set menu cho 2/câu chuyện khách; Ba Hoa: Eat LOUD/tiệc nhóm). Mỗi ý ghi nền tảng, định dạng, hook, captionDraft hoàn chỉnh (kèm khối signature cuối), visual (shot list), đúng 5 hashtag, basedOn (dẫn trend/keyword/video/âm thanh cụ thể).
+- actions: gắn outlet cụ thể khi action dành cho 1 outlet; 'all' khi áp dụng cả group.
 - platformTrends: phân tích riêng từng nền tảng có dữ liệu (TikTok, Facebook, Instagram, Threads, YouTube, Google, báo chí, PasGo, Google Maps, Tripadvisor) theo GÓC NHÌN ĐA NGÀNH dịch vụ: F&B nói chung (nhà hàng, quán ăn, cafe, fine dining), nightlife/bar, du lịch & khách quốc tế, lưu trú/staycation, sự kiện & giải trí, dịch vụ & lifestyle (dựa trên sectorMix và keywords có nhãn ngành). KHÔNG chỉ tập trung nightlife; headline phải phản ánh ngành chiếm tỷ trọng lớn nhất hoặc tăng mạnh nhất trên nền tảng đó, trends nên trải ra ít nhất 2-3 ngành khi có dữ liệu. Với nền tảng đặt bàn/review, tập trung vào loại hình đang được đẩy, dạng ưu đãi và địa điểm đang lên.
 - hashtagStrategy: dựa trên dữ liệu hashtag thực tế; nếu chưa có dữ liệu social thì nói rõ và đề xuất bộ hashtag khởi đầu.
 - actions: việc cụ thể team Marketing nên làm ngay, có ưu tiên, team phụ trách, thời hạn, KPI. Tham khảo ruleActions và upcomingEvents nhưng viết chi tiết, sắc hơn; không lặp y nguyên.
